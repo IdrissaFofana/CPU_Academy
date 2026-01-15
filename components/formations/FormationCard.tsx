@@ -145,15 +145,14 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
         <div className="flex flex-col gap-2">
           <a href={`/inscription?formation=${formation.id}`} className="w-full">
             <Button 
-              className="cursor-pointer w-full bg-gradient-to-r from-cpu-orange to-cpu-orange/90 hover:from-cpu-orange/90 hover:to-cpu-orange text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all duration-200" 
+              className="cursor-pointer w-full bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all duration-200" 
             >
               S'inscrire maintenant
             </Button>
           </a>
           <Button 
-            className="cursor-pointer w-full border-2 border-cpu-orange text-cpu-orange hover:bg-cpu-orange hover:text-white font-semibold rounded-md shadow-sm hover:shadow-lg transition-all duration-200" 
+            className="cursor-pointer w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold rounded-md shadow-sm hover:shadow-lg transition-all duration-200" 
             onClick={() => setIsModalOpen(true)}
-            variant="outline"
           >
             Voir le détail
           </Button>

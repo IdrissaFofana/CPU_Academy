@@ -65,16 +65,16 @@ export function Navbar() {
     <nav className={`bg-white/95 backdrop-blur-md sticky top-0 z-50 transition-all duration-300 animate-slide-down ${
       scrolled ? "shadow-lg border-b border-gray-100" : "shadow-md"
     }`}>
-      <div className="container mx-auto px-8 lg:px-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
+          <div className="flex-shrink-0">
             <Link href="/" className="flex items-center group">
               <div className="relative">
                 <img 
                   src="/images/cpu-logo.png" 
                   alt="CPU-PME.CI" 
-                  className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+                  className="h-11 w-auto transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-cpu-orange/10 to-cpu-green/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl -z-10" />
               </div>
@@ -82,68 +82,70 @@ export function Navbar() {
           </div>
 
           {/* Menu de navigation principal - version desktop */}
-          <div className="hidden lg:flex lg:items-center lg:space-x-1">
-            <NavLink href="/" icon={<Home className="w-4 h-4 mr-1" />}>
-              Accueil
-            </NavLink>
-            
-            <NavLink href="/catalogue" icon={<Book className="w-4 h-4 mr-1" />}>
-              Catalogue
-            </NavLink>
+          <div className="hidden lg:flex lg:items-center lg:justify-center lg:flex-1 lg:px-8">
+            <div className="flex items-center space-x-1">
+              <NavLink href="/" icon={<Home className="w-4 h-4 mr-1" />}>
+                Accueil
+              </NavLink>
+              
+              <NavLink href="/catalogue" icon={<Book className="w-4 h-4 mr-1" />}>
+                Catalogue
+              </NavLink>
 
-            <NavLinkWithDropdown 
-              title="Parcours" 
-              icon={<Rocket className="w-4 h-4 mr-1" />}
-              items={[
-                { label: "Entrepreneur & PME", href: "/parcours/entrepreneur", icon: <Lightbulb className="w-4 h-4" /> },
-                { label: "Entreprise & Corporate", href: "/parcours/corporate", icon: <Building className="w-4 h-4" /> },
-                { label: "Accès Marchés (AO)", href: "/parcours/marches", icon: <ShoppingBag className="w-4 h-4" /> },
-                { label: "Marketplace & Vente", href: "/parcours/marketplace", icon: <Store className="w-4 h-4" /> },
-                { label: "Financement & Bancabilité", href: "/parcours/financement", icon: <Wallet className="w-4 h-4" /> },
-                { label: "Incubateur / Production++", href: "/parcours/incubateur", icon: <Rocket className="w-4 h-4" /> },
-              ]}
-            />
+              <NavLinkWithDropdown 
+                title="Parcours" 
+                icon={<Rocket className="w-4 h-4 mr-1" />}
+                items={[
+                  { label: "Entrepreneur & PME", href: "/parcours/entrepreneur", icon: <Lightbulb className="w-4 h-4" /> },
+                  { label: "Entreprise & Corporate", href: "/parcours/corporate", icon: <Building className="w-4 h-4" /> },
+                  { label: "Accès Marchés (AO)", href: "/parcours/marches", icon: <ShoppingBag className="w-4 h-4" /> },
+                  { label: "Marketplace & Vente", href: "/parcours/marketplace", icon: <Store className="w-4 h-4" /> },
+                  { label: "Financement & Bancabilité", href: "/parcours/financement", icon: <Wallet className="w-4 h-4" /> },
+                  { label: "Incubateur / Production++", href: "/parcours/incubateur", icon: <Rocket className="w-4 h-4" /> },
+                ]}
+              />
 
-            <NavLink href="/certifications" icon={<Award className="w-4 h-4 mr-1" />}>
-              Certifications
-            </NavLink>
+              <NavLink href="/certifications" icon={<Award className="w-4 h-4 mr-1" />}>
+                Certifications
+              </NavLink>
 
-            <NavLinkWithDropdown 
-              title="Experts" 
-              icon={<Users className="w-4 h-4 mr-1" />}
-              items={[
-                { label: "Annuaire des experts", href: "/experts#annuaire-experts", icon: <Users className="w-4 h-4" /> },
-                { label: "Devenir formateur", href: "/experts#devenir-formateur", icon: <GraduationCap className="w-4 h-4" /> },
-              ]}
-            />
+              <NavLinkWithDropdown 
+                title="Experts" 
+                icon={<Users className="w-4 h-4 mr-1" />}
+                items={[
+                  { label: "Annuaire des experts", href: "/experts#annuaire-experts", icon: <Users className="w-4 h-4" /> },
+                  { label: "Devenir formateur", href: "/experts#devenir-formateur", icon: <GraduationCap className="w-4 h-4" /> },
+                ]}
+              />
 
-            <NavLink href="/regions" icon={<Globe className="w-4 h-4 mr-1" />}>
-              Régions
-            </NavLink>
+              <NavLink href="/regions" icon={<Globe className="w-4 h-4 mr-1" />}>
+                Régions
+              </NavLink>
 
-            <NavLinkWithDropdown 
-              title="Entreprises" 
-              icon={<Building className="w-4 h-4 mr-1" />}
-              items={[
-                { label: "Formations intra-entreprise", href: "/entreprises", icon: <Building className="w-4 h-4" /> },
-                { label: "Packs équipes", href: "/entreprises/packs", icon: <Users className="w-4 h-4" /> },
-                { label: "Évaluation des compétences", href: "/entreprises/evaluation", icon: <BadgeCheck className="w-4 h-4" /> },
-              ]}
-            />
+              <NavLinkWithDropdown 
+                title="Entreprises" 
+                icon={<Building className="w-4 h-4 mr-1" />}
+                items={[
+                  { label: "Formations intra-entreprise", href: "/entreprises", icon: <Building className="w-4 h-4" /> },
+                  { label: "Packs équipes", href: "/entreprises/packs", icon: <Users className="w-4 h-4" /> },
+                  { label: "Évaluation des compétences", href: "/entreprises/evaluation", icon: <BadgeCheck className="w-4 h-4" /> },
+                ]}
+              />
 
-            <NavLinkWithDropdown 
-              title="Ressources" 
-              icon={<FileText className="w-4 h-4 mr-1" />}
-              items={[
-                { label: "Guides & modèles", href: "/ressources", icon: <FileText className="w-4 h-4" /> },
-                { label: "Webinaires & replays", href: "/ressources/webinaires", icon: <BookOpen className="w-4 h-4" /> },
-                { label: "FAQ", href: "/faq", icon: <HelpCircle className="w-4 h-4" /> },
-              ]}
-            />
+              <NavLinkWithDropdown 
+                title="Ressources" 
+                icon={<FileText className="w-4 h-4 mr-1" />}
+                items={[
+                  { label: "Guides & modèles", href: "/ressources", icon: <FileText className="w-4 h-4" /> },
+                  { label: "Webinaires & replays", href: "/ressources/webinaires", icon: <BookOpen className="w-4 h-4" /> },
+                  { label: "FAQ", href: "/faq", icon: <HelpCircle className="w-4 h-4" /> },
+                ]}
+              />
+            </div>
           </div>
 
           {/* Boutons d'action */}
-          <div className="hidden lg:flex items-center space-x-2">
+          <div className="hidden lg:flex items-center space-x-3 flex-shrink-0">
             {isLoggedIn ? (
               <UserMenu />
             ) : (
@@ -173,7 +175,7 @@ export function Navbar() {
           {/* Bouton menu mobile */}
           <div className="lg:hidden flex items-center gap-2">
             {!isLoggedIn && (
-              <Button size="sm" asChild className="cursor-pointer bg-cpu-orange hover:bg-cpu-orange/90 text-black hover:text-white">
+              <Button size="sm" asChild className="cursor-pointer bg-cpu-orange hover:bg-cpu-orange/90 text-white">
                 <Link href="/inscription">S&apos;inscrire</Link>
               </Button>
             )}

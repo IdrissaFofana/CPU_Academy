@@ -5,8 +5,8 @@ import { formationsMock } from "@/data/mock";
 import { ArrowRight } from "lucide-react";
 
 export function ParcoursSection() {
-  // Prendre les 4 premières formations
-  const formations = formationsMock.slice(0, 4);
+  // Prendre les 3 premières formations
+  const formations = formationsMock.slice(0, 3);
 
   return (
     <section className="py-12 lg:py-16 bg-gray-50">
@@ -30,7 +30,7 @@ export function ParcoursSection() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {formations.map((formation, index) => (
             <div key={formation.id} className={`animation-delay-${(index + 1) * 100}`}>
               <FormationCard formation={formation} />
