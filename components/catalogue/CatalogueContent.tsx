@@ -401,7 +401,7 @@ export function CatalogueContent() {
                       variant="outline"
                       className="cursor-pointer bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 hover:border-white/50 backdrop-blur-sm transition-all duration-200"
                     >
-                      <a href="/faq#contact-form" className="flex items-center gap-2">
+                      <a href="/ressources/faq#contact-form" className="flex items-center gap-2">
                         <HelpCircle className="w-5 h-5" />
                         Nous contacter
                       </a>

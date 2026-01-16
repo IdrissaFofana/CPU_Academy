@@ -82,7 +82,7 @@ export function Footer() {
             <h3 className="text-cpu-orange font-semibold text-lg mb-4">Support</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/faq" className="text-slate-400 hover:text-cpu-orange transition-colors">
+                <Link href="/ressources/faq" className="text-slate-400 hover:text-cpu-orange transition-colors">
                   FAQ
                 </Link>
               </li>
@@ -102,7 +102,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/faq#contact-form" className="text-slate-400 hover:text-cpu-orange transition-colors">
+                <Link href="/ressources/faq#contact-form" className="text-slate-400 hover:text-cpu-orange transition-colors">
                   Nous contacter
                 </Link>
               </li>

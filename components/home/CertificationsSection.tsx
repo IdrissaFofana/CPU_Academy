@@ -152,7 +152,7 @@ export function CertificationsSection() {
                 className="cursor-pointer bg-white/10 border-white/30 text-white hover:bg-white/20"
                 asChild
               >
-                <Link href="/faq#contact-form">
+                <Link href="/ressources/faq#contact-form">
                   Nous contacter
                 </Link>
               </Button>

@@ -372,17 +372,20 @@ export default function EntreprisesPage() {
           </div>
 
           {/* CTA général */}
-          <div className="text-center mt-12">
+          <div className="text-center mt-12 px-4">
             <p className="text-slate-600 mb-4">Besoin d'un pack personnalisé ?</p>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="cursor-pointer border-2 border-orange-500 text-orange-600 hover:bg-orange-50"
+              className="cursor-pointer border-2 border-orange-500 text-orange-600 hover:bg-orange-50 w-full sm:w-auto"
             >
-              <Link href="#contact">
-                <Mail className="mr-2 h-5 w-5" />
-                Contactez-nous pour un programme sur mesure
+              <Link href="#contact" className="flex items-center justify-center px-3 py-2 sm:px-6">
+                <Mail className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="text-xs sm:text-base leading-tight">
+                  <span className="hidden sm:inline">Contactez-nous pour un programme sur mesure</span>
+                  <span className="sm:hidden">Programme sur mesure</span>
+                </span>
               </Link>
             </Button>
           </div>
@@ -531,7 +534,7 @@ export default function EntreprisesPage() {
                     size="lg"
                     className="w-full cursor-pointer bg-white text-orange-600 hover:bg-orange-50 shadow-lg"
                   >
-                    <Link href="/faq">
+                    <Link href="/ressources/faq">
                       <Mail className="mr-2 h-5 w-5" />
                       Demander un devis
                     </Link>

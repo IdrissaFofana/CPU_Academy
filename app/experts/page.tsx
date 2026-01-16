@@ -265,7 +265,7 @@ export default function ExpertsPage() {
                       asChild
                       className="flex-1 cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white"
                     >
-                      <Link href="/faq">
+                      <Link href="/ressources/faq">
                         <Mail className="mr-2 h-4 w-4" />
                         Contacter
                       </Link>
@@ -348,7 +348,7 @@ export default function ExpertsPage() {
                   variant="outline"
                   className="cursor-pointer border-2 border-white bg-white text-slate-900 hover:bg-slate-100 hover:text-slate-900"
                 >
-                  <Link href="/faq#contact-form">
+                  <Link href="/ressources/faq#contact-form">
                     <Mail className="mr-2 h-5 w-5" />
                     Nous contacter
                   </Link>

@@ -204,7 +204,7 @@ export function ParcoursContent() {
                       variant="outline"
                       className="cursor-pointer border-2"
                     >
-                      <Link href="/faq">
+                      <Link href="/ressources/faq">
                         Être accompagné
                       </Link>
                     </Button>

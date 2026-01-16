@@ -336,7 +336,7 @@ export default function CertificationsPage() {
                     asChild
                     className={`w-full cursor-pointer bg-gradient-to-r ${cert.gradient} hover:opacity-90 text-white shadow-md group-hover:shadow-lg transition-all`}
                   >
-                    <Link href="/faq" className="flex items-center justify-center">
+                    <Link href="/ressources/faq" className="flex items-center justify-center">
                       S'inscrire à la certification
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
@@ -622,7 +622,7 @@ export default function CertificationsPage() {
                   variant="outline"
                   className="cursor-pointer border-2"
                 >
-                  <Link href="/faq">
+                  <Link href="/ressources/faq">
                     <Download className="mr-2 h-5 w-5" />
                     Télécharger la brochure
                   </Link>

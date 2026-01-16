@@ -126,9 +126,9 @@ export function Navbar() {
                 title="Entreprises" 
                 icon={<Building className="w-4 h-4 mr-1" />}
                 items={[
-                  { label: "Formations intra-entreprise", href: "/entreprises", icon: <Building className="w-4 h-4" /> },
-                  { label: "Packs équipes", href: "/entreprises/packs", icon: <Users className="w-4 h-4" /> },
-                  { label: "Évaluation des compétences", href: "/entreprises/evaluation", icon: <BadgeCheck className="w-4 h-4" /> },
+                  { label: "Formations intra-entreprise", href: "/entreprises#services-entreprises", icon: <Building className="w-4 h-4" /> },
+                  { label: "Packs équipes", href: "/entreprises#former-vos-equipes", icon: <Users className="w-4 h-4" /> },
+                  { label: "Évaluation des compétences", href: "/entreprises#solutions-sur-mesure", icon: <BadgeCheck className="w-4 h-4" /> },
                 ]}
               />
 
@@ -136,9 +136,9 @@ export function Navbar() {
                 title="Ressources" 
                 icon={<FileText className="w-4 h-4 mr-1" />}
                 items={[
-                  { label: "Guides & modèles", href: "/ressources", icon: <FileText className="w-4 h-4" /> },
+                  { label: "Guides & modèles", href: "/ressources/guides", icon: <FileText className="w-4 h-4" /> },
                   { label: "Webinaires & replays", href: "/ressources/webinaires", icon: <BookOpen className="w-4 h-4" /> },
-                  { label: "FAQ", href: "/faq", icon: <HelpCircle className="w-4 h-4" /> },
+                  { label: "FAQ", href: "/ressources/faq", icon: <HelpCircle className="w-4 h-4" /> },
                 ]}
               />
             </div>
@@ -240,10 +240,13 @@ export function Navbar() {
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Support</span>
               </div>
             </div>
-            <MobileNavLink href="/ressources" icon={<FileText className="w-5 h-5" />}>
-              Ressources
+            <MobileNavLink href="/ressources/guides" icon={<FileText className="w-5 h-5" />}>
+              Guides & Modèles
             </MobileNavLink>
-            <MobileNavLink href="/support" icon={<HelpCircle className="w-5 h-5" />}>
+            <MobileNavLink href="/ressources/webinaires" icon={<BookOpen className="w-5 h-5" />}>
+              Webinaires
+            </MobileNavLink>
+            <MobileNavLink href="/ressources/faq" icon={<HelpCircle className="w-5 h-5" />}>
               Aide & FAQ
             </MobileNavLink>
           </div>

@@ -123,7 +123,7 @@ export function ParcoursDetailPage({
                 variant="outline"
                 className="cursor-pointer border-2"
               >
-                <Link href="/faq">
+                <Link href="/ressources/faq">
                   <UserPlus className="mr-2 h-5 w-5" />
                   S'inscrire à ce parcours
                 </Link>
@@ -212,22 +212,25 @@ export function ParcoursDetailPage({
         </div>
 
         {/* Étapes du parcours */}
-        <div className="mt-12 bg-white rounded-2xl p-8 border-2 border-slate-100 shadow-lg max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-2">
-            <Target className={`w-7 h-7 ${textColor}`} />
+        <div className="mt-12 bg-white rounded-2xl p-4 sm:p-8 border-2 border-slate-100 shadow-lg max-w-6xl mx-auto">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 sm:mb-8 flex items-center gap-2">
+            <Target className={`w-6 h-6 sm:w-7 sm:h-7 ${textColor}`} />
             Étapes du parcours
           </h2>
           <div className="space-y-4">
             {etapes.map((etape, idx) => (
-              <div key={idx} className="bg-white rounded-xl p-6 border-2 border-slate-100 hover:shadow-md transition-shadow">
-                <div className="flex items-start gap-4">
-                  <div className={`flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br ${gradient} text-white flex items-center justify-center text-xl font-bold shadow-md`}>
+              <div key={idx} className="bg-white rounded-xl p-4 sm:p-6 border-2 border-slate-100 hover:shadow-md transition-shadow">
+                <div className="flex flex-col sm:flex-row items-start gap-4">
+                  <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${gradient} text-white flex items-center justify-center text-lg sm:text-xl font-bold shadow-md`}>
                     {etape.numero}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-lg font-bold text-slate-900">{etape.titre}</h3>
-                      <span className="text-sm text-slate-500">{etape.semaines} semaine{etape.semaines > 1 ? 's' : ''}</span>
+                  <div className="flex-1 min-w-0 w-full">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900">{etape.titre}</h3>
+                      <Badge variant="secondary" className="text-xs w-fit">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {etape.semaines} semaine{etape.semaines > 1 ? 's' : ''}
+                      </Badge>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {etape.formations.map((formation, formIdx) => (
@@ -278,7 +281,7 @@ export function ParcoursDetailPage({
           <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">
             Découvrez nos autres parcours
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {otherParcours.map((parcours) => {
               const ParcoursIcon = parcours.icon;
               return (

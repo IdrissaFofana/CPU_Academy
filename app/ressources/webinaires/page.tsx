@@ -390,7 +390,7 @@ export default function WebinairesPage() {
               size="lg"
               className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white shadow-lg"
             >
-              <Link href="/faq">
+              <Link href="/ressources/faq">
                 <Bell className="mr-2 h-5 w-5" />
                 M'abonner aux notifications
               </Link>

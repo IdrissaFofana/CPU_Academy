@@ -19,12 +19,48 @@ import {
 } from "lucide-react";
 
 const categories = [
-  { id: "all", label: "Toutes", icon: HelpCircle, color: "orange" },
-  { id: "formations", label: "Formations", icon: GraduationCap, color: "blue" },
-  { id: "inscriptions", label: "Inscriptions", icon: FileText, color: "green" },
-  { id: "paiements", label: "Paiements", icon: CreditCard, color: "purple" },
-  { id: "certifications", label: "Certifications", icon: BookOpen, color: "indigo" },
-  { id: "entreprises", label: "Entreprises", icon: Users, color: "cyan" }
+  { 
+    id: "all", 
+    label: "Toutes", 
+    icon: HelpCircle, 
+    activeClass: "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg",
+    iconColor: "text-orange-600"
+  },
+  { 
+    id: "formations", 
+    label: "Formations", 
+    icon: GraduationCap, 
+    activeClass: "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg",
+    iconColor: "text-blue-600"
+  },
+  { 
+    id: "inscriptions", 
+    label: "Inscriptions", 
+    icon: FileText, 
+    activeClass: "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg",
+    iconColor: "text-green-600"
+  },
+  { 
+    id: "paiements", 
+    label: "Paiements", 
+    icon: CreditCard, 
+    activeClass: "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg",
+    iconColor: "text-purple-600"
+  },
+  { 
+    id: "certifications", 
+    label: "Certifications", 
+    icon: BookOpen, 
+    activeClass: "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg",
+    iconColor: "text-indigo-600"
+  },
+  { 
+    id: "entreprises", 
+    label: "Entreprises", 
+    icon: Users, 
+    activeClass: "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg",
+    iconColor: "text-cyan-600"
+  }
 ];
 
 const faqs = [
@@ -145,6 +181,7 @@ export default function FAQPage() {
         subtitle="Trouvez rapidement les réponses à vos questions"
         breadcrumb={[
           { label: "Accueil", href: "/" },
+          { label: "Ressources", href: "/ressources/guides" },
           { label: "FAQ" }
         ]}
       />
@@ -152,28 +189,38 @@ export default function FAQPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/10">
         <section className="container mx-auto px-8 lg:px-16 py-12">
           {/* Stats rapides */}
-          <div className="grid md:grid-cols-4 gap-6 mb-12">
-            {[
-              { icon: HelpCircle, value: "15+", label: "Questions fréquentes", color: "orange" },
-              { icon: MessageCircle, value: "24/7", label: "Support disponible", color: "blue" },
-              { icon: Phone, value: "< 2h", label: "Temps de réponse", color: "green" },
-              { icon: Users, value: "1000+", label: "Questions résolues", color: "purple" }
-            ].map((stat, idx) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={idx}
-                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group"
-                  style={{ animationDelay: `${idx * 100}ms` }}
-                >
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
-                    <Icon className={`w-8 h-8 text-${stat.color}-600`} />
-                  </div>
-                  <div className={`text-3xl font-bold mb-1 text-slate-900 group-hover:text-${stat.color}-600 transition-colors`}>{stat.value}</div>
-                  <div className="text-sm text-slate-600">{stat.label}</div>
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group">
+              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <HelpCircle className="w-6 h-6 md:w-8 md:h-8 text-orange-600" />
+              </div>
+              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900 group-hover:text-orange-600 transition-colors">15+</div>
+              <div className="text-xs md:text-sm text-slate-600">Questions fréquentes</div>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group" style={{ animationDelay: "100ms" }}>
+              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <MessageCircle className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
+              </div>
+              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900 group-hover:text-blue-600 transition-colors">24/7</div>
+              <div className="text-xs md:text-sm text-slate-600">Support disponible</div>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group" style={{ animationDelay: "200ms" }}>
+              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-2xl bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <Phone className="w-6 h-6 md:w-8 md:h-8 text-green-600" />
+              </div>
+              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900 group-hover:text-green-600 transition-colors">&lt; 2h</div>
+              <div className="text-xs md:text-sm text-slate-600">Temps de réponse</div>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group" style={{ animationDelay: "300ms" }}>
+              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <Users className="w-6 h-6 md:w-8 md:h-8 text-purple-600" />
+              </div>
+              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900 group-hover:text-purple-600 transition-colors">1000+</div>
+              <div className="text-xs md:text-sm text-slate-600">Questions résolues</div>
+            </div>
           </div>
 
           {/* Barre de recherche */}
@@ -201,25 +248,47 @@ export default function FAQPage() {
             </p>
           </div>
 
-          {/* Catégories */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12 animate-fade-in">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                    selectedCategory === cat.id
-                      ? `bg-gradient-to-r from-${cat.color}-500 to-${cat.color}-600 text-white shadow-lg scale-105`
-                      : "bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200 hover:border-slate-300 shadow-md"
-                  }`}
+          {/* Catégories - Design mobile-first avec Select sur mobile et boutons sur desktop */}
+          <div className="mb-12 animate-fade-in">
+            {/* Version mobile - Select dropdown */}
+            <div className="block lg:hidden">
+              <div className="relative">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.id)}
+                  className="w-full px-4 py-3 pr-10 text-base font-semibold bg-white border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all shadow-md appearance-none cursor-pointer"
                 >
-                  <Icon className="w-4 h-4" />
-                  {cat.label}
-                </button>
-              );
-            })}
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Version desktop - Boutons horizontaux */}
+            <div className="hidden lg:flex flex-wrap justify-center gap-3">
+              {categories.map((cat) => {
+                const Icon = cat.icon;
+                const isActive = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                      isActive
+                        ? `${cat.activeClass} scale-105`
+                        : "bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200 hover:border-slate-300 shadow-md hover:scale-105"
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : cat.iconColor}`} />
+                    {cat.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Liste des FAQs */}
