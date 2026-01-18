@@ -151,38 +151,39 @@ export function CatalogueContent() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
         <div className="container mx-auto px-8 lg:px-16 py-12">
           {/* Search Bar and Stats */}
-          <div className="mb-8">
+          <div className="mb-8 animate-fade-in-up">
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto mb-6">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <div className="relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 transition-colors group-focus-within:text-cpu-orange" />
                 <Input
                   type="text"
                   placeholder="Rechercher une formation, un domaine, une compétence..."
                   value={motCle}
                   onChange={(e) => setMotCle(e.target.value)}
-                  className="h-14 pl-12 pr-4 text-lg text-slate-900 placeholder:text-slate-400 bg-white border-slate-200 shadow-lg focus:shadow-xl transition-shadow"
+                  className="h-14 pl-12 pr-4 text-lg text-slate-900 placeholder:text-slate-400 bg-white border-2 border-slate-200 shadow-lg focus:shadow-2xl focus:border-cpu-orange transition-all duration-300 rounded-xl"
                 />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cpu-orange/5 to-cpu-green/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
             </div>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-3xl font-bold text-cpu-orange mb-1">{stats.total}</div>
-                <div className="text-sm text-slate-600">Formations</div>
+              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-2xl hover:border-cpu-orange transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-100">
+                <div className="text-3xl font-bold text-cpu-orange mb-1 group-hover:scale-110 transition-transform duration-300">{stats.total}</div>
+                <div className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Formations</div>
               </div>
-              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-3xl font-bold text-green-500 mb-1">{stats.gratuit}</div>
-                <div className="text-sm text-slate-600">Gratuites</div>
+              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-2xl hover:border-green-500 transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-200">
+                <div className="text-3xl font-bold text-green-500 mb-1 group-hover:scale-110 transition-transform duration-300">{stats.gratuit}</div>
+                <div className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Gratuites</div>
               </div>
-              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-3xl font-bold text-blue-500 mb-1">{stats.certifiant}</div>
-                <div className="text-sm text-slate-600">Certifiantes</div>
+              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-2xl hover:border-blue-500 transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-300">
+                <div className="text-3xl font-bold text-blue-500 mb-1 group-hover:scale-110 transition-transform duration-300">{stats.certifiant}</div>
+                <div className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Certifiantes</div>
               </div>
-              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-3xl font-bold text-purple-500 mb-1">{stats.regions}</div>
-                <div className="text-sm text-slate-600">Régions</div>
+              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-2xl hover:border-purple-500 transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-400">
+                <div className="text-3xl font-bold text-purple-500 mb-1 group-hover:scale-110 transition-transform duration-300">{stats.regions}</div>
+                <div className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Régions</div>
               </div>
             </div>
           </div>
@@ -205,7 +206,7 @@ export function CatalogueContent() {
 
           <div className="flex flex-col md:flex-row gap-8">
             {/* Desktop Sidebar Filters */}
-            <aside className="hidden md:block md:w-80 flex-shrink-0">
+            <aside className="hidden md:block md:w-80 flex-shrink-0 animate-slide-right">
               <div className="sticky top-24">
                 <CatalogueFilters
                   objectif={objectif}
@@ -231,7 +232,7 @@ export function CatalogueContent() {
             {/* Main Content */}
             <main className="flex-1 min-w-0">
               {/* Toolbar */}
-              <div className="bg-white rounded-2xl p-4 mb-6 border-2 border-slate-100 shadow-lg">
+              <div className="bg-white rounded-2xl p-4 mb-6 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                   <p className="text-slate-600 font-medium">
                     <span className="text-cpu-orange font-bold text-lg">{formationsFiltrees.length}</span> formation{formationsFiltrees.length > 1 ? "s" : ""} trouvée{formationsFiltrees.length > 1 ? "s" : ""}
@@ -342,22 +343,25 @@ export function CatalogueContent() {
                   {formationsFiltrees.map((formation, index) => (
                     <div
                       key={formation.id}
-                      className={`animate-slide-up animation-delay-${Math.min(index * 100, 800)}`}
+                      className="animate-fade-in-up"
+                      style={{ animationDelay: `${Math.min(index * 0.1, 0.8)}s` }}
                     >
-                      <FormationCard formation={formation} />
+                      <div className="h-full card-hover-effect">
+                        <FormationCard formation={formation} />
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-12 text-center border-2 border-slate-100">
-                  <div className="mb-6">
+                <div className="bg-white rounded-2xl p-12 text-center border-2 border-slate-100 animate-scale-in">
+                  <div className="mb-6 animate-float">
                     <Search className="h-20 w-20 text-slate-300 mx-auto" />
                   </div>
                   <h3 className="text-2xl font-bold mb-3 text-slate-900">Aucune formation trouvée</h3>
                   <p className="text-slate-600 mb-8 max-w-md mx-auto">
                     Nous n'avons pas trouvé de formation correspondant à vos critères. Essayez de modifier vos filtres.
                   </p>
-                  <Button onClick={reinitialiserFiltres} className="bg-cpu-orange hover:bg-cpu-orange/90">
+                  <Button onClick={reinitialiserFiltres} className="bg-cpu-orange hover:bg-cpu-orange/90 hover:scale-105 transition-transform duration-200 shine-effect">
                     <X className="mr-2 h-4 w-4" />
                     Réinitialiser les filtres
                   </Button>
@@ -365,13 +369,13 @@ export function CatalogueContent() {
               )}
 
               {/* CTA Formation sur mesure */}
-              <div className="mt-12 relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl">
+              <div className="mt-12 relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl animate-fade-in-up animation-delay-400 hover:shadow-3xl transition-all duration-500">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:40px_40px]" />
                 <div className="absolute top-0 right-0 w-72 h-72 bg-cpu-orange/20 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-72 h-72 bg-cpu-green/20 rounded-full blur-3xl" />
                 
                 <div className="relative text-center px-8 py-12 md:py-16 max-w-4xl mx-auto">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cpu-orange to-orange-600 rounded-2xl mb-6 shadow-lg shadow-orange-500/20 animate-pulse">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cpu-orange to-orange-600 rounded-2xl mb-6 shadow-lg shadow-orange-500/20 animate-float">
                     <Award className="w-10 h-10 text-white" />
                   </div>
                   
@@ -387,7 +391,7 @@ export function CatalogueContent() {
                     <Button 
                       asChild
                       size="lg"
-                      className="cursor-pointer bg-cpu-orange hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all duration-200 border-0"
+                      className="cursor-pointer bg-cpu-orange hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all duration-200 border-0 hover:scale-105 shine-effect"
                     >
                       <a href="/entreprises" className="flex items-center gap-2">
                         <Building className="w-5 h-5" />
@@ -399,7 +403,7 @@ export function CatalogueContent() {
                       asChild
                       size="lg"
                       variant="outline"
-                      className="cursor-pointer bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 hover:border-white/50 backdrop-blur-sm transition-all duration-200"
+                      className="cursor-pointer bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 hover:border-white/50 backdrop-blur-sm transition-all duration-200 hover:scale-105"
                     >
                       <a href="/ressources/faq#contact-form" className="flex items-center gap-2">
                         <HelpCircle className="w-5 h-5" />

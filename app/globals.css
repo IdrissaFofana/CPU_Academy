@@ -44,6 +44,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
+  --font-heading: var(--font-montserrat);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -58,42 +59,275 @@ body {
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
   font-feature-settings: "rlig" 1, "calt" 1;
+  font-size: 16px; /* Texte courant : 16px Inter Regular */
+  line-height: 1.6;
 }
 
+/* Typographie CPU-PME - Site Web */
 h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-montserrat), sans-serif;
   font-weight: 600;
   letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
 h1 {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+  font-size: 2rem; /* 32px mobile */
+  font-weight: 600; /* Montserrat SemiBold */
 }
 
 h2 {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
+  font-size: 1.625rem; /* 26px mobile */
+  font-weight: 600; /* Montserrat SemiBold */
 }
 
 h3 {
-  font-size: 1.5rem;
-  line-height: 2rem;
+  font-size: 1.25rem; /* 20px */
+  font-weight: 500; /* Montserrat Medium */
+}
+
+h4 {
+  font-size: 1.125rem; /* 18px - pour titres sections/cartes dashboard */
+  font-weight: 500;
+}
+
+h5 {
+  font-size: 1rem; /* 16px */
+  font-weight: 500;
+}
+
+h6 {
+  font-size: 0.875rem; /* 14px */
+}
+
+/* ============================================ */
+/* Animations personnalisées pour le catalogue */
+/* ============================================ */
+
+/* Animation de fade-in avec translation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(241, 116, 37, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(241, 116, 37, 0.6);
+  }
+}
+
+/* Classes d'animation */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Délais d'animation pour effet de cascade */
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-500 { animation-delay: 0.5s; }
+.animation-delay-600 { animation-delay: 0.6s; }
+.animation-delay-700 { animation-delay: 0.7s; }
+.animation-delay-800 { animation-delay: 0.8s; }
+
+/* Effet de carte avec hover avancé */
+.card-hover-effect {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.card-hover-effect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(241, 116, 37, 0.1), rgba(38, 166, 91, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.card-hover-effect:hover::before {
+  opacity: 1;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Effet de brillance au survol */
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 20%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  transform: rotate(30deg);
+  transition: left 0.7s ease;
+}
+
+.shine-effect:hover::after {
+  left: 140%;
+}
+
+/* Texte secondaire / légendes : 14px Inter Regular */
+.text-secondary {
+  font-size: 0.875rem; /* 14px */
+  color: var(--muted-foreground);
+}
+
+/* Texte infos secondaires dashboard : 12px */
+.text-caption {
+  font-size: 0.75rem; /* 12px */
+  color: var(--muted-foreground);
+}
+
+/* Boutons / labels : 14-16px Inter Medium/SemiBold */
+button, .btn {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
 }
 
 @media (min-width: 1024px) {
+  /* Desktop - tailles augmentées */
   h1 {
-    font-size: 3rem;
-    line-height: 1;
+    font-size: 2.5rem; /* 40px desktop */
   }
   
   h2 {
-    font-size: 2.25rem;
-    line-height: 2.5rem;
+    font-size: 1.875rem; /* 30px desktop */
   }
   
   h3 {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
+    font-size: 1.375rem; /* 22px desktop */
+  }
+
+  button, .btn {
+    font-size: 1rem; /* 16px sur desktop */
+  }
+}
+
+/* Classes utilitaires pour dashboard */
+.dashboard-title {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 600;
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-title {
+    font-size: 1.75rem; /* 28px desktop */
   }
 }
 
@@ -126,6 +360,22 @@ h3 {
 
 .animate-fade-up {
   animation: fade-up 0.5s ease-out forwards;
+}
+
+/* Animation scale-in personnalisée */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.6s ease-out forwards;
 }
 
 /* Classes utilitaires CPU */

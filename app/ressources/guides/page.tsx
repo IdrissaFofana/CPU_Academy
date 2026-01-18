@@ -121,10 +121,13 @@ export default function GuidesPage() {
   const [selectedCategory, setSelectedCategory] = useState("Tous");
 
   const filteredRessources = ressources.filter((ressource) => {
-    const matchSearch = searchQuery === "" || 
+    // Filtre de recherche
+    const matchSearch = !searchQuery || 
       ressource.titre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ressource.description.toLowerCase().includes(searchQuery.toLowerCase());
+      ressource.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ressource.categorie.toLowerCase().includes(searchQuery.toLowerCase());
     
+    // Filtre de catégorie
     const matchCategory = selectedCategory === "Tous" || ressource.categorie === selectedCategory;
     
     return matchSearch && matchCategory;
@@ -145,28 +148,28 @@ export default function GuidesPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/10">
         <section className="container mx-auto px-8 lg:px-16 py-12">
           {/* Recherche */}
-          <div className="mb-8">
+          <div className="mb-8 relative z-10">
             <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none z-10" />
               <input
                 type="text"
                 placeholder="Rechercher un guide ou un modèle..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 h-14 text-lg border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none shadow-md transition-all"
+                className="w-full pl-12 pr-4 h-14 text-lg border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none shadow-md transition-all relative z-10 bg-white"
               />
             </div>
           </div>
 
           {/* Filtres par catégorie - Design mobile-first */}
-          <div className="mb-8">
+          <div className="mb-8 relative z-10">
             {/* Version mobile - Select dropdown */}
             <div className="block lg:hidden">
               <div className="relative max-w-md mx-auto">
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-3 pr-10 text-base font-semibold bg-white border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all shadow-md appearance-none cursor-pointer"
+                  className="w-full px-4 py-3 pr-10 text-base font-semibold bg-white border-2 border-slate-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all shadow-md appearance-none cursor-pointer relative z-10"
                 >
                   {categories.map((cat, idx) => (
                     <option key={idx} value={cat}>
@@ -179,12 +182,13 @@ export default function GuidesPage() {
             </div>
 
             {/* Version desktop - Boutons horizontaux */}
-            <div className="hidden lg:flex flex-wrap gap-2 justify-center">
+            <div className="hidden lg:flex flex-wrap gap-2 justify-center relative z-10">
               {categories.map((cat, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-5 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  type="button"
+                  className={`px-5 py-3 rounded-xl font-semibold transition-all duration-300 cursor-pointer relative z-10 ${
                     selectedCategory === cat
                       ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-105" 
                       : "bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-md hover:scale-105"

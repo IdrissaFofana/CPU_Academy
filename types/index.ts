@@ -31,6 +31,70 @@ export type ParcoursType =
   | "Pilotage & Data"
   | "Leadership & RH";
 
+// Parcours complet avec formations
+export interface Parcours {
+  id: string;
+  titre: string;
+  slug: string;
+  sousTitre: string;
+  description: string;
+  image?: string;
+  icon?: string;
+  color: string;
+  gradient: string;
+  
+  // Objectifs et public
+  objectifs: string[];
+  publicCible: string;
+  competences: string[];
+  
+  // Durée et format
+  dureeTotal: number; // en heures
+  format: Format;
+  niveau: Niveau;
+  
+  // Formations incluses
+  formationsIds: string[];
+  formations?: Formation[];
+  
+  // Certification
+  certifiant: boolean;
+  certificat?: {
+    nom: string;
+    badge: string;
+    criteres: string[];
+  };
+  
+  // Prix
+  gratuit: boolean;
+  prixPublic?: number;
+  prixMembre?: number;
+  
+  // Stats
+  nbInscrits?: number;
+  notesMoyenne?: number;
+  tauxCompletion?: number;
+  
+  // Métadonnées
+  statut: Statut;
+  dateCreation: string;
+  datePublication?: string;
+  
+  // Structure du parcours
+  modules?: ModuleParcours[];
+}
+
+// Module d'un parcours
+export interface ModuleParcours {
+  id: string;
+  titre: string;
+  description: string;
+  ordre: number;
+  duree: number; // en heures
+  formationsIds: string[];
+  obligatoire: boolean;
+}
+
 // Compétences
 export interface Competence {
   id: string;

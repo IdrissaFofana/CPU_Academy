@@ -18,6 +18,7 @@ import {
   BookOpen,
   Briefcase,
   Building,
+  CheckCircle,
   ChevronDown,
   FileText,
   Globe,
@@ -65,7 +66,7 @@ export function Navbar() {
     <nav className={`bg-white/95 backdrop-blur-md sticky top-0 z-50 transition-all duration-300 animate-slide-down ${
       scrolled ? "shadow-lg border-b border-gray-100" : "shadow-md"
     }`}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-16">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -92,21 +93,16 @@ export function Navbar() {
                 Catalogue
               </NavLink>
 
-              <NavLinkWithDropdown 
-                title="Parcours" 
-                icon={<Rocket className="w-4 h-4 mr-1" />}
-                items={[
-                  { label: "Entrepreneur & PME", href: "/parcours/entrepreneur", icon: <Lightbulb className="w-4 h-4" /> },
-                  { label: "Entreprise & Corporate", href: "/parcours/corporate", icon: <Building className="w-4 h-4" /> },
-                  { label: "Accès Marchés (AO)", href: "/parcours/marches", icon: <ShoppingBag className="w-4 h-4" /> },
-                  { label: "Marketplace & Vente", href: "/parcours/marketplace", icon: <Store className="w-4 h-4" /> },
-                  { label: "Financement & Bancabilité", href: "/parcours/financement", icon: <Wallet className="w-4 h-4" /> },
-                  { label: "Incubateur / Production++", href: "/parcours/incubateur", icon: <Rocket className="w-4 h-4" /> },
-                ]}
-              />
+              <NavLink href="/parcours" icon={<Rocket className="w-4 h-4 mr-1" />}>
+                Parcours
+              </NavLink>
 
               <NavLink href="/certifications" icon={<Award className="w-4 h-4 mr-1" />}>
                 Certifications
+              </NavLink>
+
+              <NavLink href="/rac" icon={<CheckCircle className="w-4 h-4 mr-1" />}>
+                RAC
               </NavLink>
 
               <NavLinkWithDropdown 
@@ -149,36 +145,21 @@ export function Navbar() {
             {isLoggedIn ? (
               <UserMenu />
             ) : (
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="cursor-pointer border-2 hover:border-cpu-orange hover:text-cpu-orange transition-all duration-200"
-                  asChild
-                >
-                  <Link href="/connexion">
-                    <LogIn className="w-4 h-4 mr-2" />
-                    Connexion
-                  </Link>
-                </Button>
-                <Button 
-                  size="sm" 
-                  className="cursor-pointer bg-cpu-orange hover:bg-cpu-orange/90 text-white shadow-md shadow-orange-200 hover:shadow-lg hover:shadow-orange-300 transition-all duration-200"
-                  asChild
-                >
-                  <Link href="/inscription">S&apos;inscrire</Link>
-                </Button>
-              </>
+              <Button 
+                size="sm" 
+                className="cursor-pointer bg-cpu-orange hover:bg-cpu-orange/90 text-white shadow-md shadow-orange-200 hover:shadow-lg hover:shadow-orange-300 transition-all duration-200"
+                asChild
+              >
+                <Link href="/connexion">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Connexion
+                </Link>
+              </Button>
             )}
           </div>
 
           {/* Bouton menu mobile */}
           <div className="lg:hidden flex items-center gap-2">
-            {!isLoggedIn && (
-              <Button size="sm" asChild className="cursor-pointer bg-cpu-orange hover:bg-cpu-orange/90 text-white">
-                <Link href="/inscription">S&apos;inscrire</Link>
-              </Button>
-            )}
             <button
               className="cursor-pointer text-gray-700 hover:text-cpu-orange focus:outline-none focus:ring-2 focus:ring-cpu-orange p-2 rounded-md transition-all duration-200 hover:bg-gray-100"
               onClick={toggleMenu}
@@ -210,14 +191,14 @@ export function Navbar() {
             <MobileNavLink href="/catalogue" icon={<Book className="w-5 h-5" />}>
               Catalogue des formations
             </MobileNavLink>
-            <MobileNavLink href="/parcours/entrepreneur" icon={<Lightbulb className="w-5 h-5" />}>
-              Parcours Entrepreneur
-            </MobileNavLink>
-            <MobileNavLink href="/parcours/corporate" icon={<Building className="w-5 h-5" />}>
-              Parcours Corporate
+            <MobileNavLink href="/parcours" icon={<Rocket className="w-5 h-5" />}>
+              Parcours
             </MobileNavLink>
             <MobileNavLink href="/certifications" icon={<Award className="w-5 h-5" />}>
               Certifications & Badges
+            </MobileNavLink>
+            <MobileNavLink href="/rac" icon={<CheckCircle className="w-5 h-5" />}>
+              RAC
             </MobileNavLink>
             
             <div className="py-2 mt-2">
