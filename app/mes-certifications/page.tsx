@@ -114,7 +114,7 @@ export default function MesCertificationsPage() {
             <div>
               <h1 className="text-5xl font-bold mb-2">Mes Certifications</h1>
               <p className="text-slate-300 text-lg">
-                Vos réussites et certifications officielles CPU Academy
+                Vos réussites et certifications officielles CPU Formation
               </p>
             </div>
           </div>

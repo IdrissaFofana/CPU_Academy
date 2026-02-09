@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  title: "Régions - CPU Academy",
+  title: "Régions - CPU Formation",
   description: "Trouvez des formations près de chez vous en Côte d'Ivoire",
 };
 

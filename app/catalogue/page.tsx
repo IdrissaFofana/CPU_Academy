@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { CatalogueContent } from "@/components/catalogue/CatalogueContent";
 
 export const metadata: Metadata = {
-  title: "Catalogue des formations - CPU Academy",
+  title: "Catalogue des formations - CPU Formation",
   description: "Explorez notre catalogue complet de formations pour développer vos compétences",
 };
 

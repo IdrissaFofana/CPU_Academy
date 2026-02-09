@@ -52,7 +52,7 @@ export function TestimonialsSection() {
       initials: "YK",
       role: "Manager Commercial",
       company: "Distribution Plus",
-      message: "Formation en Leadership très enrichissante. J'ai appris à mieux gérer mon équipe et les résultats sont visibles : motivation en hausse, turnover en baisse. Merci CPU-Académie!",
+      message: "Formation en Leadership très enrichissante. J'ai appris à mieux gérer mon équipe et les résultats sont visibles : motivation en hausse, turnover en baisse. Merci CPU Formation!",
       formation: "Leadership & RH"
     },
     {

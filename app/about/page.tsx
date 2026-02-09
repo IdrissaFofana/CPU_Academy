@@ -20,8 +20,8 @@ import {
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "À propos - CPU Academy",
-  description: "Découvrez la mission, la vision et l'équipe derrière CPU Academy",
+  title: "À propos - CPU Formation",
+  description: "Découvrez la mission, la vision et l'équipe derrière CPU Formation",
 };
 
 export default function AboutPage() {
@@ -100,7 +100,7 @@ export default function AboutPage() {
   ];
 
   const milestones = [
-    { year: "2020", event: "Création de CPU Academy" },
+    { year: "2020", event: "Création de CPU Formation" },
     { year: "2021", event: "1,000 premiers apprenants formés" },
     { year: "2022", event: "Lancement des parcours certifiants" },
     { year: "2023", event: "Expansion dans 5 régions" },
@@ -123,7 +123,7 @@ export default function AboutPage() {
               Former les leaders de demain
             </h1>
             <p className="text-xl text-slate-300 leading-relaxed animate-fade-in animation-delay-200">
-              CPU Academy est la plateforme de référence pour le développement des compétences professionnelles
+              CPU Formation est la plateforme de référence pour le développement des compétences professionnelles
               en Côte d'Ivoire. Nous accompagnons les individus et les entreprises dans leur montée en compétences.
             </p>
           </div>
@@ -226,7 +226,7 @@ export default function AboutPage() {
             <Badge className="bg-cpu-orange text-white border-0 mb-4 px-4 py-2">
               Notre parcours
             </Badge>
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">L'histoire de CPU Academy</h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">L'histoire de CPU Formation</h2>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -321,7 +321,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-8 lg:px-16 text-center">
           <h2 className="text-4xl font-bold mb-6">Prêt à commencer votre parcours ?</h2>
           <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
-            Rejoignez des milliers de professionnels qui développent leurs compétences avec CPU Academy
+            Rejoignez des milliers de professionnels qui développent leurs compétences avec CPU Formation
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="bg-cpu-orange hover:bg-orange-600 text-white px-8 py-6 text-lg" asChild>

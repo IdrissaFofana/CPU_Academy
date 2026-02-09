@@ -55,7 +55,7 @@ const faqs = [
   {
     id: 5,
     question: "Puis-je financer ma formation avec mon CPF ?",
-    reponse: "Les formations CPU Academy sont éligibles au financement par différents dispositifs selon votre situation : Plan de développement des compétences pour les salariés, Fonds d'Assurance Formation (FAF) pour les indépendants, et financement personnel avec possibilité d'échelonnement.",
+    reponse: "Les formations CPU Formation sont éligibles au financement par différents dispositifs selon votre situation : Plan de développement des compétences pour les salariés, Fonds d'Assurance Formation (FAF) pour les indépendants, et financement personnel avec possibilité d'échelonnement.",
     categorie: "paiements"
   },
   {
@@ -301,14 +301,14 @@ export default function FAQPage() {
 
               <div className="grid md:grid-cols-3 gap-6 mb-12">
                 <a
-                  href="mailto:contact@cpuacademy.ci"
+                  href="mailto:contact@cpuformation.ci"
                   className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                 >
                   <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mb-3 group-hover:bg-orange-500 transition-colors">
                     <Mail className="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
                   </div>
                   <h3 className="font-bold text-slate-900 mb-1">Email</h3>
-                  <p className="text-sm text-slate-600 text-center">contact@cpuacademy.ci</p>
+                  <p className="text-sm text-slate-600 text-center">contact@cpuformation.ci</p>
                 </a>
 
                 <a

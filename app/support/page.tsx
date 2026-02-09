@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageBanner } from "@/components/layout/PageBanner";
 
 export const metadata: Metadata = {
-  title: "Support - CPU Academy",
+  title: "Support - CPU Formation",
   description: "Contactez-nous pour toute question ou assistance",
 };
 

@@ -881,7 +881,7 @@ export const parcoursMock: Parcours[] = [
     formationsIds: ["formation-3", "formation-1", "formation-2"],
     certifiant: true,
     certificat: {
-      nom: "Entrepreneur Certifié CPU Academy",
+      nom: "Entrepreneur Certifié CPU Formation",
       badge: "/badges/entrepreneur-certifie.svg",
       criteres: [
         "Compléter toutes les formations du parcours",
@@ -1352,7 +1352,7 @@ export const parcoursMock: Parcours[] = [
 export const centresFormationMock: CentreFormation[] = [
   {
     id: "centre-1",
-    nom: "CPU Academy - Plateau",
+    nom: "CPU Formation - Plateau",
     adresse: "Rue des Jardins, Immeuble le Terminus, 3ème étage",
     ville: "Abidjan",
     region: "Abidjan",
@@ -1367,7 +1367,7 @@ export const centresFormationMock: CentreFormation[] = [
     horaires: "Lun-Ven: 8h-18h, Sam: 9h-13h",
     contact: {
       telephone: "+225 27 20 30 40 50",
-      email: "plateau@cpu-academy.ci",
+      email: "plateau@cpu-formation.ci",
     },
     formationsDisponibles: ["form-001", "form-002"],
     capacite: 40,
@@ -1378,7 +1378,7 @@ export const centresFormationMock: CentreFormation[] = [
   },
   {
     id: "centre-2",
-    nom: "CPU Academy - Cocody",
+    nom: "CPU Formation - Cocody",
     adresse: "Boulevard Latrille, Résidence les Ambassadeurs",
     ville: "Abidjan",
     region: "Abidjan",
@@ -1393,7 +1393,7 @@ export const centresFormationMock: CentreFormation[] = [
     horaires: "Lun-Ven: 8h-19h, Sam: 9h-14h",
     contact: {
       telephone: "+225 27 20 31 41 51",
-      email: "cocody@cpu-academy.ci",
+      email: "cocody@cpu-formation.ci",
     },
     formationsDisponibles: ["form-001", "form-002", "form-003"],
     capacite: 30,
@@ -1404,7 +1404,7 @@ export const centresFormationMock: CentreFormation[] = [
   },
   {
     id: "centre-3",
-    nom: "CPU Academy - Bouaké",
+    nom: "CPU Formation - Bouaké",
     adresse: "Quartier Commerce, Avenue de la République",
     ville: "Bouaké",
     region: "Vallée du Bandama",
@@ -1418,7 +1418,7 @@ export const centresFormationMock: CentreFormation[] = [
     horaires: "Lun-Ven: 8h-17h, Sam: 9h-12h",
     contact: {
       telephone: "+225 27 31 40 50 60",
-      email: "bouake@cpu-academy.ci",
+      email: "bouake@cpu-formation.ci",
     },
     formationsDisponibles: ["form-001"],
     capacite: 25,
@@ -1490,7 +1490,7 @@ export const webinairesMock: Webinaire[] = [
     date: new Date("2026-02-15T14:00:00"),
     duree: 90,
     statut: "a-venir",
-    lienMeet: "https://meet.cpu-academy.ci/webinaire-1",
+    lienMeet: "https://meet.cpu-formation.ci/webinaire-1",
     inscrits: 247,
     capacite: 500,
     gratuit: true,
@@ -1518,7 +1518,7 @@ export const webinairesMock: Webinaire[] = [
     date: new Date("2026-02-09T15:30:00"),
     duree: 60,
     statut: "live",
-    lienMeet: "https://meet.cpu-academy.ci/webinaire-2",
+    lienMeet: "https://meet.cpu-formation.ci/webinaire-2",
     inscrits: 412,
     gratuit: true,
     prix: 0,

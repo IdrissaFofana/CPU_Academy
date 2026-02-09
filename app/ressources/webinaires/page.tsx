@@ -19,7 +19,7 @@ import {
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Webinaires & Replays - CPU Academy",
+  title: "Webinaires & Replays - CPU Formation",
   description: "Participez à nos webinaires ou visionnez les replays",
 };
 

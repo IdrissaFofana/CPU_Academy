@@ -19,7 +19,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "CPU Academy - Formations pratiques pour PME ivoiriennes",
+  title: "CPU Formation - Formations pratiques pour PME ivoiriennes",
   description: "Développez les compétences qui font grandir vos activités. Formations pratiques, certifiantes et ancrées dans la réalité des PME ivoiriennes.",
   keywords: ["formation", "PME", "Côte d'Ivoire", "certification", "compétences"],
 };

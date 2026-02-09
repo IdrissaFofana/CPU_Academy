@@ -7,7 +7,7 @@ import { Award, CheckCircle2, Clock, Users, TrendingUp, Shield, BookOpen, FileCh
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Certifications - CPU Academy",
+  title: "Certifications - CPU Formation",
   description: "Validez vos compétences avec nos certifications reconnues",
 };
 

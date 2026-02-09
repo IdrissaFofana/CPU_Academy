@@ -7,9 +7,9 @@ export function Footer() {
     <footer className="bg-[#1a1f2e] text-slate-300">
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          {/* À propos de CPU-Académie */}
+          {/* À propos de CPU Formation */}
           <div>
-            <h3 className="text-cpu-orange font-semibold text-lg mb-4">À propos de CPU-Académie</h3>
+            <h3 className="text-cpu-orange font-semibold text-lg mb-4">À propos de CPU Formation</h3>
             <div className="mb-4">
               <div className="bg-white p-3 rounded-lg inline-block">
                 <Image 
@@ -133,7 +133,7 @@ export function Footer() {
         <div className="border-t border-slate-700 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
             <p className="text-slate-400">
-              © 2026 CPU-Académie. Tous droits réservés.
+              © 2026 CPU Formation. Tous droits réservés.
             </p>
             <p className="text-slate-400">
               Une initiative de la <span className="text-cpu-orange font-medium">Confédération Patronale Unique des PME de Côte d&apos;Ivoire</span>

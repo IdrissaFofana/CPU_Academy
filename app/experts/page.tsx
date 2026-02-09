@@ -8,7 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Nos experts - CPU Academy",
+  title: "Nos experts - CPU Formation",
   description: "Découvrez nos formateurs experts dans leur domaine",
 };
 
@@ -283,7 +283,7 @@ export default function ExpertsPage() {
             <div className="text-center mb-12">
               <Sparkles className="w-12 h-12 mx-auto mb-4 text-orange-500" />
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Devenez Formateur chez CPU Academy
+                Devenez Formateur chez CPU Formation
               </h2>
               <p className="text-lg text-slate-300 max-w-2xl mx-auto">
                 Partagez votre expertise, impactez des carrières et développez votre activité de formation

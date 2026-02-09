@@ -389,7 +389,7 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
                   🎁 Offre spéciale membre
                 </p>
                 <p className="text-xs text-gray-600 mb-3">
-                  Devenez membre CPU Academy et bénéficiez de réductions sur toutes les formations
+                  Devenez membre CPU Formation et bénéficiez de réductions sur toutes les formations
                 </p>
                 <Button variant="outline" className="cursor-pointer w-full text-sm border-cpu-orange text-cpu-orange hover:bg-cpu-orange hover:text-white">
                   En savoir plus

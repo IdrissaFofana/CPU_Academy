@@ -510,7 +510,7 @@ export function InscriptionForm() {
                             className="mt-1 w-5 h-5 text-orange-600 border-2 border-slate-300 rounded focus:ring-2 focus:ring-orange-500/20"
                           />
                           <span className="text-sm text-slate-700">
-                            J'accepte de recevoir des informations sur les formations et actualités de CPU Academy
+                            J'accepte de recevoir des informations sur les formations et actuéalités de CPU Formation
                           </span>
                         </label>
                       </div>

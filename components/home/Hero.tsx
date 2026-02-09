@@ -16,7 +16,7 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="animate-slide-right">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              Formez-vous aux métiers d'avenir avec <span className="text-cpu-orange">CPU-Académie</span>
+              Formez-vous aux métiers d'avenir avec <span className="text-cpu-orange">CPU Formation</span>
             </h1>
             <p className="text-xl text-gray-300 mb-8 max-w-lg">
               La plateforme de formation professionnelle de la Confédération Patronale Unique des PME de Côte d'Ivoire.
@@ -86,7 +86,7 @@ export function Hero() {
             <div className="aspect-video rounded-lg overflow-hidden shadow-2xl transform rotate-2 relative h-96">
               <Image 
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800&h=600"
-                alt="Apprenants en formation CPU-Académie" 
+                alt="Apprenants en formation CPU Formation" 
                 fill
                 className="object-cover"
                 priority

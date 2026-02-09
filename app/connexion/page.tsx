@@ -50,10 +50,10 @@ export default function ConnexionPage() {
             <div className="space-y-8">
               <div>
                 <Link href="/" className="inline-flex items-center mb-8">
-                  <Image src="/images/cpu-logo.png" alt="CPU Academy" width={120} height={48} className="h-12 w-auto" />
+                  <Image src="/images/cpu-logo.png" alt="CPU Formation" width={120} height={48} className="h-12 w-auto" />
                 </Link>
                 <h1 className="text-5xl font-bold text-slate-900 mb-4">
-                  Bienvenue sur <span className="text-cpu-orange">CPU Academy</span>
+                  Bienvenue sur <span className="text-cpu-orange">CPU Formation</span>
                 </h1>
                 <p className="text-xl text-slate-600 leading-relaxed">
                   La plateforme N°1 de formation professionnelle en Côte d'Ivoire

@@ -40,7 +40,7 @@ export default function BlogPage() {
       titre: "10 compétences clés pour réussir en 2026",
       slug: "10-competences-cles-2026",
       extrait:
-        "Découvrez les compétences les plus recherchées par les employeurs en 2026 et comment les développer avec CPU Academy.",
+        "Découvrez les compétences les plus recherchées par les employeurs en 2026 et comment les développer avec CPU Formation.",
       image: "/blog/competences-2026.jpg",
       categorie: "formation",
       auteur: "Dr. Kouamé Yao",
@@ -70,7 +70,7 @@ export default function BlogPage() {
       titre: "L'IA dans l'éducation: opportunités pour l'Afrique",
       slug: "ia-education-afrique",
       extrait:
-        "L'intelligence artificielle révolutionne l'apprentissage. Découvrez comment CPU Academy intègre ces technologies.",
+        "L'intelligence artificielle révolutionne l'apprentissage. Découvrez comment CPU Formation intègre ces technologies.",
       image: "/blog/ia-education.jpg",
       categorie: "tech",
       auteur: "M. Diabaté Ibrahim",

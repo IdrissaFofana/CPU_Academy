@@ -499,7 +499,7 @@ export function CatalogueContent() {
                   </h3>
                   
                   <p className="text-slate-300 mb-8 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                    CPU-Académie propose également des formations personnalisées pour les entreprises et organisations.
+                    CPU Formation propose également des formations personnalisées pour les entreprises et organisations.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

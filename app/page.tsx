@@ -9,9 +9,9 @@ import { CertificationsSection } from "@/components/home/CertificationsSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://cpu-academy.ci'),
-  title: "CPU Academy - Plateforme de Formation Professionnelle en Côte d'Ivoire",
-  description: "CPU Academy, la plateforme de formation de la Confédération Patronale Unique des PME. 350+ formations certifiantes pour entrepreneurs et professionnels ivoiriens. Développez vos compétences avec nos experts.",
+  metadataBase: new URL('https://cpu-formation.ci'),
+  title: "CPU Formation - Plateforme de Formation Professionnelle en Côte d'Ivoire",
+  description: "CPU Formation, la plateforme de formation de la Confédération Patronale Unique des PME. 350+ formations certifiantes pour entrepreneurs et professionnels ivoiriens. Développez vos compétences avec nos experts.",
   keywords: [
     "formation professionnelle côte d'ivoire",
     "CPU PME",
@@ -24,27 +24,27 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_CI",
-    url: "https://cpu-academy.ci",
-    siteName: "CPU Academy",
-    title: "CPU Academy - Formations Certifiantes pour PME Ivoiriennes",
+    url: "https://cpu-formation.ci",
+    siteName: "CPU Formation",
+    title: "CPU Formation - Formations Certifiantes pour PME Ivoiriennes",
     description: "350+ formations professionnelles pour entrepreneurs et salariés. Certifications reconnues, experts locaux, accompagnement personnalisé.",
     images: [
       {
-        url: "/images/cpu-academy-og.jpg",
+        url: "/images/cpu-formation-og.jpg",
         width: 1200,
         height: 630,
-        alt: "CPU Academy - Formation professionnelle en Côte d'Ivoire"
+        alt: "CPU Formation - Formation professionnelle en Côte d'Ivoire"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "CPU Academy - Formations pour PME Ivoiriennes",
+    title: "CPU Formation - Formations pour PME Ivoiriennes",
     description: "350+ formations certifiantes | Experts du secteur | Accompagnement personnalisé",
-    images: ["/images/cpu-academy-og.jpg"]
+    images: ["/images/cpu-formation-og.jpg"]
   },
   alternates: {
-    canonical: "https://cpu-academy.ci"
+    canonical: "https://cpu-formation.ci"
   }
 };
 

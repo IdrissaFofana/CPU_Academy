@@ -51,7 +51,7 @@ export default function CertificatPage({
             month: "long",
             day: "numeric",
           }),
-          verificationUrl: `https://cpu-academy.ci/verify/${formation.id}-${Date.now()}`,
+          verificationUrl: `https://cpu-formation.ci/verify/${formation.id}-${Date.now()}`,
         };
 
         setCertificateData(certData);
@@ -83,7 +83,7 @@ export default function CertificatPage({
     alert(
       "Fonctionnalité de téléchargement PDF en cours de développement.\n\n" +
       "Le certificat sera téléchargé au format PDF avec :\n" +
-      "- Design professionnel CPU Academy\n" +
+      "- Design professionnel CPU Formation\n" +
       "- QR code de vérification\n" +
       "- Signature numérique"
     );
@@ -92,7 +92,7 @@ export default function CertificatPage({
   const handleShareLinkedIn = () => {
     const linkedInUrl = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(
       formation.titre
-    )}&organizationId=CPU-Academy&issueYear=${new Date().getFullYear()}&issueMonth=${
+    )}&organizationId=CPU-Formation&issueYear=${new Date().getFullYear()}&issueMonth=${
       new Date().getMonth() + 1
     }&certUrl=${encodeURIComponent(window.location.href)}`;
 
@@ -100,11 +100,11 @@ export default function CertificatPage({
   };
 
   const handleSendEmail = () => {
-    const subject = `Certificat CPU Academy - ${formation.titre}`;
+    const subject = `Certificat CPU Formation - ${formation.titre}`;
     const body = `
 Bonjour,
 
-Je vous fais part de l'obtention de mon certificat de formation délivré par CPU Academy.
+Je vous fais part de l'obtention de mon certificat de formation délivré par CPU Formation.
 
 Formation : ${formation.titre}
 Date d'obtention : ${certificateData?.completionDate}
@@ -204,7 +204,7 @@ ${certificateData?.studentName}
                 </div>
                 <div className="text-left">
                   <h2 className="text-3xl font-bold text-slate-900">
-                    CPU Academy
+                    CPU Formation
                   </h2>
                   <p className="text-sm text-slate-600">
                     Centrale des Professionnels et Universités de Côte d'Ivoire
@@ -290,7 +290,7 @@ ${certificateData?.studentName}
                   </span>
                 </div>
                 <p className="text-sm font-semibold text-slate-900">
-                  Directeur CPU Academy
+                  Directeur CPU Formation
                 </p>
                 <p className="text-xs text-slate-600">
                   Centrale des Professionnels

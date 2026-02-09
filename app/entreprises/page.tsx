@@ -31,7 +31,7 @@ import {
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Solutions entreprises - CPU Academy",
+  title: "Solutions entreprises - CPU Formation",
   description: "Formez vos équipes avec nos solutions adaptées aux entreprises",
 };
 
@@ -395,7 +395,7 @@ export default function EntreprisesPage() {
         <section id="solutions-sur-mesure" className="container mx-auto px-8 lg:px-16 py-20 bg-gradient-to-br from-orange-50/30 via-white to-blue-50/20">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-              Pourquoi choisir CPU Academy ?
+              Pourquoi choisir CPU Formation ?
             </h2>
           </div>
 
@@ -510,7 +510,7 @@ export default function EntreprisesPage() {
                   </div>
                   <div className="flex items-center gap-3 text-slate-300">
                     <Mail className="w-5 h-5 text-orange-500" />
-                    <span>entreprises@cpu-academy.ci</span>
+                    <span>entreprises@cpu-formation.ci</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-300">
                     <Clock className="w-5 h-5 text-orange-500" />

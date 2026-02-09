@@ -376,7 +376,7 @@ export default function ParcoursPage() {
                     Certifications reconnues
                   </h3>
                   <p className="text-slate-600 leading-relaxed">
-                    Obtenez des certificats officiels CPU Academy valorisables sur le marché du travail ivoirien et africain
+                    Obtenez des certificats officiels CPU Formation valorisables sur le marché du travail ivoirien et africain
                   </p>
                 </div>
               </Card>
@@ -417,7 +417,7 @@ export default function ParcoursPage() {
                 Prêt à démarrer votre parcours ?
               </h2>
               <p className="text-xl mb-10 text-slate-300 max-w-2xl mx-auto leading-relaxed">
-                Rejoignez des <span className="text-cpu-orange font-semibold">{parcoursMock.reduce((acc, p) => acc + (p.nbInscrits || 0), 0).toLocaleString()}</span> apprenants qui transforment leur carrière avec CPU Academy
+                Rejoignez des <span className="text-cpu-orange font-semibold">{parcoursMock.reduce((acc, p) => acc + (p.nbInscrits || 0), 0).toLocaleString()}</span> apprenants qui transforment leur carrière avec CPU Formation
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">

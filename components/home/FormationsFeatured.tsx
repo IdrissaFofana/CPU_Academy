@@ -48,7 +48,7 @@ export function AboutSection() {
             
             <div className="space-y-4 text-lg">
               <p className="text-slate-600 leading-relaxed">
-                <span className="font-semibold text-slate-900">CPU-Académie</span> est une initiative de la <span className="text-cpu-orange font-medium">Confédération Patronale Unique des PME de Côte d'Ivoire (CPU-PMECI)</span>, dédiée au renforcement des compétences des entrepreneurs et professionnels ivoiriens.
+                <span className="font-semibold text-slate-900">CPU Formation</span> est une initiative de la <span className="text-cpu-orange font-medium">Confédération Patronale Unique des PME de Côte d'Ivoire (CPU-PMECI)</span>, dédiée au renforcement des compétences des entrepreneurs et professionnels ivoiriens.
               </p>
               
               <p className="text-slate-600 leading-relaxed">

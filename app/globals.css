@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* Couleurs principales CPU Academy */
+  /* Couleurs principales CPU Formation */
   --primary: 30 100% 54%;  /* Orange CPU #F17425 */
   --primary-foreground: 0 0% 100%;
   

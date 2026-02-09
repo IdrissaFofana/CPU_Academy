@@ -1,4 +1,4 @@
-// Design System Tokens - CPU Academy
+// Design System Tokens - CPU Formation
 // Version sans dégradés
 
 export const SPACING = {

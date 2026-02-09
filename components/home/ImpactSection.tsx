@@ -135,7 +135,7 @@ export function ImpactSection() {
             Notre impact en chiffres
           </h2>
           <p className="text-base text-slate-600 max-w-3xl mx-auto">
-            CPU-Académie s'engage à former les professionnels et entrepreneurs ivoiriens pour répondre aux besoins du marché du travail.
+            CPU Formation s'engage à former les professionnels et entrepreneurs ivoiriens pour répondre aux besoins du marché du travail.
           </p>
         </div>
 
