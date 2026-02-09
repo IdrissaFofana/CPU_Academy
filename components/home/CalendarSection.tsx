@@ -101,16 +101,16 @@ export function CalendarSection() {
   };
 
   return (
-    <section className="py-20 lg:py-28 bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      <div className="container mx-auto px-8 lg:px-16">
+    <section id="calendrier" className="py-12 md:py-20 bg-slate-50">
+      <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
         <div className="text-center mb-16 animate-slide-down">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cpu-orange/10 to-cpu-green/10 rounded-full border-2 border-cpu-orange/40 mb-6 animate-fade-in shadow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border-2 border-cpu-orange/40 mb-6 animate-fade-in shadow-sm">
             <Calendar className="w-4 h-4 text-cpu-orange" />
             <span className="text-sm font-medium text-slate-900">Prochaines sessions</span>
           </div>
 
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-slate-900">
-            Calendrier des <span className="font-extrabold bg-gradient-to-r from-orange-600 via-orange-500 to-green-600 bg-clip-text text-transparent">formations</span>
+            Calendrier des <span className="font-extrabold text-cpu-orange">formations</span>
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
             Consultez les prochaines sessions de formation et réservez votre place dès maintenant

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,16 +14,20 @@ import {
   CheckCircle2,
   Target,
   Sparkles,
-  Zap
+  Zap,
+  Heart
 } from "lucide-react";
 import type { Parcours } from "@/types";
 
 interface ParcoursCardProps {
   parcours: Parcours;
   onInscription?: (parcoursId: string) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: (parcoursId: string) => void;
+  isNew?: boolean;
 }
 
-export function ParcoursCard({ parcours, onInscription }: ParcoursCardProps) {
+export function ParcoursCard({ parcours, onInscription, isFavorite = false, onToggleFavorite, isNew = false }: ParcoursCardProps) {
   const handleInscription = () => {
     if (onInscription) {
       onInscription(parcours.id);
@@ -30,8 +35,28 @@ export function ParcoursCard({ parcours, onInscription }: ParcoursCardProps) {
   };
 
   return (
-    <Card className="group relative overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 animate-fade-in-up">
-      {/* Effet de brillance animé au survol */}
+    <Link href={`/parcours/${parcours.id}`} className="block">
+      <Card className="group relative overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 animate-fade-in-up h-full">
+        {/* Bouton Favori */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleFavorite?.(parcours.id);
+          }}
+          className="absolute top-4 right-4 z-20 p-2 bg-white rounded-full shadow-lg hover:scale-110 transition-transform"
+          aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+        >
+          <Heart 
+            className={`w-5 h-5 transition-colors ${
+              isFavorite 
+                ? "fill-cpu-orange text-cpu-orange" 
+                : "text-slate-400 hover:text-cpu-orange"
+            }`}
+          />
+        </button>
+        
+        {/* Effet de brillance animé au survol */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
         <div className="absolute inset-0 bg-gradient-to-br from-cpu-orange/5 via-transparent to-blue-500/5"></div>
       </div>
@@ -55,6 +80,12 @@ export function ParcoursCard({ parcours, onInscription }: ParcoursCardProps) {
         
         {/* Badges flottants */}
         <div className="absolute top-4 left-4 flex gap-2 z-10">
+          {isNew && (
+            <Badge className="bg-cpu-green text-white border-0 shadow-lg hover:scale-105 transition-transform animate-pulse">
+              <Zap className="w-3 h-3 mr-1" />
+              Nouveau
+            </Badge>
+          )}
           <Badge className="bg-white/95 backdrop-blur-sm text-slate-900 border-0 shadow-lg hover:scale-105 transition-transform">
             <Sparkles className="w-3 h-3 mr-1" />
             {parcours.niveau}
@@ -101,8 +132,8 @@ export function ParcoursCard({ parcours, onInscription }: ParcoursCardProps) {
             </div>
           </div>
           
-          <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gradient-to-br from-blue-50 to-blue-50/50 group-hover:from-blue-100 group-hover:to-blue-50 transition-colors">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+          <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gradient-to-br from-cpu-green/10 to-cpu-green/5 group-hover:from-cpu-green/20 group-hover:to-cpu-green/10 transition-colors">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-cpu-green to-green-600 flex items-center justify-center">
               <BookOpen className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -111,8 +142,8 @@ export function ParcoursCard({ parcours, onInscription }: ParcoursCardProps) {
             </div>
           </div>
           
-          <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gradient-to-br from-green-50 to-green-50/50 group-hover:from-green-100 group-hover:to-green-50 transition-colors">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+          <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gradient-to-br from-cpu-orange/10 to-cpu-orange/5 group-hover:from-cpu-orange/20 group-hover:to-cpu-orange/10 transition-colors">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-cpu-green to-green-600 flex items-center justify-center">
               <Users className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -220,5 +251,6 @@ export function ParcoursCard({ parcours, onInscription }: ParcoursCardProps) {
         </div>
       </div>
     </Card>
+    </Link>
   );
 }

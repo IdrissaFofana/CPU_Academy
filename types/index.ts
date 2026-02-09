@@ -82,6 +82,18 @@ export interface Parcours {
   
   // Structure du parcours
   modules?: ModuleParcours[];
+  
+  // Amélioration design card
+  nbAvis?: number;              // Nombre total d'avis
+  nbInscritsMonth?: number;     // Inscrits ce mois
+  nbInscritsWeek?: number;      // Inscrits cette semaine
+  
+  instructeur?: {               // Info instructeur
+    nom: string;
+    titre: string;
+    photo?: string;
+    specialite?: string;
+  };
 }
 
 // Module d'un parcours
@@ -119,6 +131,16 @@ export interface Expert {
   nbApprenants?: number;
 }
 
+// Module de Formation
+export interface Module {
+  id: string;
+  titre: string;
+  description: string;
+  ordre: number;
+  duree: number; // en heures
+  objectifs: string[];
+}
+
 // Formation
 export interface Formation {
   id: string;
@@ -149,9 +171,12 @@ export interface Formation {
   region?: string;
   ville?: string;
   
-  // Expert
+  // Expert/Formateur
   expertId: string;
   expert?: Expert;
+  
+  // Modules de la formation
+  modules?: Module[];
   
   // Certification
   certifiant: boolean;
@@ -170,8 +195,8 @@ export interface Formation {
   prixPublic?: number;
   prixMembre?: number;
   
-  // Programme
-  chapitres: Chapitre[];
+  // Programme (chapitres = contenus détaillés des modules)
+  chapitres?: Chapitre[];
   
   // Stats
   nbInscrits?: number;
@@ -451,4 +476,108 @@ export interface ItemPanier {
   formation?: Formation;
   prix: number;
   remise?: number;
+}
+
+// ==================== PHASE 2: TYPES ====================
+
+// Centre de formation (présentiel)
+export interface CentreFormation {
+  id: string;
+  nom: string;
+  adresse: string;
+  ville: string;
+  region: string;
+  coordonnees: {
+    lat: number;
+    lng: number;
+  };
+  photos: string[];
+  horaires: string;
+  contact: {
+    telephone: string;
+    email: string;
+  };
+  formationsDisponibles: string[]; // IDs formations
+  capacite: number;
+  equipements: string[];
+  parking: boolean;
+  restauration: boolean;
+  transportsPublics?: string[];
+}
+
+// Session présentielle
+export interface SessionPresentiel {
+  id: string;
+  formationId: string;
+  centreId: string;
+  centre?: CentreFormation;
+  dateDebut: Date;
+  dateFin: Date;
+  horaires: string; // "9h-17h"
+  capacite: number;
+  inscrits: number;
+  prix: number;
+  materielFourni: string[];
+  restauration: boolean;
+  hebergementPartenaires?: {
+    nom: string;
+    tarif: number;
+    distance: string;
+  }[];
+}
+
+// Webinaire
+export interface Webinaire {
+  id: string;
+  titre: string;
+  slug: string;
+  description: string;
+  themes: string[];
+  publicCible: string;
+  prerequis?: string[];
+  formateur: Expert;
+  date: Date;
+  duree: number; // minutes
+  statut: "a-venir" | "live" | "termine";
+  lienMeet?: string;
+  inscrits: number;
+  capacite?: number;
+  gratuit: boolean;
+  prix?: number;
+  programme: {
+    temps: string;
+    titre: string;
+    description: string;
+  }[];
+  ressources: {
+    titre: string;
+    url: string;
+    type: "pdf" | "lien";
+  }[];
+  replay?: {
+    url: string;
+    duree: number;
+  };
+  thumbnail: string;
+}
+
+// Review (avis sur formation)
+export interface Review {
+  id: string;
+  formationId: string;
+  userId: string;
+  userName: string;
+  userPhoto?: string;
+  rating: number; // 1-5
+  titre?: string;
+  commentaire: string;
+  date: Date;
+  formationTerminee: boolean;
+  helpful: number;
+  notHelpful: number;
+  reponseInstructeur?: {
+    texte: string;
+    date: Date;
+  };
+  photos?: string[];
 }

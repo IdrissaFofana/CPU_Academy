@@ -27,7 +27,7 @@ export function PageBanner({ title, subtitle, breadcrumb }: PageBannerProps) {
       {/* Overlay gradient léger pour améliorer la lisibilité du texte */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/30 to-slate-900/50" />
       
-      <div className="container mx-auto px-8 lg:px-16 relative z-10">
+      <div className="container mx-auto px-6 lg:px-16 max-w-7xl relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Breadcrumb */}
           {breadcrumb && breadcrumb.length > 0 && (

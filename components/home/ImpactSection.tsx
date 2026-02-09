@@ -6,6 +6,7 @@ import { Users, BookOpen, TrendingUp, Building2 } from "lucide-react";
 export function ImpactSection() {
   const [isVisible, setIsVisible] = useState(false);
   const [animatedValues, setAnimatedValues] = useState([0, 0, 0, 0]);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const stats = [
@@ -57,6 +58,17 @@ export function ImpactSection() {
     }
   ];
 
+  // Détecter prefers-reduced-motion
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = () => setPrefersReducedMotion(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -82,6 +94,12 @@ export function ImpactSection() {
 
   useEffect(() => {
     if (!isVisible) return;
+
+    // Si reduced motion, afficher directement les valeurs finales
+    if (prefersReducedMotion) {
+      setAnimatedValues(stats.map(stat => stat.value));
+      return;
+    }
 
     stats.forEach((stat, index) => {
       const duration = 2000;
@@ -109,8 +127,8 @@ export function ImpactSection() {
   }, [isVisible]);
 
   return (
-    <section ref={sectionRef} className="py-16 lg:py-20 bg-[#f5f1ed]">
-      <div className="container mx-auto px-8 lg:px-16">
+    <section ref={sectionRef} className="py-12 md:py-20 bg-[#f5f1ed]">
+      <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
         {/* Impact en chiffres */}
         <div className="text-center mb-12 animate-slide-down">
           <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-3">

@@ -11,12 +11,12 @@ export function CertificationsSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   return (
-    <section className="py-20 lg:py-28 bg-gradient-to-br from-white via-orange-50/20 to-white relative overflow-hidden">
+    <section id="certifications" className="py-12 md:py-20 bg-gradient-to-br from-white via-orange-50/20 to-white relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-cpu-orange/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cpu-green/10 rounded-full blur-3xl" />
       
-      <div className="container mx-auto px-8 lg:px-16 relative">
+      <div className="container mx-auto px-6 lg:px-16 max-w-7xl relative">
         {/* Header */}
         <div className="text-center mb-16 animate-slide-down">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cpu-orange/10 to-cpu-green/10 rounded-full border-2 border-cpu-orange/40 mb-6 animate-fade-in shadow-sm">
@@ -34,7 +34,7 @@ export function CertificationsSection() {
         </div>
 
         {/* Certifications Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {certifications.map((cert, index) => (
             <div
               key={cert.id}

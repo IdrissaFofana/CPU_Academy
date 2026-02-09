@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,24 +26,28 @@ import {
   GraduationCap,
   HelpCircle,
   Home,
+  Info,
+  LayoutDashboard,
   Landmark,
   Lightbulb,
   LogIn,
   MapPin,
   Menu,
+  Newspaper,
   Rocket,
   ShoppingBag,
   Store,
   TrendingUp,
   User,
   Users,
+  Video,
   Wallet,
   X,
 } from "lucide-react";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn] = useState(false);
+  const [isLoggedIn] = useState(true); // TODO: Remplacer par vraie authentification
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
@@ -66,16 +71,19 @@ export function Navbar() {
     <nav className={`bg-white/95 backdrop-blur-md sticky top-0 z-50 transition-all duration-300 animate-slide-down ${
       scrolled ? "shadow-lg border-b border-gray-100" : "shadow-md"
     }`}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-16">
+      <div className="container mx-auto px-6 lg:px-16">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center group">
               <div className="relative">
-                <img 
+                <Image 
                   src="/images/cpu-logo.png" 
                   alt="CPU-PME.CI" 
+                  width={120}
+                  height={44}
                   className="h-11 w-auto transition-transform duration-300 group-hover:scale-105"
+                  priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-cpu-orange/10 to-cpu-green/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl -z-10" />
               </div>
@@ -85,56 +93,52 @@ export function Navbar() {
           {/* Menu de navigation principal - version desktop */}
           <div className="hidden lg:flex lg:items-center lg:justify-center lg:flex-1 lg:px-8">
             <div className="flex items-center space-x-1">
-              <NavLink href="/" icon={<Home className="w-4 h-4 mr-1" />}>
-                Accueil
-              </NavLink>
-              
-              <NavLink href="/catalogue" icon={<Book className="w-4 h-4 mr-1" />}>
-                Catalogue
-              </NavLink>
-
-              <NavLink href="/parcours" icon={<Rocket className="w-4 h-4 mr-1" />}>
-                Parcours
-              </NavLink>
-
-              <NavLink href="/certifications" icon={<Award className="w-4 h-4 mr-1" />}>
-                Certifications
-              </NavLink>
-
-              <NavLink href="/rac" icon={<CheckCircle className="w-4 h-4 mr-1" />}>
-                RAC
-              </NavLink>
-
               <NavLinkWithDropdown 
-                title="Experts" 
-                icon={<Users className="w-4 h-4 mr-1" />}
+                title="Formations" 
+                icon={<Book className="w-4 h-4 mr-1" />}
                 items={[
-                  { label: "Annuaire des experts", href: "/experts#annuaire-experts", icon: <Users className="w-4 h-4" /> },
-                  { label: "Devenir formateur", href: "/experts#devenir-formateur", icon: <GraduationCap className="w-4 h-4" /> },
+                  { label: "Catalogue de formations", href: "/catalogue", icon: <Book className="w-4 h-4" /> },
+                  { label: "Parcours métiers", href: "/parcours", icon: <Rocket className="w-4 h-4" /> },
+                  { label: "Centres de formation", href: "/centres-formation", icon: <MapPin className="w-4 h-4" /> },
+                  { label: "Webinaires live", href: "/webinaires", icon: <Video className="w-4 h-4" /> },
+                  { label: "Certifications", href: "/certifications", icon: <Award className="w-4 h-4" /> },
                 ]}
               />
 
-              <NavLink href="/regions" icon={<Globe className="w-4 h-4 mr-1" />}>
-                Régions
-              </NavLink>
+              {isLoggedIn && (
+                <NavLinkWithDropdown 
+                  title="Pour vous" 
+                  icon={<User className="w-4 h-4 mr-1" />}
+                  items={[
+                    { label: "Dashboard Apprenant", href: "/dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
+                    { label: "Dashboard Formateur", href: "/dashboard-formateur", icon: <LayoutDashboard className="w-4 h-4" /> },
+                    { label: "Dashboard Entreprise", href: "/dashboard-entreprise", icon: <LayoutDashboard className="w-4 h-4" /> },
+                    { label: "Mes formations", href: "/mes-formations", icon: <Book className="w-4 h-4" /> },
+                    { label: "Mes certifications", href: "/mes-certifications", icon: <Award className="w-4 h-4" /> },
+                  ]}
+                />
+              )}
 
               <NavLinkWithDropdown 
                 title="Entreprises" 
                 icon={<Building className="w-4 h-4 mr-1" />}
                 items={[
-                  { label: "Formations intra-entreprise", href: "/entreprises#services-entreprises", icon: <Building className="w-4 h-4" /> },
+                  { label: "Solutions entreprises", href: "/entreprises", icon: <Building className="w-4 h-4" /> },
                   { label: "Packs équipes", href: "/entreprises#former-vos-equipes", icon: <Users className="w-4 h-4" /> },
-                  { label: "Évaluation des compétences", href: "/entreprises#solutions-sur-mesure", icon: <BadgeCheck className="w-4 h-4" /> },
                 ]}
               />
 
+              <NavLink href="/experts" icon={<Users className="w-4 h-4 mr-1" />}>
+                Experts
+              </NavLink>
+
               <NavLinkWithDropdown 
-                title="Ressources" 
-                icon={<FileText className="w-4 h-4 mr-1" />}
+                title="Support" 
+                icon={<HelpCircle className="w-4 h-4 mr-1" />}
                 items={[
-                  { label: "Guides & modèles", href: "/ressources/guides", icon: <FileText className="w-4 h-4" /> },
-                  { label: "Webinaires & replays", href: "/ressources/webinaires", icon: <BookOpen className="w-4 h-4" /> },
-                  { label: "FAQ", href: "/ressources/faq", icon: <HelpCircle className="w-4 h-4" /> },
+                  { label: "Centre d'aide", href: "/ressources/faq", icon: <HelpCircle className="w-4 h-4" /> },
+                  { label: "Guides & ressources", href: "/ressources/guides", icon: <FileText className="w-4 h-4" /> },
+                  { label: "RAC", href: "/rac", icon: <CheckCircle className="w-4 h-4" /> },
                 ]}
               />
             </div>
@@ -163,7 +167,8 @@ export function Navbar() {
             <button
               className="cursor-pointer text-gray-700 hover:text-cpu-orange focus:outline-none focus:ring-2 focus:ring-cpu-orange p-2 rounded-md transition-all duration-200 hover:bg-gray-100"
               onClick={toggleMenu}
-              aria-label="Menu"
+              aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -179,64 +184,90 @@ export function Navbar() {
       {isMenuOpen && (
         <div className="lg:hidden bg-white/95 backdrop-blur-md pb-4 px-4 shadow-lg max-h-[80vh] overflow-y-auto animate-in slide-in-from-top-2 duration-300 border-t border-gray-100">
           <div className="space-y-1">
-            <MobileNavLink href="/" icon={<Home className="w-5 h-5" />}>
-              Accueil
-            </MobileNavLink>
-            
             <div className="py-2 mt-2">
-              <div className="px-3 py-1.5 bg-gradient-to-r from-gray-50 to-transparent rounded-lg">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Formations</span>
+              <div className="px-3 py-1.5 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                <span className="text-xs font-semibold text-cpu-orange uppercase tracking-wider">Formations</span>
               </div>
             </div>
             <MobileNavLink href="/catalogue" icon={<Book className="w-5 h-5" />}>
-              Catalogue des formations
+              Catalogue de formations
             </MobileNavLink>
             <MobileNavLink href="/parcours" icon={<Rocket className="w-5 h-5" />}>
-              Parcours
+              Parcours métiers
+            </MobileNavLink>
+            <MobileNavLink href="/centres-formation" icon={<MapPin className="w-5 h-5" />}>
+              Centres de formation
+            </MobileNavLink>
+            <MobileNavLink href="/webinaires" icon={<Video className="w-5 h-5" />}>
+              Webinaires live
             </MobileNavLink>
             <MobileNavLink href="/certifications" icon={<Award className="w-5 h-5" />}>
-              Certifications & Badges
-            </MobileNavLink>
-            <MobileNavLink href="/rac" icon={<CheckCircle className="w-5 h-5" />}>
-              RAC
+              Certifications
             </MobileNavLink>
             
+            {isLoggedIn && (
+              <>
+                <div className="py-2 mt-2">
+                  <div className="px-3 py-1.5 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                    <span className="text-xs font-semibold text-cpu-orange uppercase tracking-wider">Mon espace</span>
+                  </div>
+                </div>
+                <MobileNavLink href="/dashboard" icon={<LayoutDashboard className="w-5 h-5" />}>
+                  Dashboard Apprenant
+                </MobileNavLink>
+                <MobileNavLink href="/dashboard-formateur" icon={<LayoutDashboard className="w-5 h-5" />}>
+                  Dashboard Formateur
+                </MobileNavLink>
+                <MobileNavLink href="/dashboard-entreprise" icon={<LayoutDashboard className="w-5 h-5" />}>
+                  Dashboard Entreprise
+                </MobileNavLink>
+                <MobileNavLink href="/mes-formations" icon={<Book className="w-5 h-5" />}>
+                  Mes formations
+                </MobileNavLink>
+                <MobileNavLink href="/mes-certifications" icon={<Award className="w-5 h-5" />}>
+                  Mes certifications
+                </MobileNavLink>
+              </>
+            )}
+            
             <div className="py-2 mt-2">
-              <div className="px-3 py-1.5 bg-gradient-to-r from-gray-50 to-transparent rounded-lg">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Réseau</span>
+              <div className="px-3 py-1.5 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                <span className="text-xs font-semibold text-cpu-orange uppercase tracking-wider">Entreprises & Experts</span>
               </div>
             </div>
+            <MobileNavLink href="/entreprises" icon={<Building className="w-5 h-5" />}>
+              Solutions entreprises
+            </MobileNavLink>
             <MobileNavLink href="/experts" icon={<Users className="w-5 h-5" />}>
               Experts & Formateurs
             </MobileNavLink>
-            <MobileNavLink href="/regions" icon={<Globe className="w-5 h-5" />}>
-              Régions
-            </MobileNavLink>
-            <MobileNavLink href="/entreprises" icon={<Landmark className="w-5 h-5" />}>
-              Solutions Entreprises
-            </MobileNavLink>
             
             <div className="py-2 mt-2">
-              <div className="px-3 py-1.5 bg-gradient-to-r from-gray-50 to-transparent rounded-lg">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Support</span>
+              <div className="px-3 py-1.5 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                <span className="text-xs font-semibold text-cpu-orange uppercase tracking-wider">Support</span>
               </div>
             </div>
-            <MobileNavLink href="/ressources/guides" icon={<FileText className="w-5 h-5" />}>
-              Guides & Modèles
-            </MobileNavLink>
-            <MobileNavLink href="/ressources/webinaires" icon={<BookOpen className="w-5 h-5" />}>
-              Webinaires
-            </MobileNavLink>
             <MobileNavLink href="/ressources/faq" icon={<HelpCircle className="w-5 h-5" />}>
-              Aide & FAQ
+              Centre d'aide
+            </MobileNavLink>
+            <MobileNavLink href="/ressources/guides" icon={<FileText className="w-5 h-5" />}>
+              Guides & Ressources
+            </MobileNavLink>
+            <MobileNavLink href="/rac" icon={<CheckCircle className="w-5 h-5" />}>
+              RAC
             </MobileNavLink>
           </div>
 
           <div className="mt-4 pt-4 border-t border-gray-200 flex flex-col space-y-2">
             {isLoggedIn ? (
-              <MobileNavLink href="/profil" icon={<User className="w-5 h-5" />}>
-                Mon profil
-              </MobileNavLink>
+              <>
+                <MobileNavLink href="/dashboard" icon={<LayoutDashboard className="w-5 h-5" />}>
+                  Mon dashboard
+                </MobileNavLink>
+                <MobileNavLink href="/profil" icon={<User className="w-5 h-5" />}>
+                  Mon profil
+                </MobileNavLink>
+              </>
             ) : (
               <>
                 <Button 
@@ -380,6 +411,9 @@ const MobileNavLink = ({ href, children, icon }: { href: string; children: React
 
 // Menu utilisateur
 const UserMenu = () => {
+  // TODO: Remplacer par le vrai type d'utilisateur depuis le contexte d'authentification
+  // Pour le développement, tous les dashboards sont visibles
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -395,35 +429,34 @@ const UserMenu = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl border border-gray-200">
+        {/* Paramètres et gestion du compte uniquement */}
         <DropdownMenuItem asChild>
-          <Link href="/profil" className="w-full cursor-pointer">
+          <Link href="/profil" className="w-full cursor-pointer flex items-center gap-2">
+            <User className="w-4 h-4" />
             Mon profil
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/mes-formations" className="w-full cursor-pointer">
-            Mes formations
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/mes-certifications" className="w-full cursor-pointer">
-            Mes certifications
-          </Link>
-        </DropdownMenuItem>
+        
         <DropdownMenuSeparator />
+        
         <DropdownMenuItem asChild>
-          <Link href="/favoris" className="w-full cursor-pointer">
+          <Link href="/favoris" className="w-full cursor-pointer flex items-center gap-2">
+            <Wallet className="w-4 h-4" />
             Favoris
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/paiements" className="w-full cursor-pointer">
-            Mes paiements
+          <Link href="/checkout" className="w-full cursor-pointer flex items-center gap-2">
+            <ShoppingBag className="w-4 h-4" />
+            Panier
           </Link>
         </DropdownMenuItem>
+        
         <DropdownMenuSeparator />
+        
         <DropdownMenuItem asChild>
-          <Link href="/aide" className="w-full cursor-pointer">
+          <Link href="/ressources/faq" className="w-full cursor-pointer flex items-center gap-2">
+            <HelpCircle className="w-4 h-4" />
             Centre d&apos;aide
           </Link>
         </DropdownMenuItem>

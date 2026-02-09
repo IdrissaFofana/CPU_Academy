@@ -27,17 +27,17 @@ export function AboutSection() {
   ];
 
   return (
-    <section className="py-12 lg:py-16 bg-gradient-to-br from-slate-50 via-white to-slate-50 relative overflow-hidden">
+    <section id="a-propos" className="py-12 md:py-20 bg-slate-50 relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-cpu-orange/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-cpu-green/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       
-      <div className="container mx-auto px-8 lg:px-16 relative">
+      <div className="container mx-auto px-6 lg:px-16 max-w-7xl relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Contenu texte */}
           <div className="space-y-8 animate-slide-right">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cpu-orange/10 to-cpu-green/10 rounded-full border border-cpu-orange/20 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border border-cpu-orange/20 animate-fade-in">
               <CheckCircle2 className="w-4 h-4 text-cpu-orange" />
               <span className="text-sm font-medium text-slate-700">Académie certifiée</span>
             </div>
@@ -66,7 +66,7 @@ export function AboutSection() {
                     transition-all duration-300 cursor-pointer
                     animate-fade-in animation-delay-${(index + 1) * 100}`}
                 >
-                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-cpu-orange to-cpu-green 
+                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-cpu-orange 
                     flex items-center justify-center text-white
                     group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                     {feature.icon}

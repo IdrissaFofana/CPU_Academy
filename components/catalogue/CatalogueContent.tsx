@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { FormationCard } from "@/components/formations/FormationCard";
+import { EnhancedFormationCard } from "@/components/catalogue/EnhancedFormationCard";
 import { CatalogueFilters } from "@/components/catalogue/CatalogueFilters";
+import { SearchAutocomplete } from "@/components/catalogue/SearchAutocomplete";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,10 +13,15 @@ import { Badge } from "@/components/ui/badge";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { formationsMock } from "@/data/mock";
 import { objectifsMetier } from "@/data/constants";
-import { Search, Filter, X, Grid3x3, List, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal } from "lucide-react";
+import { Search, Filter, X, Grid3x3, List, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type ViewMode = "grid" | "list";
 type SortOption = "recent" | "popular" | "title" | "price";
+
+const ITEMS_PER_PAGE = 12; // 3 colonnes × 4 lignes en desktop
 
 export function CatalogueContent() {
   const searchParams = useSearchParams();
@@ -22,6 +29,10 @@ export function CatalogueContent() {
   const regionParam = searchParams.get('region');
   
   const [motCle, setMotCle] = useState("");
+  const debouncedMotCle = useDebounce(motCle, 300); // Quick Win #1: Debounce search
+  const { history: searchHistory, addSearch, clearHistory } = useSearchHistory(); // Quick Win #2: History
+  const { isFavorite, toggleFavorite } = useFavorites(); // Phase 3: Favorites
+  
   const [objectif, setObjectif] = useState<string>("all");
   const [region, setRegion] = useState<string>("all");
   const [secteur, setSecteur] = useState<string>("all");
@@ -34,6 +45,15 @@ export function CatalogueContent() {
   const [expertFilter, setExpertFilter] = useState<string | null>(null);
   const [regionFilter, setRegionFilter] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [resultCount, setResultCount] = useState(0); // Pour aria-live
+  const [currentPage, setCurrentPage] = useState(1); // Phase 3: Pagination
+
+  // Sauvegarder la recherche dans l'historique quand elle est finalisée (debounce)
+  useEffect(() => {
+    if (debouncedMotCle.trim()) {
+      addSearch(debouncedMotCle);
+    }
+  }, [debouncedMotCle, addSearch]);
 
   useEffect(() => {
     if (expertParam) {
@@ -68,40 +88,74 @@ export function CatalogueContent() {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isDrawerOpen]);
 
-  // Filtrage des formations
-  const formationsFiltrees = formationsMock.filter((formation) => {
-    if (expertFilter && formation.expertId !== expertFilter) {
-      return false;
-    }
-    if (regionFilter && formation.region !== regionFilter) {
-      return false;
-    }
-    if (motCle && !formation.titre.toLowerCase().includes(motCle.toLowerCase())) {
-      return false;
-    }
-    if (objectif && objectif !== "all" && formation.objectifMetier !== objectif) {
-      return false;
-    }
-    if (region && region !== "all" && formation.region !== region) {
-      return false;
-    }
-    if (secteur && secteur !== "all" && formation.secteur !== secteur) {
-      return false;
-    }
-    if (niveau && niveau !== "all" && formation.niveau !== niveau) {
-      return false;
-    }
-    if (format && format !== "all" && formation.format !== format) {
-      return false;
-    }
-    if (gratuit !== null && formation.gratuit !== gratuit) {
-      return false;
-    }
-    if (certifiant !== null && formation.certifiant !== certifiant) {
-      return false;
-    }
-    return true;
-  });
+  // Filtrage et tri des formations (avec useMemo pour éviter re-calculs)
+  const formationsFiltrees = useMemo(() => {
+    let filtered = formationsMock.filter((formation) => {
+      if (expertFilter && formation.expertId !== expertFilter) {
+        return false;
+      }
+      if (regionFilter && formation.region !== regionFilter) {
+        return false;
+      }
+      // Utiliser debouncedMotCle pour éviter les re-rendus excessifs
+      if (debouncedMotCle && !formation.titre.toLowerCase().includes(debouncedMotCle.toLowerCase())) {
+        return false;
+      }
+      if (objectif && objectif !== "all" && formation.objectifMetier !== objectif) {
+        return false;
+      }
+      if (region && region !== "all" && formation.region !== region) {
+        return false;
+      }
+      if (secteur && secteur !== "all" && formation.secteur !== secteur) {
+        return false;
+      }
+      if (niveau && niveau !== "all" && formation.niveau !== niveau) {
+        return false;
+      }
+      if (format && format !== "all" && formation.format !== format) {
+        return false;
+      }
+      if (gratuit !== null && formation.gratuit !== gratuit) {
+        return false;
+      }
+      if (certifiant !== null && formation.certifiant !== certifiant) {
+        return false;
+      }
+      return true;
+    });
+
+    // Tri amélioré
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "popular":
+          return (b.nbInscrits || 0) - (a.nbInscrits || 0);
+        case "title":
+          return a.titre.localeCompare(b.titre, "fr");
+        case "price":
+          return (a.prixPublic || 0) - (b.prixPublic || 0);
+        case "recent":
+        default:
+          // Tri par position dans le mock (premiers ajoutés = plus récents)
+          // En pratique, les premiers dans le tableau sont considérés comme plus récents
+          return formationsMock.indexOf(b) - formationsMock.indexOf(a);
+      }
+    });
+
+    setResultCount(filtered.length);
+    return filtered;
+  }, [debouncedMotCle, objectif, region, secteur, niveau, format, gratuit, certifiant, expertFilter, regionFilter, sortBy]);
+
+  // Phase 3: Pagination - Extraire les formations à afficher
+  const totalPages = Math.ceil(formationsFiltrees.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const formationsPage = formationsFiltrees.slice(startIndex, endIndex);
+
+  // Réinitialiser pagination si les filtres changent
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedMotCle, objectif, region, secteur, niveau, format, gratuit, certifiant]);
 
   const reinitialiserFiltres = () => {
     setMotCle("");
@@ -114,6 +168,7 @@ export function CatalogueContent() {
     setCertifiant(null);
     setExpertFilter(null);
     setRegionFilter(null);
+    setCurrentPage(1);
   };
 
   const nombreFiltresActifs = [
@@ -152,19 +207,16 @@ export function CatalogueContent() {
         <div className="container mx-auto px-8 lg:px-16 py-12">
           {/* Search Bar and Stats */}
           <div className="mb-8 animate-fade-in-up">
-            {/* Search Bar */}
+            {/* Search Bar with Autocomplete */}
             <div className="max-w-2xl mx-auto mb-6">
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 transition-colors group-focus-within:text-cpu-orange" />
-                <Input
-                  type="text"
-                  placeholder="Rechercher une formation, un domaine, une compétence..."
-                  value={motCle}
-                  onChange={(e) => setMotCle(e.target.value)}
-                  className="h-14 pl-12 pr-4 text-lg text-slate-900 placeholder:text-slate-400 bg-white border-2 border-slate-200 shadow-lg focus:shadow-2xl focus:border-cpu-orange transition-all duration-300 rounded-xl"
-                />
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cpu-orange/5 to-cpu-green/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-              </div>
+              <SearchAutocomplete
+                value={motCle}
+                onChange={setMotCle}
+                suggestions={[...new Set(formationsMock.map(f => f.titre).slice(0, 8))]}
+                recentSearches={searchHistory}
+                onSelectSuggestion={(suggestion) => addSearch(suggestion)}
+                onClearHistory={clearHistory}
+              />
             </div>
 
             {/* Quick Stats */}
@@ -234,8 +286,8 @@ export function CatalogueContent() {
               {/* Toolbar */}
               <div className="bg-white rounded-2xl p-4 mb-6 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                  <p className="text-slate-600 font-medium">
-                    <span className="text-cpu-orange font-bold text-lg">{formationsFiltrees.length}</span> formation{formationsFiltrees.length > 1 ? "s" : ""} trouvée{formationsFiltrees.length > 1 ? "s" : ""}
+                  <p className="text-slate-600 font-medium" aria-live="polite" aria-atomic="true" role="status">
+                    <span className="text-cpu-orange font-bold text-lg">{resultCount}</span> formation{resultCount > 1 ? "s" : ""} trouvée{resultCount > 1 ? "s" : ""}
                   </p>
 
                   <div className="flex items-center gap-3">
@@ -332,26 +384,89 @@ export function CatalogueContent() {
                 )}
               </div>
 
-              {/* Formations Grid/List */}
+              {/* Formations Grid/List with Pagination */}
               {formationsFiltrees.length > 0 ? (
-                <div className={`
-                  ${viewMode === "grid" 
-                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6" 
-                    : "flex flex-col gap-4"
-                  }
-                `}>
-                  {formationsFiltrees.map((formation, index) => (
-                    <div
-                      key={formation.id}
-                      className="animate-fade-in-up"
-                      style={{ animationDelay: `${Math.min(index * 0.1, 0.8)}s` }}
-                    >
-                      <div className="h-full card-hover-effect">
-                        <FormationCard formation={formation} />
+                <>
+                  <div className={`
+                    ${viewMode === "grid" 
+                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+                      : "flex flex-col gap-4"
+                    }
+                  `}>
+                    {formationsPage.map((formation, index) => (
+                      <div
+                        key={formation.id}
+                        className="animate-fade-in-up"
+                        style={{ animationDelay: `${Math.min(index * 0.08, 0.6)}s` }}
+                      >
+                        <EnhancedFormationCard 
+                          formation={formation}
+                          isFavorite={isFavorite(formation.id)}
+                          onFavoriteToggle={toggleFavorite}
+                        />
                       </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="mt-12 flex items-center justify-center gap-4">
+                      <Button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        variant="outline"
+                        className="gap-2"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Précédent
+                      </Button>
+
+                      <div className="flex items-center gap-2">
+                        {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                          let pageNum: number;
+                          if (totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else {
+                            if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+                          }
+
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`w-10 h-10 rounded-lg font-semibold transition-all ${
+                                currentPage === pageNum
+                                  ? "bg-cpu-orange text-white shadow-lg"
+                                  : "border-2 border-gray-200 hover:border-cpu-orange"
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <Button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="gap-2 bg-cpu-orange hover:bg-cpu-orange/90 text-white"
+                      >
+                        Suivant
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+
+                      <span className="ml-4 text-sm text-gray-600">
+                        Page {currentPage} sur {totalPages}
+                      </span>
                     </div>
-                  ))}
-                </div>
+                  )}
+                </>
               ) : (
                 <div className="bg-white rounded-2xl p-12 text-center border-2 border-slate-100 animate-scale-in">
                   <div className="mb-6 animate-float">

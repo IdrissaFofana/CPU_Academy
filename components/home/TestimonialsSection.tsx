@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 export function TestimonialsSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const animationRef = useRef<number | undefined>(undefined);
 
   const testimonials = [
@@ -100,9 +101,23 @@ export function TestimonialsSection() {
     setTimeout(() => setIsPaused(false), 1000);
   };
 
+  // Détecter prefers-reduced-motion
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = () => setPrefersReducedMotion(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
+
+    // Ne pas démarrer l'auto-scroll si reduced motion
+    if (prefersReducedMotion) return;
 
     const scrollSpeed = 0.5; // Pixels par frame
     let lastTime = performance.now();
@@ -148,18 +163,18 @@ export function TestimonialsSection() {
       scrollContainer.removeEventListener('mouseenter', handleMouseEnter);
       scrollContainer.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [isPaused]);
+  }, [isPaused, prefersReducedMotion]);
 
   return (
-    <section className="py-20 lg:py-28 bg-white relative overflow-hidden">
+    <section id="temoignages" className="py-12 md:py-20 bg-white relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-cpu-green/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-cpu-orange/5 rounded-full blur-3xl" />
       
-      <div className="container mx-auto px-8 lg:px-16 relative">
+      <div className="container mx-auto px-6 lg:px-16 max-w-7xl relative">
         {/* Header */}
         <div className="text-center mb-16 animate-slide-down">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cpu-orange/10 to-cpu-green/10 rounded-full border-2 border-cpu-orange/40 mb-6 animate-fade-in shadow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border-2 border-cpu-orange/40 mb-6 animate-fade-in shadow-sm">
             <svg className="w-4 h-4 text-cpu-orange" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
               <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
@@ -168,7 +183,7 @@ export function TestimonialsSection() {
           </div>
           
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-slate-900">
-            Ce que disent nos <span className="font-extrabold bg-gradient-to-r from-orange-600 via-orange-500 to-green-600 bg-clip-text text-transparent">apprenants</span>
+            Ce que disent nos <span className="font-extrabold text-cpu-orange">apprenants</span>
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
             Découvrez les témoignages de professionnels qui ont transformé leur carrière et leur entreprise grâce à nos formations
@@ -224,7 +239,7 @@ export function TestimonialsSection() {
                 {/* Header with avatar */}
                 <div className="flex items-center gap-4 mb-6">
                   <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cpu-orange to-cpu-green 
+                    <div className="w-16 h-16 rounded-full bg-cpu-orange 
                       flex items-center justify-center text-white font-bold text-xl shadow-lg
                       group-hover:scale-110 transition-transform duration-500">
                       {testimonial.initials}
@@ -257,7 +272,7 @@ export function TestimonialsSection() {
                 {/* Formation badge */}
                 <div className="pt-4 border-t border-slate-100">
                   <div className="text-xs text-slate-500 mb-1">Formation suivie</div>
-                  <div className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-cpu-orange/10 to-cpu-green/10 border border-cpu-orange/30">
+                  <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-50 border border-cpu-orange/30">
                     <span className="text-sm font-semibold text-cpu-orange">{testimonial.formation}</span>
                   </div>
                 </div>

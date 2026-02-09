@@ -5,7 +5,7 @@ import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "luc
 export function Footer() {
   return (
     <footer className="bg-[#1a1f2e] text-slate-300">
-      <div className="container mx-auto px-8 lg:px-16 py-12">
+      <div className="container mx-auto px-6 lg:px-16 max-w-7xl py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* À propos de CPU-Académie */}
           <div>
@@ -40,13 +40,18 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Liens rapides */}
+          {/* Formations */}
           <div>
-            <h3 className="text-cpu-orange font-semibold text-lg mb-4">Liens rapides</h3>
+            <h3 className="text-cpu-orange font-semibold text-lg mb-4">Formations</h3>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link href="/catalogue" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Catalogue des formations
+                  Catalogue de formations
+                </Link>
+              </li>
+              <li>
+                <Link href="/parcours" className="text-slate-400 hover:text-cpu-orange transition-colors">
+                  Parcours métiers
                 </Link>
               </li>
               <li>
@@ -56,54 +61,49 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/entreprises" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Espace Entreprises
-                </Link>
-              </li>
-              <li>
-                <Link href="/parcours/entrepreneur" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Parcours Entrepreneur
+                  Solutions entreprises
                 </Link>
               </li>
               <li>
                 <Link href="/experts" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Nos Experts
-                </Link>
-              </li>
-              <li>
-                <Link href="/regions" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Régions
+                  Nos experts
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Support */}
+          {/* À propos */}
           <div>
-            <h3 className="text-cpu-orange font-semibold text-lg mb-4">Support</h3>
+            <h3 className="text-cpu-orange font-semibold text-lg mb-4">À propos</h3>
             <ul className="space-y-3 text-sm">
               <li>
+                <Link href="/about" className="text-slate-400 hover:text-cpu-orange transition-colors font-medium">
+                  Qui sommes-nous ?
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="text-slate-400 hover:text-cpu-orange transition-colors font-medium">
+                  Blog & Actualités
+                </Link>
+              </li>
+              <li>
+                <Link href="/about#equipe" className="text-slate-400 hover:text-cpu-orange transition-colors">
+                  Notre équipe
+                </Link>
+              </li>
+              <li>
+                <Link href="/about#partenaires" className="text-slate-400 hover:text-cpu-orange transition-colors">
+                  Nos partenaires
+                </Link>
+              </li>
+              <li>
                 <Link href="/ressources/faq" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  FAQ
+                  Centre d'aide
                 </Link>
               </li>
               <li>
-                <Link href="/ressources" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Guides & Ressources
-                </Link>
-              </li>
-              <li>
-                <Link href="/ressources?tab=webinaires" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Webinaires
-                </Link>
-              </li>
-              <li>
-                <Link href="/ressources?tab=support" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Support & Assistance
-                </Link>
-              </li>
-              <li>
-                <Link href="/ressources/faq#contact-form" className="text-slate-400 hover:text-cpu-orange transition-colors">
-                  Nous contacter
+                <Link href="/rac" className="text-slate-400 hover:text-cpu-orange transition-colors">
+                  RAC
                 </Link>
               </li>
             </ul>

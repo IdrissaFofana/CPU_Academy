@@ -6,32 +6,32 @@ const stats = [
     icon: Users,
     value: "10,000+",
     label: "Apprenants actifs",
-    color: "text-blue-600"
+    color: "text-cpu-orange"
   },
   {
     icon: BookOpen,
     value: "250+",
     label: "Formations disponibles",
-    color: "text-green-600"
+    color: "text-cpu-green"
   },
   {
     icon: Award,
     value: "5,000+",
     label: "Certifications délivrées",
-    color: "text-purple-600"
+    color: "text-cpu-orange"
   },
   {
     icon: Building2,
     value: "500+",
     label: "Entreprises partenaires",
-    color: "text-orange-600"
+    color: "text-cpu-green"
   }
 ];
 
 export function StatsSection() {
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-8 lg:px-16">
+    <section className="py-10 md:py-16 bg-white">
+      <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <Card key={index} className={`text-center animate-scale-in animation-delay-${(index + 1) * 100}`}>

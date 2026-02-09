@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,10 +56,13 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
       {/* Image de la formation */}
       <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
         {formation.image ? (
-          <img 
+          <Image 
             src={formation.image} 
             alt={formation.titre}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            loading="lazy"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cpu-orange/10 to-cpu-green/10">
@@ -150,12 +155,13 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
               S'inscrire maintenant
             </Button>
           </a>
-          <Button 
-            className="cursor-pointer w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold rounded-md shadow-sm hover:shadow-lg transition-all duration-200" 
-            onClick={() => setIsModalOpen(true)}
-          >
-            Voir le détail
-          </Button>
+          <Link href={`/formations/${formation.slug}`} className="w-full">
+            <Button 
+              className="cursor-pointer w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold rounded-md shadow-sm hover:shadow-lg transition-all duration-200" 
+            >
+              Voir le détail
+            </Button>
+          </Link>
         </div>
       </CardContent>
 
