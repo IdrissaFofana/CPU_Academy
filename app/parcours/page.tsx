@@ -8,6 +8,7 @@ import { ParcoursCardOptimized, ViewModeToggle } from "@/components/parcours/Par
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { SearchBar } from "@/components/ui/search-bar";
 import {
   Target,
   Filter,
@@ -16,10 +17,10 @@ import {
   Users,
   Award,
   BookOpen,
+  Rocket,
   Sparkles,
   CheckCircle2,
   Zap,
-  Rocket,
   Trophy,
   GraduationCap
 } from "lucide-react";
@@ -109,6 +110,10 @@ export default function ParcoursPage() {
           { label: "Accueil", href: "/" },
           { label: "Parcours" }
         ]}
+        buttons={[
+          { label: "Commencer maintenant", href: "/inscription", icon: <Rocket className="h-5 w-5" /> },
+          { label: "Voir le catalogue", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+        ]}
       />
 
       <div className="min-h-screen bg-slate-50">
@@ -192,141 +197,200 @@ export default function ParcoursPage() {
           </div>
         </section>
 
-        {/* Filtres et recherche */}
-        <section id="recherche" className="py-8 bg-white/80 backdrop-blur-sm sticky top-0 z-30 border-b border-slate-200 shadow-sm animate-fade-in-up animation-delay-300">
+        {/* Main layout with sidebar */}
+        <section id="parcours" className="py-8 lg:py-12">
           <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              {/* Barre de recherche améliorée */}
-              <div className="relative flex-1 max-w-xl group">
-                <div className="absolute inset-0 bg-gradient-to-r from-cpu-orange/20 to-blue-500/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 z-10 group-focus-within:text-cpu-orange transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Rechercher un parcours par nom ou compétence..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="relative w-full pl-12 pr-4 py-3.5 border-2 border-slate-200 rounded-xl focus:border-cpu-orange focus:outline-none bg-white shadow-md focus:shadow-xl transition-all duration-300 text-slate-900 placeholder:text-slate-400"
-                />
-              </div>
+            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+              {/* Sidebar Filtres */}
+              <aside className="w-full lg:w-64 flex-shrink-0">
+                <Card className="p-6 border-2 border-slate-200 shadow-lg sticky top-24 bg-white">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                      <div className="w-1 h-6 bg-cpu-orange rounded-full"></div>
+                      Filtres
+                    </h2>
+                    {(filtreNiveau !== "all" || searchTerm !== "") && (
+                      <button
+                        onClick={() => {
+                          setFiltreNiveau("all");
+                          setSearchTerm("");
+                        }}
+                        className="text-xs text-cpu-orange hover:underline font-medium"
+                      >
+                        Réinitialiser
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Filtres actifs */}
+                  {(filtreNiveau !== "all" || searchTerm !== "") && (
+                    <div className="mb-6 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                      <p className="text-xs font-semibold text-orange-900 mb-2">Filtres actifs:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {filtreNiveau !== "all" && (
+                          <Badge className="bg-cpu-orange text-white text-xs">
+                            {filtreNiveau}
+                          </Badge>
+                        )}
+                        {searchTerm !== "" && (
+                          <Badge className="bg-slate-700 text-white text-xs">
+                            Recherche: {searchTerm.substring(0, 10)}...
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Filtrer par niveau */}
+                  <div className="mb-6 pb-6 border-b-2 border-slate-100">
+                    <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
+                      <Target className="w-4 h-4 text-cpu-orange" />
+                      Niveau
+                    </h3>
+                    <div className="space-y-2">
+                      {["all", "Débutant", "Intermédiaire", "Avancé"].map((niveau) => {
+                        const count = parcoursMock.filter(p => niveau === "all" || p.niveau === niveau).length;
+                        const Icon = niveau === "all" ? Rocket : niveau === "Débutant" ? Sparkles : niveau === "Intermédiaire" ? Trophy : GraduationCap;
+                        const colorClass = niveau === "Débutant" ? "text-green-600" : niveau === "Intermédiaire" ? "text-blue-600" : niveau === "Avancé" ? "text-purple-600" : "text-slate-600";
+                        
+                        return (
+                          <Button
+                            key={niveau}
+                            onClick={() => setFiltreNiveau(niveau)}
+                            variant="ghost"
+                            className={`w-full justify-between text-sm transition-all group ${
+                              filtreNiveau === niveau
+                                ? "bg-cpu-orange text-white hover:bg-cpu-orange shadow-md scale-105"
+                                : "text-slate-700 hover:bg-slate-100 hover:scale-[1.02]"
+                            }`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <Icon className={`w-4 h-4 ${filtreNiveau === niveau ? "text-white" : colorClass}`} />
+                              {niveau === "all" ? "Tous" : niveau}
+                            </span>
+                            <Badge 
+                              className={`text-xs ${
+                                filtreNiveau === niveau
+                                  ? "bg-white/20 text-white border-0"
+                                  : "bg-slate-200 text-slate-700 border-0"
+                              }`}
+                            >
+                              {count}
+                            </Badge>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-              {/* Filtres par niveau stylisés */}
-              <div className="flex items-center gap-3 flex-wrap">
-                <Filter className="w-5 h-5 text-slate-500" />
-                <div className="flex gap-2 p-1.5 bg-slate-100 rounded-xl">
-                  {["all", "Débutant", "Intermédiaire", "Avancé"].map((niveau) => (
-                    <Button
-                      key={niveau}
-                      onClick={() => setFiltreNiveau(niveau)}
-                      variant="ghost"
-                      className={`rounded-lg transition-all duration-200 ${
-                        filtreNiveau === niveau 
-                          ? "bg-cpu-orange text-white shadow-md hover:shadow-lg" 
-                          : "hover:bg-white text-slate-700"
-                      }`}
-                      size="sm"
+                  {/* Tri */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-cpu-orange" />
+                      Trier par
+                    </h3>
+                    <select
+                      value={triPar}
+                      onChange={(e) => setTriPar(e.target.value)}
+                      className="w-full px-4 py-2.5 border-2 border-slate-200 rounded-lg focus:border-cpu-orange focus:outline-none bg-white text-slate-700 cursor-pointer transition-all text-sm"
                     >
-                      {niveau === "all" ? "Tous" : niveau}
-                    </Button>
-                  ))}
-                </div>
-              </div>              
-              {/* Système de tri */}
-              <div className="flex items-center gap-3">
-                <TrendingUp className="w-5 h-5 text-slate-500" />
-                <select
-                  value={triPar}
-                  onChange={(e) => setTriPar(e.target.value)}
-                  className="px-4 py-2 border-2 border-slate-200 rounded-xl focus:border-cpu-orange focus:outline-none bg-white text-slate-700 cursor-pointer hover:border-slate-300 transition-colors"
-                >
-                  <option value="populaire">Plus populaires</option>
-                  <option value="note">Mieux notés</option>
-                  <option value="duree-asc">Durée croissante</option>
-                  <option value="duree-desc">Durée décroissante</option>
-                </select>
-              </div>            </div>
+                      <option value="populaire">Plus populaires</option>
+                      <option value="note">Mieux notés</option>
+                      <option value="duree-asc">Durée croissante</option>
+                      <option value="duree-desc">Durée décroissante</option>
+                    </select>
+                  </div>
 
-            {/* Résultats de recherche stylisés */}
-            {searchTerm && (
-              <div className="mt-4 flex items-center gap-2 text-sm animate-fade-in">
-                <CheckCircle2 className="w-4 h-4 text-cpu-orange" />
-                <span className="text-slate-600">
-                  <span className="font-bold text-cpu-orange">{parcoursFiltres.length}</span> résultat{parcoursFiltres.length > 1 ? "s" : ""} pour <span className="font-semibold">"{searchTerm}"</span>
-                </span>
-              </div>
-            )}
-          </div>
-        </section>
+                  {/* Info helper */}
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-xs text-blue-800 leading-relaxed">
+                      <span className="font-semibold">💡 Astuce:</span> Combinez recherche et filtres pour trouver le parcours idéal
+                    </p>
+                  </div>
+                </Card>
+              </aside>
 
-        {/* Liste des parcours */}
-        <section id="parcours" className="py-16">
-          <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
-            {/* VIEW MODE TOGGLE */}
-            <div className="flex items-center justify-between gap-4 mb-8">
-              <div className="text-sm text-slate-600">
-                <span className="font-semibold text-slate-900">{parcoursTries.length}</span> parcours trouvés
-              </div>
-              <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-            </div>
-
-            {parcoursTries.length > 0 ? (
-              <div
-                className={`
-                  ${
-                    viewMode === "grid"
-                      ? "grid md:grid-cols-2 lg:grid-cols-4 gap-6"
-                      : viewMode === "list"
-                      ? "space-y-3"
-                      : "space-y-2"
-                  }
-                `}
-              >
-                {parcoursTries.map((parcours, index) => (
-                  <div
-                    key={parcours.id}
-                    className={viewMode === "grid" ? "animate-fade-in-up" : ""}
-                    style={
-                      viewMode === "grid"
-                        ? { animationDelay: `${Math.min(index * 0.1, 0.8)}s` }
-                        : {}
-                    }
-                  >
-                    <ParcoursCardOptimized
-                      parcours={parcours}
-                      variant={viewMode}
-                      onInscription={handleInscription}
-                      isFavorite={isParcoursLiked(parcours.id)}
-                      onToggleFavorite={toggleFavori}
-                      isNew={isParcoursNew(parcours.dateCreation)}
+              {/* Contenu principal */}
+              <div className="flex-1 min-w-0">
+                {/* Barre de recherche + VIEW MODE TOGGLE */}
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
+                  <div className="flex-1 max-w-md">
+                    <SearchBar 
+                      value={searchTerm}
+                      onChange={setSearchTerm}
+                      placeholder="Rechercher un parcours..."
+                      size="md"
                     />
                   </div>
-                ))}
-              </div>
-            ) : (
-              <Card className="relative overflow-hidden p-16 text-center border-2 border-slate-100 animate-scale-in">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white"></div>
-                <div className="relative">
-                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 mb-6 animate-float">
-                    <Search className="w-12 h-12 text-slate-400" />
+                  <div className="flex items-center gap-4">
+                    <div className="text-sm text-slate-600">
+                      <span className="font-semibold text-slate-900">{parcoursTries.length}</span> parcours trouvés
+                    </div>
+                    <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                    Aucun parcours trouvé
-                  </h3>
-                  <p className="text-slate-600 mb-8 max-w-md mx-auto text-lg">
-                    Essayez de modifier vos critères de recherche ou vos filtres
-                  </p>
-                  <Button 
-                    onClick={() => {
-                      setSearchTerm("");
-                      setFiltreNiveau("all");
-                    }}
-                    className="bg-gradient-to-r from-cpu-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 shine-effect"
-                  >
-                    <Zap className="mr-2 h-5 w-5" />
-                    Réinitialiser les filtres
-                  </Button>
                 </div>
-              </Card>
-            )}
+
+                {parcoursTries.length > 0 ? (
+                  <div
+                    className={`
+                      ${
+                        viewMode === "grid"
+                          ? "grid md:grid-cols-2 xl:grid-cols-3 gap-6"
+                          : viewMode === "list"
+                          ? "space-y-3"
+                          : "space-y-2"
+                      }
+                    `}
+                  >
+                    {parcoursTries.map((parcours, index) => (
+                      <div
+                        key={parcours.id}
+                        className={viewMode === "grid" ? "animate-fade-in-up" : ""}
+                        style={
+                          viewMode === "grid"
+                            ? { animationDelay: `${Math.min(index * 0.1, 0.8)}s` }
+                            : {}
+                        }
+                      >
+                        <ParcoursCardOptimized
+                          parcours={parcours}
+                          variant={viewMode}
+                          onInscription={handleInscription}
+                          isFavorite={isParcoursLiked(parcours.id)}
+                          onToggleFavorite={toggleFavori}
+                          isNew={isParcoursNew(parcours.dateCreation)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="relative overflow-hidden p-16 text-center border-2 border-slate-100 animate-scale-in">
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white"></div>
+                    <div className="relative">
+                      <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 mb-6 animate-float">
+                        <Search className="w-12 h-12 text-slate-400" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                        Aucun parcours trouvé
+                      </h3>
+                      <p className="text-slate-600 mb-8 max-w-md mx-auto text-lg">
+                        Essayez de modifier vos critères de recherche ou vos filtres
+                      </p>
+                      <Button 
+                        onClick={() => {
+                          setSearchTerm("");
+                          setFiltreNiveau("all");
+                        }}
+                        className="bg-gradient-to-r from-cpu-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 shine-effect"
+                      >
+                        <Zap className="mr-2 h-5 w-5" />
+                        Réinitialiser les filtres
+                      </Button>
+                    </div>
+                  </Card>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 

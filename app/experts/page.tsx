@@ -1,95 +1,154 @@
-import type { Metadata } from "next";
+"use client";
+
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Users, GraduationCap, Award, Briefcase, Star, MapPin, Clock, CheckCircle2, ArrowRight, Mail, Linkedin, Globe, BookOpen, Target, TrendingUp, Sparkles } from "lucide-react";
+import { ExpertCard } from "@/components/experts/ExpertCard";
+import { ExpertFilters } from "@/components/experts/ExpertFilters";
+import { useExpertFilters } from "@/hooks/useExpertFilters";
+import { useExpertFavorites } from "@/hooks/useExpertFavorites";
+import { 
+  Users, 
+  GraduationCap, 
+  Award, 
+  Star, 
+  TrendingUp, 
+  Sparkles, 
+  CheckCircle2, 
+  ArrowRight,
+  Grid3x3,
+  List,
+  LayoutGrid,
+  BookOpen,
+  UserPlus,
+  MapPin,
+  Filter,
+  SlidersHorizontal
+} from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-
-export const metadata: Metadata = {
-  title: "Nos experts - CPU Formation",
-  description: "Découvrez nos formateurs experts dans leur domaine",
-};
+import { useState } from "react";
 
 const experts = [
   {
     id: 1,
     nom: "Dr. Kouassi Amani",
     specialite: "Entrepreneuriat & Management",
-    photo: "/experts/avatar-1.jpg",
+    photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
     experience: "15 ans",
     formations: 45,
+    studentsCount: 1250,
     rating: 4.9,
-    certifications: ["MBA", "Consultant CEPICI"],
+    reviewsCount: 287,
+    certifications: ["MBA", "Consultant CEPICI", "PMP"],
     domaines: ["Business Plan", "Stratégie", "Finance"],
-    localisation: "Abidjan, Plateau",
-    disponible: true
+    localisation: "Plateau, Abidjan",
+    disponible: true,
+    bio: "Expert en entrepreneuriat avec plus de 15 ans d'expérience dans l'accompagnement des startups et PME africaines.",
+    tarif: "50 000 FCFA/h",
+    langues: ["Français", "Anglais"],
+    isTop: true,
+    isNew: false
   },
   {
     id: 2,
     nom: "Marie-Claire Koné",
     specialite: "Marketing Digital & E-commerce",
-    photo: "/experts/avatar-2.jpg",
+    photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
     experience: "10 ans",
     formations: 38,
+    studentsCount: 980,
     rating: 4.8,
-    certifications: ["Google Analytics", "Meta Blueprint"],
+    reviewsCount: 245,
+    certifications: ["Google Analytics", "Meta Blueprint", "HubSpot"],
     domaines: ["SEO", "Réseaux Sociaux", "Marketplace"],
-    localisation: "Abidjan, Cocody",
-    disponible: true
+    localisation: "Cocody, Abidjan",
+    disponible: true,
+    bio: "Spécialiste du marketing digital et de la transformation numérique des entreprises en Afrique de l'Ouest.",
+    tarif: "45 000 FCFA/h",
+    langues: ["Français", "Anglais"],
+    isTop: true,
+    isNew: false
   },
   {
     id: 3,
     nom: "Jean-Baptiste Yao",
     specialite: "Marchés Publics & AO",
-    photo: "/experts/avatar-3.jpg",
+    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
     experience: "12 ans",
     formations: 32,
+    studentsCount: 650,
     rating: 4.9,
-    certifications: ["Expert AO", "Juriste"],
+    reviewsCount: 198,
+    certifications: ["Expert AO", "Juriste", "CIPS"],
     domaines: ["Appels d'offres", "Conformité", "Rédaction"],
-    localisation: "Abidjan, Marcory",
-    disponible: false
+    localisation: "Marcory, Abidjan",
+    disponible: false,
+    bio: "Consultant senior en marchés publics et procédures d'appels d'offres internationaux.",
+    tarif: "60 000 FCFA/h",
+    langues: ["Français"],
+    isTop: false,
+    isNew: false
   },
   {
     id: 4,
     nom: "Fatou Traoré",
     specialite: "Finance & Bancabilité",
-    photo: "/experts/avatar-4.jpg",
+    photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop",
     experience: "18 ans",
     formations: 41,
+    studentsCount: 1450,
     rating: 5.0,
-    certifications: ["CFA", "Expert Comptable"],
+    reviewsCount: 312,
+    certifications: ["CFA", "Expert Comptable", "ACCA"],
     domaines: ["Comptabilité", "Audit", "Levée de fonds"],
-    localisation: "Abidjan, Deux Plateaux",
-    disponible: true
+    localisation: "Deux Plateaux, Abidjan",
+    disponible: true,
+    bio: "Experte financière reconnue, spécialisée dans l'accompagnement des entreprises vers la bancabilité.",
+    tarif: "70 000 FCFA/h",
+    langues: ["Français", "Anglais"],
+    isTop: true,
+    isNew: false
   },
   {
     id: 5,
     nom: "Ibrahim Diallo",
     specialite: "Production & Qualité",
-    photo: "/experts/avatar-5.jpg",
+    photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
     experience: "14 ans",
     formations: 28,
+    studentsCount: 540,
     rating: 4.7,
-    certifications: ["ISO 9001", "HACCP"],
+    reviewsCount: 176,
+    certifications: ["ISO 9001", "HACCP", "Lean Six Sigma"],
     domaines: ["Qualité", "Process", "Certification"],
-    localisation: "Abidjan, Yopougon",
-    disponible: true
+    localisation: "Yopougon, Abidjan",
+    disponible: true,
+    bio: "Ingénieur qualité certifié avec une expertise approfondie en gestion de la production et des processus.",
+    tarif: "40 000 FCFA/h",
+    langues: ["Français"],
+    isTop: false,
+    isNew: false
   },
   {
     id: 6,
     nom: "Aya N'Guessan",
     specialite: "Ressources Humaines",
-    photo: "/experts/avatar-6.jpg",
+    photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
     experience: "11 ans",
     formations: 35,
+    studentsCount: 820,
     rating: 4.8,
-    certifications: ["GPEC", "Coach Certifiée"],
+    reviewsCount: 234,
+    certifications: ["GPEC", "Coach Certifiée", "SHRM"],
     domaines: ["Recrutement", "Formation", "Management"],
-    localisation: "Abidjan, Angré",
-    disponible: true
+    localisation: "Angré, Abidjan",
+    disponible: true,
+    bio: "Coach RH certifiée, experte en développement des talents et transformation managériale.",
+    tarif: "50 000 FCFA/h",
+    langues: ["Français", "Anglais"],
+    isTop: false,
+    isNew: true
   }
 ];
 
@@ -105,7 +164,7 @@ const avantagesFormateur = [
     description: "Rejoignez un réseau de formateurs qualifiés et échangez les meilleures pratiques"
   },
   {
-    icon: BookOpen,
+    icon: GraduationCap,
     titre: "Ressources pédagogiques",
     description: "Accédez à nos outils et supports de formation pour faciliter vos interventions"
   },
@@ -126,6 +185,39 @@ const criteres = [
 ];
 
 export default function ExpertsPage() {
+  // State for view mode
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "compact">("grid");
+  
+  // Use filters hook
+  const {
+    filters,
+    updateFilters,
+    resetFilters,
+    filteredExperts,
+    resultsCount,
+    availableSpecialties,
+    availableLocations
+  } = useExpertFilters(experts);
+
+  // Use favorites hook
+  const { toggleFavorite, isFavorite } = useExpertFavorites();
+
+  // Calculate dynamic stats based on filtered experts
+  const avgRating = filteredExperts.length > 0
+    ? (filteredExperts.reduce((sum, e) => sum + e.rating, 0) / filteredExperts.length).toFixed(1)
+    : "4.8";
+
+  const totalFormations = filteredExperts.reduce((sum, e) => sum + e.formations, 0);
+
+  const avgExperience = filteredExperts.length > 0
+    ? Math.round(
+        filteredExperts.reduce((sum, e) => {
+          const match = e.experience.match(/(\d+)/);
+          return sum + (match ? parseInt(match[0]) : 0);
+        }, 0) / filteredExperts.length
+      )
+    : 12;
+
   return (
     <>
       <PageBanner 
@@ -135,175 +227,164 @@ export default function ExpertsPage() {
           { label: "Accueil", href: "/" },
           { label: "Experts" }
         ]}
+        buttons={[
+          { label: "Devenir expert", href: "/support", icon: <UserPlus className="h-5 w-5" /> },
+          { label: "Voir les formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+        ]}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
         {/* Stats Section */}
-        <section className="container mx-auto px-8 lg:px-16 py-12">
-          <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in">
-              <Users className="w-10 h-10 mx-auto mb-3 text-orange-600" />
-              <div className="text-3xl font-bold mb-1 text-slate-900">50+</div>
-              <div className="text-sm text-slate-600">Experts</div>
+        <section className="container mx-auto px-4 md:px-8 lg:px-16 py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto">
+            <div className="bg-white rounded-xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
+              <Users className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-orange-600" />
+              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900">{resultsCount}</div>
+              <div className="text-xs md:text-sm text-slate-600">Experts</div>
             </div>
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in animation-delay-100">
-              <GraduationCap className="w-10 h-10 mx-auto mb-3 text-blue-600" />
-              <div className="text-3xl font-bold mb-1 text-slate-900">200+</div>
-              <div className="text-sm text-slate-600">Formations</div>
+            <div className="bg-white rounded-xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
+              <GraduationCap className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-blue-600" />
+              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900">{totalFormations}+</div>
+              <div className="text-xs md:text-sm text-slate-600">Formations</div>
             </div>
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in animation-delay-200">
-              <Star className="w-10 h-10 mx-auto mb-3 text-yellow-600" />
-              <div className="text-3xl font-bold mb-1 text-slate-900">4.8/5</div>
-              <div className="text-sm text-slate-600">Satisfaction</div>
+            <div className="bg-white rounded-xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
+              <Star className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-yellow-600" />
+              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900">{avgRating}/5</div>
+              <div className="text-xs md:text-sm text-slate-600">Satisfaction</div>
             </div>
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in animation-delay-300">
-              <Briefcase className="w-10 h-10 mx-auto mb-3 text-green-600" />
-              <div className="text-3xl font-bold mb-1 text-slate-900">12+</div>
-              <div className="text-sm text-slate-600">Ans d'expérience moyenne</div>
+            <div className="bg-white rounded-xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
+              <Award className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-green-600" />
+              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900">{avgExperience}+</div>
+              <div className="text-xs md:text-sm text-slate-600">Ans d'expérience</div>
             </div>
           </div>
         </section>
 
-        {/* Annuaire des experts Section */}
-        <section id="annuaire-experts" className="container mx-auto px-8 lg:px-16 py-12">
-          <div className="text-center mb-12 animate-slide-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+        {/* Experts Directory with Sidebar */}
+        <section className="container mx-auto px-4 md:px-8 lg:px-16 py-8 md:py-12">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 md:mb-4">
               Annuaire des Experts
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto px-4">
               Nos formateurs sont des professionnels reconnus, passionnés par la transmission de leur expertise
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {experts.map((expert, idx) => (
-              <div
-                key={expert.id}
-                className="group bg-white rounded-3xl border border-slate-200 shadow-md hover:shadow-2xl transition-all duration-300 animate-slide-up overflow-hidden flex flex-col"
-                style={{ animationDelay: `${idx * 100}ms` }}
-              >
-                {/* Photo & Status */}
-                <div className="relative">
-                  <div className="h-48 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                    <Users className="w-24 h-24 text-slate-400" />
-                  </div>
-                  {expert.disponible && (
-                    <Badge className="absolute top-4 right-4 bg-green-500 text-white border-0">
-                      Disponible
-                    </Badge>
-                  )}
+          <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
+            {/* Sidebar Filters */}
+            <aside className="w-full lg:w-80 flex-shrink-0">
+              <ExpertFilters
+                filters={filters}
+                onFiltersChange={updateFilters}
+                onReset={resetFilters}
+                resultsCount={resultsCount}
+                availableSpecialties={availableSpecialties}
+                availableLocations={availableLocations}
+              />
+            </aside>
+
+            {/* Main Content */}
+            <div className="flex-1 min-w-0">
+              {/* View Mode Toggle & Actions */}
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
+                  >
+                    <Grid3x3 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "compact" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("compact")}
+                    className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </Button>
                 </div>
-
-                {/* Content */}
-                <div className="p-6 flex-grow">
-                  <h3 className="text-xl font-bold text-slate-900 mb-1">
-                    {expert.nom}
-                  </h3>
-                  <p className="text-orange-600 font-medium text-sm mb-4">
-                    {expert.specialite}
-                  </p>
-
-                  <div className="flex items-center gap-2 text-sm text-slate-600 mb-3">
-                    <MapPin className="w-4 h-4" />
-                    <span>{expert.localisation}</span>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-sm mb-4">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-slate-500" />
-                      <span className="text-slate-700">{expert.experience}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <BookOpen className="w-4 h-4 text-slate-500" />
-                      <span className="text-slate-700">{expert.formations} formations</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                      <span className="text-slate-700 font-semibold">{expert.rating}</span>
-                    </div>
-                  </div>
-
-                  {/* Certifications */}
-                  <div className="mb-4">
-                    <p className="text-xs font-bold text-slate-900 mb-2">Certifications:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {expert.certifications.map((cert, i) => (
-                        <Badge key={i} variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
-                          {cert}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Domaines */}
-                  <div className="mb-4">
-                    <p className="text-xs font-bold text-slate-900 mb-2">Domaines:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {expert.domaines.map((domaine, i) => (
-                        <span key={i} className="px-2.5 py-1 rounded-lg bg-slate-50 text-xs text-slate-700 border border-slate-200">
-                          {domaine}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="p-6 pt-0 mt-auto">
-                  <div className="flex gap-3">
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="flex-1 cursor-pointer border-2 border-slate-200 hover:bg-slate-50"
-                    >
-                      <Link href={`/catalogue?expert=expert-${expert.id}`}>
-                        <BookOpen className="mr-2 h-4 w-4" />
-                        Voir formations
-                      </Link>
-                    </Button>
-                    <Button
-                      asChild
-                      className="flex-1 cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white"
-                    >
-                      <Link href="/ressources/faq">
-                        <Mail className="mr-2 h-4 w-4" />
-                        Contacter
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
+                <p className="text-sm text-gray-600">
+                  {resultsCount} {resultsCount > 1 ? "experts trouvés" : "expert trouvé"}
+                </p>
               </div>
-            ))}
+
+              {/* Experts Grid/List */}
+              {filteredExperts.length === 0 ? (
+                <Card className="p-12 text-center">
+                  <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Aucun expert trouvé
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Essayez de modifier vos critères de recherche
+                  </p>
+                  <Button onClick={resetFilters} variant="outline">
+                    Réinitialiser les filtres
+                  </Button>
+                </Card>
+              ) : (
+                <div className={`grid gap-6 ${
+                  viewMode === "grid" 
+                    ? "md:grid-cols-2 xl:grid-cols-3" 
+                    : viewMode === "compact" 
+                    ? "md:grid-cols-3 xl:grid-cols-4" 
+                    : "grid-cols-1"
+                }`}>
+                  {filteredExperts.map((expert) => (
+                    <ExpertCard
+                      key={expert.id}
+                      expert={expert}
+                      variant={viewMode}
+                      onToggleFavorite={toggleFavorite}
+                      isFavorite={isFavorite(expert.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
         {/* Devenir Formateur Section */}
-        <section id="devenir-formateur" className="container mx-auto px-8 lg:px-16 py-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <Sparkles className="w-12 h-12 mx-auto mb-4 text-orange-500" />
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <section 
+          id="devenir-formateur" 
+          className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-16"
+        >
+          <div className="max-w-6xl mx-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 text-white">
+            <div className="text-center mb-8 md:mb-12">
+              <Sparkles className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 text-orange-500" />
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
                 Devenez Formateur chez CPU Formation
               </h2>
-              <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+              <p className="text-base md:text-lg text-slate-300 max-w-2xl mx-auto">
                 Partagez votre expertise, impactez des carrières et développez votre activité de formation
               </p>
             </div>
 
             {/* Avantages */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
               {avantagesFormateur.map((avantage, idx) => {
                 const Icon = avantage.icon;
                 return (
                   <div
                     key={idx}
-                    className="bg-white/10 rounded-2xl p-6 backdrop-blur-sm hover:bg-white/15 transition-all animate-fade-in"
-                    style={{ animationDelay: `${idx * 100}ms` }}
+                    className="bg-white/10 rounded-2xl p-4 md:p-6 backdrop-blur-sm hover:bg-white/15 transition-all"
                   >
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-orange-500/20 mb-4">
-                      <Icon className="w-6 h-6 text-orange-400" />
+                    <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-orange-500/20 mb-3 md:mb-4">
+                      <Icon className="w-5 h-5 md:w-6 md:h-6 text-orange-400" />
                     </div>
-                    <h3 className="text-lg font-bold mb-2">{avantage.titre}</h3>
+                    <h3 className="text-base md:text-lg font-bold mb-2">{avantage.titre}</h3>
                     <p className="text-sm text-slate-300">{avantage.description}</p>
                   </div>
                 );
@@ -311,16 +392,16 @@ export default function ExpertsPage() {
             </div>
 
             {/* Critères */}
-            <div className="bg-white/5 rounded-3xl p-8 md:p-12 backdrop-blur-sm border border-white/10 mb-12">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <Target className="w-7 h-7 text-orange-500" />
+            <div className="bg-white/5 rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-12 backdrop-blur-sm border border-white/10 mb-8 md:mb-12">
+              <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 flex items-center gap-3">
+                <CheckCircle2 className="w-6 h-6 md:w-7 md:h-7 text-orange-500" />
                 Critères de sélection
               </h3>
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-2 gap-3 md:gap-4">
                 {criteres.map((critere, idx) => (
                   <div key={idx} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-200">{critere}</span>
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base text-slate-200">{critere}</span>
                   </div>
                 ))}
               </div>
@@ -328,14 +409,14 @@ export default function ExpertsPage() {
 
             {/* CTA */}
             <div className="text-center">
-              <p className="text-lg text-slate-300 mb-6">
+              <p className="text-base md:text-lg text-slate-300 mb-4 md:mb-6">
                 Prêt à rejoindre notre équipe d'experts ?
               </p>
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 md:gap-4">
                 <Button
                   asChild
                   size="lg"
-                  className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white shadow-lg"
+                  className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white shadow-lg w-full sm:w-auto"
                 >
                   <Link href="/support">
                     <GraduationCap className="mr-2 h-5 w-5" />
@@ -346,11 +427,11 @@ export default function ExpertsPage() {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="cursor-pointer border-2 border-white bg-white text-slate-900 hover:bg-slate-100 hover:text-slate-900"
+                  className="cursor-pointer border-2 border-white bg-white text-slate-900 hover:bg-slate-100 hover:text-slate-900 w-full sm:w-auto"
                 >
-                  <Link href="/ressources/faq#contact-form">
-                    <Mail className="mr-2 h-5 w-5" />
-                    Nous contacter
+                  <Link href="/support">
+                    <ArrowRight className="mr-2 h-5 w-5" />
+                    En savoir plus
                   </Link>
                 </Button>
               </div>

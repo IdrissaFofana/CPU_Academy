@@ -194,6 +194,10 @@ export default function RegionsPage() {
           { label: "Accueil", href: "/" },
           { label: "Régions" }
         ]}
+        buttons={[
+          { label: "Voir les formations", href: "/catalogue", icon: <BookOpen className="h-5 w-5" /> },
+          { label: "Trouver un centre", href: "/centres-formation", variant: "outline", icon: <MapPin className="h-5 w-5" /> }
+        ]}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">

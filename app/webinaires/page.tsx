@@ -4,23 +4,32 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SearchBar } from "@/components/ui/search-bar";
 import { PageBanner } from "@/components/layout/PageBanner";
 import {
   Video,
   Calendar,
+  BookOpen,
   Clock,
   Users,
   TrendingUp,
   Sparkles,
   Play,
   CheckCircle2,
+  Grid3x3,
+  List,
+  LayoutGrid
 } from "lucide-react";
 import Link from "next/link";
 import { webinairesMock } from "@/data/mock";
 
+type ViewMode = "grid" | "list" | "compact";
+
 export default function WebinairesPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [selectedTheme, setSelectedTheme] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const statuses = ["all", "a-venir", "live", "termine"];
   const themes = [
@@ -31,6 +40,8 @@ export default function WebinairesPage() {
   const filteredWebinaires = webinairesMock.filter((w) => {
     if (selectedStatus !== "all" && w.statut !== selectedStatus) return false;
     if (selectedTheme !== "all" && !w.themes.includes(selectedTheme)) return false;
+    if (searchTerm !== "" && !w.titre.toLowerCase().includes(searchTerm.toLowerCase()) && 
+        !w.description.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     return true;
   });
 
@@ -81,6 +92,10 @@ export default function WebinairesPage() {
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Webinaires" }
+        ]}
+        buttons={[
+          { label: "S'inscrire maintenant", href: "#webinaires", icon: <Calendar className="h-5 w-5" /> },
+          { label: "Voir formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
         ]}
       />
 
@@ -135,94 +150,206 @@ export default function WebinairesPage() {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Sidebar Filtres */}
           <aside className="w-full lg:w-64 flex-shrink-0">
-            <Card className="p-6 border border-slate-200 sticky top-24">
-              <h2 className="text-lg font-bold text-slate-900 mb-6">Filtres</h2>
+            <Card className="p-6 border-2 border-slate-200 shadow-lg sticky top-24 bg-white">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-cpu-orange rounded-full"></div>
+                  Filtres
+                </h2>
+                {(selectedStatus !== "all" || selectedTheme !== "all") && (
+                  <button
+                    onClick={() => {
+                      setSelectedStatus("all");
+                      setSelectedTheme("all");
+                    }}
+                    className="text-xs text-cpu-orange hover:underline font-medium"
+                  >
+                    Réinitialiser
+                  </button>
+                )}
+              </div>
+              
+              {/* Filtres actifs */}
+              {(selectedStatus !== "all" || selectedTheme !== "all") && (
+                <div className="mb-6 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <p className="text-xs font-semibold text-orange-900 mb-2">Filtres actifs:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedStatus !== "all" && (
+                      <Badge className="bg-cpu-orange text-white text-xs">
+                        {selectedStatus === "a-venir" ? "À venir" : selectedStatus === "live" ? "En direct" : "Replays"}
+                      </Badge>
+                    )}
+                    {selectedTheme !== "all" && (
+                      <Badge className="bg-slate-700 text-white text-xs">
+                        {selectedTheme}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              )}
               
               {/* Filtrer par statut */}
-              <div className="mb-8 pb-8 border-b border-slate-200">
-                <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wide text-slate-700">
+              <div className="mb-6 pb-6 border-b-2 border-slate-100">
+                <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <Video className="w-4 h-4 text-cpu-orange" />
                   Statut
                 </h3>
                 <div className="space-y-2">
-                  {statuses.map((status) => (
-                    <Button
-                      key={status}
-                      onClick={() => setSelectedStatus(status)}
-                      variant="ghost"
-                      className={`w-full justify-start text-sm transition-all ${
-                        selectedStatus === status
-                          ? "bg-cpu-orange text-white hover:bg-cpu-orange"
-                          : "text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      {status === "all"
-                        ? "Tous"
-                        : status === "a-venir"
-                        ? "À venir"
-                        : status === "live"
-                        ? "En direct"
-                        : "Replays"}
-                    </Button>
-                  ))}
+                  {statuses.map((status) => {
+                    const count = webinairesMock.filter(w => status === "all" || w.statut === status).length;
+                    const Icon = status === "all" ? Video : status === "a-venir" ? Calendar : status === "live" ? Sparkles : Play;
+                    const colorClass = status === "live" ? "text-red-600" : status === "a-venir" ? "text-blue-600" : status === "termine" ? "text-green-600" : "text-slate-600";
+                    
+                    return (
+                      <Button
+                        key={status}
+                        onClick={() => setSelectedStatus(status)}
+                        variant="ghost"
+                        className={`w-full justify-between text-sm transition-all group ${
+                          selectedStatus === status
+                            ? "bg-cpu-orange text-white hover:bg-cpu-orange shadow-md scale-105"
+                            : "text-slate-700 hover:bg-slate-100 hover:scale-[1.02]"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Icon className={`w-4 h-4 ${selectedStatus === status ? "text-white" : colorClass}`} />
+                          {status === "all"
+                            ? "Tous"
+                            : status === "a-venir"
+                            ? "À venir"
+                            : status === "live"
+                            ? "En direct"
+                            : "Replays"}
+                        </span>
+                        <Badge 
+                          className={`text-xs ${
+                            selectedStatus === status
+                              ? "bg-white/20 text-white border-0"
+                              : "bg-slate-200 text-slate-700 border-0"
+                          }`}
+                        >
+                          {count}
+                        </Badge>
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Filtrer par thème */}
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wide text-slate-700">
+                <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-cpu-orange" />
                   Thème
                 </h3>
-                <div className="space-y-2">
-                  {themes.map((theme) => (
-                    <Button
-                      key={theme}
-                      onClick={() => setSelectedTheme(theme)}
-                      variant="ghost"
-                      className={`w-full justify-start text-sm transition-all ${
-                        selectedTheme === theme
-                          ? "bg-cpu-orange text-white hover:bg-cpu-orange"
-                          : "text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      {theme === "all" ? "Tous les thèmes" : theme}
-                    </Button>
-                  ))}
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                  {themes.map((theme) => {
+                    const count = webinairesMock.filter(w => theme === "all" || w.themes.includes(theme)).length;
+                    
+                    return (
+                      <Button
+                        key={theme}
+                        onClick={() => setSelectedTheme(theme)}
+                        variant="ghost"
+                        className={`w-full justify-between text-sm transition-all group ${
+                          selectedTheme === theme
+                            ? "bg-cpu-orange text-white hover:bg-cpu-orange shadow-md scale-105"
+                            : "text-slate-700 hover:bg-slate-100 hover:scale-[1.02]"
+                        }`}
+                      >
+                        <span className="truncate flex-1 text-left">{theme === "all" ? "Tous les thèmes" : theme}</span>
+                        <Badge 
+                          className={`text-xs ml-2 ${
+                            selectedTheme === theme
+                              ? "bg-white/20 text-white border-0"
+                              : "bg-slate-200 text-slate-700 border-0"
+                          }`}
+                        >
+                          {count}
+                        </Badge>
+                      </Button>
+                    );
+                  })}
                 </div>
+              </div>
+
+              {/* Info helper */}
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-xs text-blue-800 leading-relaxed">
+                  <span className="font-semibold">💡 Astuce:</span> Combinez plusieurs filtres pour affiner votre recherche
+                </p>
               </div>
             </Card>
           </aside>
 
           {/* Contenu principal */}
           <div className="flex-1 min-w-0">
-            {/* Nombre de résultats */}
-            <div className="mb-6">
+            {/* Nombre de résultats + View Toggle */}
+            <div className="mb-6 flex items-center justify-between">
               <p className="text-sm text-slate-600">
                 <span className="font-semibold text-slate-900">{filteredWebinaires.length}</span> webinaire{filteredWebinaires.length > 1 ? "s" : ""} trouvé{filteredWebinaires.length > 1 ? "s" : ""}
               </p>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant={viewMode === "grid" ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => setViewMode("grid")}
+                  className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                </Button>
+                <Button 
+                  variant={viewMode === "list" ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => setViewMode("list")}
+                  className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+                <Button 
+                  variant={viewMode === "compact" ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => setViewMode("compact")}
+                  className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Liste des webinaires */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6 mb-8">
-          {filteredWebinaires.map((webinaire) => (
-            <Card
-              key={webinaire.id}
-              className={`p-4 md:p-5 border-2 hover:shadow-xl transition-all duration-300 ${
-                webinaire.statut === "live"
-                  ? "border-red-500 shadow-lg shadow-red-100"
-                  : "border-slate-100 hover:border-cpu-orange"
-              }`}
-            >
+            <div className={(viewMode === "grid"
+                ? "grid sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6"
+                : viewMode === "compact"
+                ? "grid md:grid-cols-3 gap-4"
+                : "space-y-4") + " mb-8"}>
+          {filteredWebinaires.map((webinaire) => {
+            const isListMode = viewMode === "list";
+            const isCompactMode = viewMode === "compact";
+            const isLive = webinaire.statut === "live";
+            const borderColor = isLive ? "border-red-500 shadow-lg shadow-red-100" : "border-slate-100 hover:border-cpu-orange";
+            const cardClassName = "border-2 hover:shadow-xl transition-all duration-300 " + borderColor + " " + (isListMode ? "flex flex-row p-0 overflow-hidden" : isCompactMode ? "p-3" : "p-4 md:p-5");
+            const imageHeight = isListMode ? "h-full w-48" : isCompactMode ? "h-24" : "h-32 md:h-40";
+            const padding = isCompactMode ? "p-3" : isListMode ? "p-4 flex-1" : "p-0";
+            const titleSize = isCompactMode ? "text-sm" : "text-lg md:text-xl";
+            const textSizeSmall = isCompactMode ? "text-xs" : "text-xs md:text-sm";
+            const iconSize = isCompactMode ? "w-3 h-3" : "w-3 h-3 md:w-4 md:h-4";
+            const buttonText = isLive ? "Rejoindre" : webinaire.statut === "a-venir" ? "S'inscrire" : isCompactMode ? "Voir" : "Replay";
+            const ButtonIcon = isLive ? Video : webinaire.statut === "a-venir" ? Calendar : Play;
+            const buttonBg = isLive ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" : "bg-cpu-orange hover:bg-cpu-orange/90 text-white";
+            const formateurInitial = webinaire.formateur.nom.charAt(0);
+            const formateurNomComplet = webinaire.formateur.prenom + " " + webinaire.formateur.nom;
+            const dateFormatted = formatDate(webinaire.date).split(" à ")[0];
+            
+            return (
+            <Card key={webinaire.id} className={cardClassName}>
               {/* Image & Badge */}
-              <div className="relative h-32 md:h-40 rounded-lg overflow-hidden mb-4">
-                <img
-                  src={webinaire.thumbnail}
-                  alt={webinaire.titre}
-                  className="w-full h-full object-cover"
-                />
+              <div className={"relative rounded-lg overflow-hidden " + imageHeight + " " + (isListMode ? "flex-shrink-0" : "mb-4")}>
+                <img src={webinaire.thumbnail} alt={webinaire.titre} className="w-full h-full object-cover" />
                 <div className="absolute top-4 right-4">
                   {getStatusBadge(webinaire.statut)}
                 </div>
-                {webinaire.statut === "live" && (
+                {isLive && (
                   <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center">
                     <div className="bg-red-500 text-white px-6 py-3 rounded-full font-bold text-lg shadow-lg animate-pulse">
                       EN DIRECT MAINTENANT
@@ -232,89 +359,77 @@ export default function WebinairesPage() {
               </div>
 
               {/* Infos */}
-              <div className="space-y-3">
+              <div className={(isListMode ? "flex-1 p-4" : padding) + " space-y-3"}>
                 <div>
                   <Badge className="bg-slate-100 text-slate-700 border-0 mb-2 text-xs">
                     {webinaire.themes[0]}
                   </Badge>
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-1 line-clamp-2">
+                  <h3 className={titleSize + " font-bold text-slate-900 mb-1 line-clamp-2"}>
                     {webinaire.titre}
                   </h3>
-                  <p className="text-xs md:text-sm text-slate-600 line-clamp-2">
-                    {webinaire.description}
-                  </p>
+                  {!isCompactMode && (
+                    <p className={textSizeSmall + " text-slate-600 line-clamp-2"}>
+                      {webinaire.description}
+                    </p>
+                  )}
                 </div>
 
                 {/* Formateur */}
-                <div className="flex items-center gap-2 py-2 border-y border-slate-100">
-                  <div className="w-8 h-8 rounded-full bg-cpu-orange flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                    {webinaire.formateur.nom.charAt(0)}
+                {!isCompactMode && (
+                  <div className="flex items-center gap-2 py-2 border-y border-slate-100">
+                    <div className="w-8 h-8 rounded-full bg-cpu-orange flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                      {formateurInitial}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 truncate">
+                        {formateurNomComplet}
+                      </p>
+                      <p className="text-xs text-slate-600 truncate">
+                        Expert en {webinaire.formateur.domaines[0]}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 truncate">
-                      {webinaire.formateur.prenom} {webinaire.formateur.nom}
-                    </p>
-                    <p className="text-xs text-slate-600 truncate">
-                      Expert en {webinaire.formateur.domaines[0]}
-                    </p>
-                  </div>
-                </div>
+                )}
 
                 {/* Détails */}
-                <div className="grid grid-cols-2 gap-2 text-xs md:text-sm">
-                  <div className="flex items-center gap-1 md:gap-2 text-slate-600">
-                    <Calendar className="w-3 h-3 md:w-4 md:h-4 text-cpu-orange flex-shrink-0" />
-                    <span className="truncate">{formatDate(webinaire.date).split(" à ")[0]}</span>
+                <div className={"grid gap-2 " + textSizeSmall + " " + (isCompactMode ? "grid-cols-1" : "grid-cols-2")}>
+                  <div className={"flex items-center gap-1 text-slate-600 " + (isCompactMode ? "gap-1" : "md:gap-2")}>
+                    <Calendar className={iconSize + " text-cpu-orange flex-shrink-0"} />
+                    <span className="truncate">{dateFormatted}</span>
                   </div>
-                  <div className="flex items-center gap-1 md:gap-2 text-slate-600">
-                    <Clock className="w-3 h-3 md:w-4 md:h-4 text-cpu-orange flex-shrink-0" />
+                  <div className={"flex items-center gap-1 text-slate-600 " + (isCompactMode ? "gap-1" : "md:gap-2")}>
+                    <Clock className={iconSize + " text-cpu-orange flex-shrink-0"} />
                     <span className="truncate">{webinaire.duree} min</span>
                   </div>
-                  <div className="flex items-center gap-1 md:gap-2 text-slate-600">
-                    <Users className="w-3 h-3 md:w-4 md:h-4 text-cpu-orange flex-shrink-0" />
-                    <span className="truncate">{webinaire.inscrits} inscrits</span>
-                  </div>
-                  {webinaire.gratuit && (
-                    <div className="flex items-center gap-1 md:gap-2 text-green-600 font-semibold">
-                      <TrendingUp className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
-                      <span>Gratuit</span>
-                    </div>
+                  {!isCompactMode && (
+                    <>
+                      <div className="flex items-center gap-1 md:gap-2 text-slate-600">
+                        <Users className={iconSize + " text-cpu-orange flex-shrink-0"} />
+                        <span className="truncate">{webinaire.inscrits} inscrits</span>
+                      </div>
+                      {webinaire.gratuit && (
+                        <div className="flex items-center gap-1 md:gap-2 text-green-600 font-semibold">
+                          <TrendingUp className={iconSize + " flex-shrink-0"} />
+                          <span>Gratuit</span>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 
                 {/* Actions */}
                 <div className="pt-3">
-                  <Link href={`/webinaires/${webinaire.id}`} className="block">
-                    <Button
-                      size="sm"
-                      className={`w-full text-xs md:text-sm ${
-                        webinaire.statut === "live"
-                          ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                          : "bg-cpu-orange hover:bg-cpu-orange/90 text-white"
-                      }`}
-                    >
-                      {webinaire.statut === "live" ? (
-                        <>
-                          <Video className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          <span>Rejoindre</span>
-                        </>
-                      ) : webinaire.statut === "a-venir" ? (
-                        <>
-                          <Calendar className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          <span>S'inscrire</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          <span>Replay</span>
-                        </>
-                      )}
+                  <Link href={"/webinaires/" + webinaire.id} className="block">
+                    <Button size="sm" className={"w-full " + textSizeSmall + " " + buttonBg}>
+                      <ButtonIcon className={iconSize + " mr-1"} />
+                      <span>{buttonText}</span>
                     </Button>
                   </Link>
                 </div>
               </div>
             </Card>
-          ))}
+            );
+          })}
             </div>
 
             {filteredWebinaires.length === 0 && (

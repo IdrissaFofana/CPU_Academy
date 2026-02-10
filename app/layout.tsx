@@ -4,6 +4,9 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { StickyCTA } from "@/components/layout/StickyCTA";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
+import { ScrollProgress } from "@/components/layout/ScrollProgress";
+import { BottomNavigation } from "@/components/layout/BottomNavigation";
 
 // Configuration des polices Google Fonts
 const inter = Inter({ 
@@ -31,13 +34,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${montserrat.variable}`}>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased bg-white text-gray-900">
+        <ScrollProgress />
+        <AnnouncementBar />
         <Navbar />
-        <main className="min-h-screen">
+        <main className="min-h-screen pb-16 lg:pb-0">
           {children}
         </main>
         <Footer />
         <StickyCTA />
+        <BottomNavigation />
       </body>
     </html>
   );

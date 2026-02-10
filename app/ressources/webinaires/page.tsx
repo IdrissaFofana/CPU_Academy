@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+import { useState } from "react";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SearchBar } from "@/components/ui/search-bar";
 import { 
   Video, 
   Calendar, 
@@ -14,14 +16,14 @@ import {
   ArrowRight,
   Presentation,
   TrendingUp,
-  Bell
+  Bell,
+  Grid3x3,
+  List,
+  LayoutGrid
 } from "lucide-react";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Webinaires & Replays - CPU Formation",
-  description: "Participez à nos webinaires ou visionnez les replays",
-};
+type ViewMode = "grid" | "list" | "compact";
 
 const stats = [
   { icon: Video, value: "30+", label: "Webinaires disponibles" },
@@ -151,6 +153,16 @@ const replays = [
 ];
 
 export default function WebinairesPage() {
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredReplays = replays.filter(replay =>
+    searchTerm === "" ||
+    replay.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    replay.animateur.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    replay.themes.some(theme => theme.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+  
   return (
     <>
       <PageBanner 
@@ -293,18 +305,78 @@ export default function WebinairesPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {replays.map((replay, idx) => (
+          {/* Recherche + View Mode Toggle */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8 max-w-7xl mx-auto">
+            <div className="flex-1 max-w-md">
+              <SearchBar 
+                value={searchTerm}
+                onChange={setSearchTerm}
+                placeholder="Rechercher un replay..."
+                size="md"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-slate-600">
+                <span className="font-semibold">{filteredReplays.length}</span> replay{filteredReplays.length > 1 ? "s" : ""} disponible{filteredReplays.length > 1 ? "s" : ""}
+              </p>
+              <div className="flex items-center gap-2">
+              <Button 
+                variant={viewMode === "grid" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setViewMode("grid")}
+                className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
+              >
+                <Grid3x3 className="w-4 h-4" />
+              </Button>
+              <Button 
+                variant={viewMode === "list" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setViewMode("list")}
+                className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
+              >
+                <List className="w-4 h-4" />
+              </Button>
+              <Button 
+                variant={viewMode === "compact" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setViewMode("compact")}
+                className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </Button>
+            </div>
+            </div>
+          </div>
+
+          <div className={(viewMode === "grid" 
+              ? "grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+              : viewMode === "compact"
+              ? "grid md:grid-cols-4 gap-4"
+              : "space-y-4") + " max-w-7xl mx-auto"}>
+            {filteredReplays.map((replay, idx) => {
+              const isListMode = viewMode === "list";
+              const isCompactMode = viewMode === "compact";
+              const cardClassName = "group flex hover:shadow-2xl transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up overflow-hidden " + (isListMode ? "flex-row" : "flex-col");
+              const thumbnailClassName = isListMode ? "w-64 h-48 flex-shrink-0" : isCompactMode ? "h-32" : "h-48";
+              const contentPadding = isCompactMode ? "p-4" : "p-6";
+              const titleClassName = isCompactMode ? "text-sm font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-2" : "text-lg font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-2";
+              const textSize = isCompactMode ? "text-xs" : "text-sm";
+              const buttonSize = isCompactMode ? "text-xs" : "text-sm";
+              const playIconSize = isCompactMode ? "w-10 h-10" : "w-16 h-16";
+              const playIconInner = isCompactMode ? "w-5 h-5" : "w-8 h-8";
+              const animationDelay = idx * 100 + "ms";
+              
+              return (
               <Card
                 key={replay.id}
-                className="group flex flex-col hover:shadow-2xl transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up overflow-hidden"
-                style={{ animationDelay: `${idx * 100}ms` }}
+                className={cardClassName}
+                style={{ animationDelay: animationDelay }}
               >
                 {/* Thumbnail avec play button */}
-                <div className="relative h-48 bg-gradient-to-br from-slate-900 to-slate-700 overflow-hidden">
+                <div className={"relative bg-gradient-to-br from-slate-900 to-slate-700 overflow-hidden " + thumbnailClassName}>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform cursor-pointer">
-                      <Play className="w-8 h-8 text-white ml-1" />
+                    <div className={playIconSize + " rounded-full bg-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform cursor-pointer"}>
+                      <Play className={playIconInner + " text-white ml-1"} />
                     </div>
                   </div>
                   <div className="absolute top-4 right-4">
@@ -314,48 +386,55 @@ export default function WebinairesPage() {
                   </div>
                 </div>
 
-                <div className="p-6 flex-grow flex flex-col">
+                <div className={contentPadding + " flex-grow flex flex-col"}>
                   {/* Titre */}
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-2">
+                  <h3 className={titleClassName}>
                     {replay.titre}
                   </h3>
 
                   {/* Animateur */}
-                  <p className="text-sm text-slate-600 mb-3">
-                    Par <span className="font-semibold">{replay.animateur}</span>
-                  </p>
+                  {!isCompactMode && (
+                    <p className={textSize + " text-slate-600 mb-3"}>
+                      Par <span className="font-semibold">{replay.animateur}</span>
+                    </p>
+                  )}
 
                   {/* Stats */}
-                  <div className="flex items-center gap-4 text-xs text-slate-500 mb-4">
+                  <div className={"flex items-center gap-4 text-xs text-slate-500 mb-4 " + (isCompactMode ? "text-xs" : "")}>
                     <div className="flex items-center gap-1">
                       <Eye className="w-3.5 h-3.5" />
-                      <span>{replay.vues.toLocaleString()} vues</span>
+                      <span>{replay.vues.toLocaleString()} </span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>{replay.date}</span>
-                    </div>
+                    {!isCompactMode && (
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{replay.date}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Themes */}
-                  <div className="flex flex-wrap gap-1.5 mb-6 flex-grow">
-                    {replay.themes.map((theme, i) => (
-                      <Badge key={i} variant="outline" className="text-xs bg-slate-50">
-                        {theme}
-                      </Badge>
-                    ))}
-                  </div>
+                  {!isCompactMode && (
+                    <div className="flex flex-wrap gap-1.5 mb-6 flex-grow">
+                      {replay.themes.slice(0, isListMode ? 5 : 3).map((theme, i) => (
+                        <Badge key={i} variant="outline" className="text-xs bg-slate-50">
+                          {theme}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Bouton */}
                   <Button
-                    className="w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white"
+                    className={"w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white " + buttonSize}
                   >
-                    <Play className="mr-2 h-4 w-4" />
-                    Regarder le replay
+                    <Play className={"mr-2 h-4 w-4 " + (isCompactMode ? "h-3 w-3" : "")} />
+                    {isCompactMode ? "Voir" : "Regarder le replay"}
                   </Button>
                 </div>
               </Card>
-            ))}
+              );
+            })}
           </div>
 
           {/* CTA voir tous */}

@@ -13,12 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { formationsMock } from "@/data/mock";
 import { objectifsMetier } from "@/data/constants";
-import { Search, Filter, X, Grid3x3, List, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, X, Grid3x3, List, LayoutGrid, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal, Clock, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useFavorites } from "@/hooks/useFavorites";
 
-type ViewMode = "grid" | "list";
+type ViewMode = "grid" | "list" | "compact";
 type SortOption = "recent" | "popular" | "title" | "price";
 
 const ITEMS_PER_PAGE = 12; // 3 colonnes × 4 lignes en desktop
@@ -201,6 +201,10 @@ export function CatalogueContent() {
           { label: "Accueil", href: "/" },
           { label: "Catalogue" }
         ]}
+        buttons={[
+          { label: "Voir toutes les formations", href: "#formations", icon: <BookOpen className="h-5 w-5" /> },
+          { label: "Solutions entreprises", href: "/entreprises", variant: "outline", icon: <Building className="h-5 w-5" /> }
+        ]}
       />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
@@ -311,19 +315,21 @@ export function CatalogueContent() {
                     <div className="hidden md:flex gap-1 p-1 bg-slate-100 rounded-lg">
                       <button
                         onClick={() => setViewMode("grid")}
-                        className={`cursor-pointer p-2 rounded transition-colors ${
-                          viewMode === "grid" ? 'bg-white shadow-sm' : 'hover:bg-white/50'
-                        }`}
+                        className={("cursor-pointer p-2 rounded transition-colors " + (viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-white/50"))}
                       >
                         <Grid3x3 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setViewMode("list")}
-                        className={`cursor-pointer p-2 rounded transition-colors ${
-                          viewMode === "list" ? 'bg-white shadow-sm' : 'hover:bg-white/50'
-                        }`}
+                        className={("cursor-pointer p-2 rounded transition-colors " + (viewMode === "list" ? "bg-white shadow-sm" : "hover:bg-white/50"))}
                       >
                         <List className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setViewMode("compact")}
+                        className={("cursor-pointer p-2 rounded transition-colors " + (viewMode === "compact" ? "bg-white shadow-sm" : "hover:bg-white/50"))}
+                      >
+                        <LayoutGrid className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -384,15 +390,14 @@ export function CatalogueContent() {
                 )}
               </div>
 
-              {/* Formations Grid/List with Pagination */}
+              {/* Formations Grid/List/Compact with Pagination */}
               {formationsFiltrees.length > 0 ? (
                 <>
-                  <div className={`
-                    ${viewMode === "grid" 
+                  <div className={(viewMode === "grid" 
                       ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
-                      : "flex flex-col gap-4"
-                    }
-                  `}>
+                      : viewMode === "compact"
+                      ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+                      : "flex flex-col gap-4")}>
                     {formationsPage.map((formation, index) => (
                       <div
                         key={formation.id}

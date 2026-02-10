@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { 
   FileText, 
   Video,
+  Download,
   HelpCircle,
   ArrowRight
 } from "lucide-react";
@@ -50,6 +51,10 @@ export default function RessourcesPage() {
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Ressources" }
+        ]}
+        buttons={[
+          { label: "Télécharger guides", href: "/ressources/guides", icon: <Download className="h-5 w-5" /> },
+          { label: "Voir webinaires", href: "/webinaires", variant: "outline", icon: <Video className="h-5 w-5" /> }
         ]}
       />
 

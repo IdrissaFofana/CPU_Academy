@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { PageBanner } from "@/components/layout/PageBanner";
+import { Rocket, BookOpen } from "lucide-react";
 import { InscriptionForm } from "@/components/inscription/InscriptionForm";
 
 export default function InscriptionPage() {
@@ -12,6 +13,10 @@ export default function InscriptionPage() {
           { label: "Accueil", href: "/" },
           { label: "Catalogue", href: "/catalogue" },
           { label: "Inscription" }
+        ]}
+        buttons={[
+          { label: "Commencer", href: "#formulaire", icon: <Rocket className="h-5 w-5" /> },
+          { label: "Retour au catalogue", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
         ]}
       />
 

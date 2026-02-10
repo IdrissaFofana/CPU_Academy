@@ -9,6 +9,7 @@ import {
   ChevronDown,
   HelpCircle,
   BookOpen,
+  Send,
   CreditCard,
   GraduationCap,
   FileText,
@@ -146,6 +147,10 @@ export default function FAQPage() {
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "FAQ" }
+        ]}
+        buttons={[
+          { label: "Contactez-nous", href: "/support", icon: <Send className="h-5 w-5" /> },
+          { label: "Voir les formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
         ]}
       />
 
