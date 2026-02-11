@@ -61,7 +61,7 @@ export default function ConnexionPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-lg transition-all duration-300">
+                <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300">
                   <div className="bg-gradient-to-br from-cpu-orange to-orange-600 p-3 rounded-lg inline-flex mb-4">
                     <CheckCircle2 className="w-6 h-6 text-white" />
                   </div>
@@ -71,7 +71,7 @@ export default function ConnexionPage() {
                   </p>
                 </Card>
 
-                <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-lg transition-all duration-300">
+                <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300">
                   <div className="bg-gradient-to-br from-green-500 to-green-600 p-3 rounded-lg inline-flex mb-4">
                     <CheckCircle2 className="w-6 h-6 text-white" />
                   </div>
@@ -81,7 +81,7 @@ export default function ConnexionPage() {
                   </p>
                 </Card>
 
-                <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-lg transition-all duration-300">
+                <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300">
                   <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-lg inline-flex mb-4">
                     <CheckCircle2 className="w-6 h-6 text-white" />
                   </div>
@@ -91,7 +91,7 @@ export default function ConnexionPage() {
                   </p>
                 </Card>
 
-                <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-lg transition-all duration-300">
+                <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300">
                   <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-3 rounded-lg inline-flex mb-4">
                     <CheckCircle2 className="w-6 h-6 text-white" />
                   </div>
@@ -420,3 +420,4 @@ export default function ConnexionPage() {
     </div>
   );
 }
+

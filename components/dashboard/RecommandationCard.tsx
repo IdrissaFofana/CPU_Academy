@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +13,7 @@ interface RecommandationCardProps {
 
 export function RecommandationCard({ formation }: RecommandationCardProps) {
   return (
-    <Card className="p-5 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-xl transition-all duration-300 group">
+    <Card className="p-5 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 group">
       <Badge className="bg-orange-50 text-cpu-orange border-0 mb-3">
         {formation.niveau}
       </Badge>
@@ -35,9 +36,12 @@ export function RecommandationCard({ formation }: RecommandationCardProps) {
           <span className="text-sm">FCFA</span>
         </span>
       </div>
-      <Button className="w-full bg-cpu-orange hover:bg-orange-600 text-white">
-        Voir détails
-      </Button>
+      <Link href={formation.slug ? `/formations/${formation.slug}` : "#"}>
+        <Button className="w-full bg-cpu-orange hover:bg-orange-600 text-white">
+          Voir détails
+        </Button>
+      </Link>
     </Card>
   );
 }
+

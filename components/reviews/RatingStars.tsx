@@ -55,3 +55,4 @@ export function RatingStars({
     </div>
   );
 }
+

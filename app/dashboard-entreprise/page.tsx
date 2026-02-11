@@ -154,7 +154,7 @@ export default function DashboardEntreprisePage() {
       <div className="container mx-auto px-8 lg:px-16 py-12">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="p-6 border-2 border-slate-100 hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 border-2 border-slate-100 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-blue-50 p-3 rounded-lg">
                 <Users className="w-6 h-6 text-blue-600" />
@@ -167,7 +167,7 @@ export default function DashboardEntreprisePage() {
             <div className="text-sm text-slate-600">Collaborateurs actifs</div>
           </Card>
 
-          <Card className="p-6 border-2 border-slate-100 hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 border-2 border-slate-100 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-green-50 p-3 rounded-lg">
                 <CheckCircle2 className="w-6 h-6 text-green-600" />
@@ -178,7 +178,7 @@ export default function DashboardEntreprisePage() {
             <div className="text-sm text-slate-600">Formations complétées</div>
           </Card>
 
-          <Card className="p-6 border-2 border-slate-100 hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 border-2 border-slate-100 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-yellow-50 p-3 rounded-lg">
                 <Award className="w-6 h-6 text-yellow-600" />
@@ -189,7 +189,7 @@ export default function DashboardEntreprisePage() {
             <div className="text-sm text-slate-600">Certificats obtenus</div>
           </Card>
 
-          <Card className="p-6 border-2 border-slate-100 hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 border-2 border-slate-100 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-cpu-orange/10 p-3 rounded-lg">
                 <DollarSign className="w-6 h-6 text-cpu-orange" />
@@ -668,3 +668,4 @@ export default function DashboardEntreprisePage() {
     </div>
   );
 }
+

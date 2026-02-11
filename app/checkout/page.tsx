@@ -22,33 +22,18 @@ import {
   Award,
 } from "lucide-react";
 import Link from "next/link";
+import { useCart } from "@/contexts/CartContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 
 export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
-
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      titre: "Marketing Digital Avancé",
-      categorie: "Marketing",
-      duree: "20h",
-      prix: 350000,
-      image: "/images/formation-1.jpg",
-      certifiant: true,
-    },
-    {
-      id: 2,
-      titre: "Gestion Financière pour PME",
-      categorie: "Finance",
-      duree: "18h",
-      prix: 280000,
-      image: "/images/formation-2.jpg",
-      certifiant: true,
-    },
-  ]);
+  
+  // Utiliser le panier depuis le contexte
+  const { items: cartItems, removeItem, clearCart } = useCart();
+  const { addNotification } = useNotifications();
 
   const paymentMethods = [
     {
@@ -81,8 +66,19 @@ export default function CheckoutPage() {
     },
   ];
 
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
+  const handleCompletePayment = () => {
+    // Créer une notification de succès
+    addNotification({
+      type: "success",
+      titre: "Paiement réussi !",
+      message: `Votre paiement de ${total.toLocaleString()} FCFA a été confirmé. Vous pouvez maintenant accéder à vos ${cartItems.length} formation${cartItems.length > 1 ? "s" : ""}.`,
+      icon: "🎉",
+      link: "/mes-formations",
+    });
+    
+    // Vider le panier après le paiement réussi
+    clearCart();
+    setCurrentStep(3);
   };
 
   const applyPromo = () => {
@@ -433,7 +429,7 @@ export default function CheckoutPage() {
                   {currentStep === 2 && (
                     <>
                       <Button
-                        onClick={() => setCurrentStep(3)}
+                        onClick={handleCompletePayment}
                         disabled={!paymentMethod}
                         className="w-full bg-cpu-orange hover:bg-orange-600 text-white py-6 mb-3"
                       >
@@ -476,3 +472,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+

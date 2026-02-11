@@ -35,3 +35,4 @@ export function StickySidebar({ children, offset = 80 }: StickySidebarProps) {
     </div>
   );
 }
+

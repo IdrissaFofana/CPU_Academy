@@ -167,7 +167,7 @@ export default function DashboardFormateurPage() {
       <div className="container mx-auto px-8 lg:px-16 py-12">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="p-6 border-2 border-slate-100 hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 border-2 border-slate-100 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-blue-50 p-3 rounded-lg">
                 <BookOpen className="w-6 h-6 text-blue-600" />
@@ -178,7 +178,7 @@ export default function DashboardFormateurPage() {
             <div className="text-sm text-slate-600">Formations actives</div>
           </Card>
 
-          <Card className="p-6 border-2 border-slate-100 hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 border-2 border-slate-100 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-green-50 p-3 rounded-lg">
                 <Users className="w-6 h-6 text-green-600" />
@@ -189,7 +189,7 @@ export default function DashboardFormateurPage() {
             <div className="text-sm text-slate-600">Apprenants totaux</div>
           </Card>
 
-          <Card className="p-6 border-2 border-slate-100 hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 border-2 border-slate-100 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-yellow-50 p-3 rounded-lg">
                 <Star className="w-6 h-6 text-yellow-600" />
@@ -200,7 +200,7 @@ export default function DashboardFormateurPage() {
             <div className="text-sm text-slate-600">Note moyenne</div>
           </Card>
 
-          <Card className="p-6 border-2 border-slate-100 hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 border-2 border-slate-100 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-cpu-orange/10 p-3 rounded-lg">
                 <DollarSign className="w-6 h-6 text-cpu-orange" />
@@ -288,7 +288,7 @@ export default function DashboardFormateurPage() {
 
                   <div className="space-y-4">
                     {formationsActives.slice(0, 3).map((formation) => (
-                      <Card key={formation.id} className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-lg transition-all duration-300">
+                      <Card key={formation.id} className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
@@ -527,7 +527,7 @@ export default function DashboardFormateurPage() {
                   {messages.map((message) => (
                     <Card
                       key={message.id}
-                      className={`p-6 border-2 hover:shadow-lg transition-all duration-300 ${
+                      className={`p-6 border-2 transition-all duration-300 ${
                         message.nonLu ? "border-cpu-orange bg-orange-50" : "border-slate-100"
                       }`}
                     >
@@ -622,3 +622,4 @@ export default function DashboardFormateurPage() {
     </div>
   );
 }
+

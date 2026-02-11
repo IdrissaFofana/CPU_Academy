@@ -48,58 +48,42 @@ export default function CentresFormationPage() {
   return (
     <>
       <PageBanner
-        title="Nos Centres de Formation"
-        subtitle="Découvrez nos espaces équipés et professionnels partout en Côte d'Ivoire"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Centres de Formation" }
         ]}
-        buttons={[
-          { label: "Trouver un centre", href: "#centres", icon: <MapPin className="h-5 w-5" /> },
-          { label: "Contactez-nous", href: "/support", variant: "outline", icon: <Send className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Nos Centres de Formation",
+            subtitle: "Découvrez nos espaces équipés et professionnels partout en Côte d'Ivoire",
+            buttons: [
+              { label: "Trouver un centre", href: "#centres", icon: <MapPin className="h-5 w-5" /> },
+              { label: "Contactez-nous", href: "/support", variant: "outline", icon: <Send className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Infrastructures Modernes",
+            subtitle: "Des équipements de pointe pour une formation optimale",
+            buttons: [
+              { label: "Visiter un centre", href: "#centres", icon: <MapPin className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Accessibilité Nationale",
+            subtitle: "Présents dans toutes les grandes villes de Côte d'Ivoire",
+            buttons: [
+              { label: "Localisation", href: "/regions", icon: <MapPin className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 
       <div className="min-h-screen bg-slate-50">
         <div className="container mx-auto px-6 lg:px-16 max-w-7xl py-8 lg:py-12">
-          {/* Stats */}
-          <div className="grid md:grid-cols-3 gap-4 md:gap-6 mb-8 lg:mb-12">
-            <Card className="p-6 bg-emerald-50 border-emerald-200 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-              <div className="flex items-center gap-4">
-                <div className="bg-emerald-500 text-white p-3 rounded-lg">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-emerald-900">{centresFormationMock.length}</p>
-                  <p className="text-sm text-emerald-700">Centres de formation</p>
-                </div>
-              </div>
-            </Card>
 
-            <Card className="p-6 bg-blue-50 border-blue-200 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-              <div className="flex items-center gap-4">
-                <div className="bg-blue-500 text-white p-3 rounded-lg">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-blue-900">{regions.length - 1}</p>
-                  <p className="text-sm text-blue-700">Régions de Côte d'Ivoire</p>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-purple-50 border-purple-200 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
-              <div className="flex items-center gap-4">
-                <div className="bg-purple-500 text-white p-3 rounded-lg">
-                  <Users className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-purple-900">{centresFormationMock.reduce((acc, c) => acc + c.capacite, 0).toLocaleString()}+</p>
-                  <p className="text-sm text-purple-700">Apprenants pouvant être accueillis</p>
-                </div>
-              </div>
-            </Card>
-          </div>
 
           {/* Main layout */}
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -181,7 +165,7 @@ export default function CentresFormationPage() {
                   const isListMode = viewMode === "list";
                   const isCompactMode = viewMode === "compact";
                   const cardPadding = isListMode ? "p-0 overflow-hidden flex flex-col md:flex-row" : "p-6";
-                  const cardClassName = "border-2 border-slate-100 hover:border-cpu-orange hover:shadow-lg transition-all duration-300 animate-fade-in-up " + cardPadding;
+                  const cardClassName = "border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 animate-fade-in-up " + cardPadding;
                   const photoClassName = isListMode ? "relative overflow-hidden group md:w-64 h-48 md:h-auto flex-shrink-0" : "relative overflow-hidden group h-56 rounded-lg mb-5";
                   const badgeClassName = isListMode ? "absolute top-4 left-4 bg-cpu-orange text-white border-0 shadow-lg" : "absolute top-4 right-4 bg-cpu-orange text-white border-0 shadow-lg";
                   const contentClassName = isListMode ? "flex-1 p-6 space-y-4" : "space-y-4";
@@ -299,3 +283,4 @@ export default function CentresFormationPage() {
     </>
   );
 }
+

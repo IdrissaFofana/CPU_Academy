@@ -43,6 +43,7 @@ import {
   Menu,
   Newspaper,
   Rocket,
+  Search,
   ShoppingBag,
   Store,
   TrendingUp,
@@ -58,6 +59,8 @@ import {
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
 import { CommandPalette } from "@/components/layout/CommandPalette";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useCart } from "@/contexts/CartContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -65,11 +68,14 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [accountDrawerOpen, setAccountDrawerOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const pathname = usePathname();
-
-  // Notifications mock data (combinées notifications + messages)
-  const [notificationCount] = useState(8); // 3 notifications + 5 messages
-  const [cartItemCount] = useState(2);
+  
+  // Panier depuis CartContext
+  const { itemCount: cartItemCount } = useCart();
+  
+  // Notifications depuis NotificationContext
+  const { unreadCount: notificationCount } = useNotifications();
 
   // Progression utilisateur mock
   const [userProgress] = useState(67); // Pourcentage de progression
@@ -106,8 +112,8 @@ export function Navbar() {
       <nav className={`bg-white/95 backdrop-blur-md sticky top-0 z-50 transition-all duration-300 animate-slide-down ${
         scrolled ? "shadow-lg border-b border-gray-100" : "shadow-md"
       }`}>
-        <div className="container mx-auto px-6 lg:px-16">
-          <div className="flex items-center justify-between gap-4 h-20">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-between gap-2 h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center group">
@@ -125,13 +131,25 @@ export function Navbar() {
               </Link>
             </div>
 
-            {/* Barre de recherche - Desktop */}
-            <div className="hidden lg:flex flex-1 max-w-2xl mx-6">
-              <GlobalSearch />
-            </div>
+            {/* Icône de recherche ou barre complète - Desktop */}
+            {isSearchOpen ? (
+              <div className="hidden lg:flex flex-1 max-w-2xl mx-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <GlobalSearch onClose={() => setIsSearchOpen(false)} />
+              </div>
+            ) : (
+              <div className="hidden lg:flex justify-center">
+                <button
+                  onClick={() => setIsSearchOpen(true)}
+                  className="p-2 text-gray-600 hover:text-cpu-orange hover:bg-orange-50 rounded-lg transition-all duration-200"
+                  aria-label="Ouvrir la recherche"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              </div>
+            )}
 
             {/* Menu de navigation principal - version desktop */}
-            <div className="hidden lg:flex lg:items-center lg:gap-1 flex-shrink-0">
+            <div className="hidden lg:flex lg:items-center gap-0.5 flex-shrink-0">
               <NavLinkWithDropdown 
                 title="Explorer" 
                 icon={<Compass className="w-4 h-4 mr-1" />}
@@ -160,10 +178,33 @@ export function Navbar() {
                 ]}
                 isMegaMenu={false}
               />
+
+              {/* Nouveaux onglets - masqués quand la recherche est active */}
+              <div className={`flex items-center gap-0.5 transition-all duration-300 ${isSearchOpen ? 'hidden' : 'flex'}`}>
+
+
+                <NavLink href="/rac" icon={<BadgeCheck className="w-4 h-4 mr-1" />}>
+                  RAC
+                </NavLink>
+
+                <NavLinkWithDropdown 
+                  title="Ressources" 
+                  icon={<FileText className="w-4 h-4 mr-1" />}
+                  items={[
+                    { label: "Guides pratiques", href: "/ressources/guides", icon: <FileText className="w-4 h-4" />, description: "Documentations et tutoriels" },
+                    { label: "Centre d'aide (FAQ)", href: "/ressources/faq", icon: <HelpCircle className="w-4 h-4" />, description: "Réponses à vos questions" },
+                    { label: "Webinaires", href: "/ressources/webinaires", icon: <Video className="w-4 h-4" />, description: "Replays et formations live" },
+                  ]}
+                  isMegaMenu={false}
+                />
+                <NavLink href="/about" icon={<Info className="w-4 h-4 mr-1" />}>
+                  À propos
+                </NavLink>
+              </div>
             </div>
 
             {/* Boutons d'action */}
-            <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
+            <div className="hidden lg:flex items-center gap-1 flex-shrink-0">
               {/* Bouton recherche rapide */}
               <Button
                 variant="ghost"
@@ -218,7 +259,7 @@ export function Navbar() {
               ) : (
                 <Button 
                   size="sm" 
-                  className="cursor-pointer bg-cpu-orange hover:bg-cpu-orange/90 text-white shadow-md shadow-orange-200 hover:shadow-lg hover:shadow-orange-300 transition-all duration-200 hover:scale-105"
+                  className="cursor-pointer bg-cpu-orange hover:bg-cpu-orange/90 text-white shadow-md shadow-orange-200-300 transition-all duration-200 hover:scale-105"
                   asChild
                 >
                   <Link href="/connexion">
@@ -420,7 +461,7 @@ export function Navbar() {
                   </Link>
                 </Button>
                 <Button 
-                  className="w-full justify-center bg-cpu-orange hover:bg-cpu-orange/90 text-white shadow-lg shadow-orange-200 hover:shadow-xl hover:shadow-orange-300 transition-all duration-200" 
+                  className="w-full justify-center bg-cpu-orange hover:bg-cpu-orange/90 text-white shadow-lg shadow-orange-200-300 transition-all duration-200" 
                   asChild
                 >
                   <Link href="/inscription">S&apos;inscrire</Link>
@@ -443,7 +484,7 @@ const NavLink = ({ href, children, icon }: { href: string; children: React.React
   return (
     <Link
       href={href}
-      className={`px-3 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-200 group relative ${
+      className={`px-2.5 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-200 group relative ${
         isActive 
           ? "text-cpu-orange bg-orange-50" 
           : "text-gray-700 hover:text-cpu-orange hover:bg-gray-50"
@@ -481,7 +522,7 @@ const NavLinkWithDropdown = ({
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className={`px-3 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-200 group ${
+        <button className={`px-2.5 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-200 group ${
           isActive 
             ? "text-cpu-orange bg-orange-50" 
             : "text-gray-700 hover:text-cpu-orange hover:bg-gray-50"
@@ -818,3 +859,4 @@ const UserMenu = ({ userProgress, isOpen, setIsOpen }: { userProgress: number, i
     </Sheet>
   );
 };
+

@@ -304,3 +304,4 @@ export const menuPrincipal = [
   { label: "Ressources", href: "/ressources" },
   { label: "Support", href: "/faq" }
 ];
+

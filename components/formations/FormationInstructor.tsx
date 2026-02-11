@@ -142,3 +142,4 @@ export function FormationInstructor({ expert }: FormationInstructorProps) {
     </div>
   );
 }
+

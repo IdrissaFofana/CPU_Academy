@@ -308,7 +308,7 @@ export default function ExamenFinalResultsPage({
                         {question.explication && (
                           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <p className="text-sm font-medium text-blue-900 mb-1">
-                              💡 Explication
+                              Explication
                             </p>
                             <p className="text-sm text-blue-800">
                               {question.explication}

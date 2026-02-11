@@ -21,6 +21,7 @@ export interface User {
 export interface Formation {
   id: number;
   titre: string;
+  slug?: string;
   categorie: string;
   duree: string;
   progression: number;
@@ -69,6 +70,7 @@ export interface Session {
 export interface FormationRecommandee {
   id: number;
   titre: string;
+  slug?: string;
   niveau: "Débutant" | "Intermédiaire" | "Avancé";
   duree: string;
   note: number;
@@ -112,3 +114,4 @@ export interface DashboardState {
   statsEvolution: StatsEvolution;
   activeTab: string;
 }
+

@@ -166,12 +166,22 @@ export default function WebinairesPage() {
   return (
     <>
       <PageBanner 
-        title="Webinaires & Replays"
-        subtitle="Participez à nos sessions en direct ou visionnez les replays"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Ressources" },
           { label: "Webinaires" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Webinaires & Replays",
+            subtitle: "Participez à nos sessions en direct ou visionnez les replays",
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Sessions À la Demande",
+            subtitle: "Accédez à notre bibliothèque complète de webinaires enregistrés",
+          }
         ]}
       />
 
@@ -184,7 +194,7 @@ export default function WebinairesPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in"
+                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-md transition-all  animate-fade-in"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   <Icon className="w-10 h-10 mx-auto mb-3 text-orange-600" />
@@ -215,7 +225,7 @@ export default function WebinairesPage() {
             {prochains.map((webinaire, idx) => (
               <Card
                 key={webinaire.id}
-                className="group hover:shadow-2xl transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up overflow-hidden"
+                className="group transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up overflow-hidden"
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="flex flex-col lg:flex-row">
@@ -356,7 +366,7 @@ export default function WebinairesPage() {
             {filteredReplays.map((replay, idx) => {
               const isListMode = viewMode === "list";
               const isCompactMode = viewMode === "compact";
-              const cardClassName = "group flex hover:shadow-2xl transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up overflow-hidden " + (isListMode ? "flex-row" : "flex-col");
+              const cardClassName = "group flex transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up overflow-hidden " + (isListMode ? "flex-row" : "flex-col");
               const thumbnailClassName = isListMode ? "w-64 h-48 flex-shrink-0" : isCompactMode ? "h-32" : "h-48";
               const contentPadding = isCompactMode ? "p-4" : "p-6";
               const titleClassName = isCompactMode ? "text-sm font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-2" : "text-lg font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-2";
@@ -480,3 +490,4 @@ export default function WebinairesPage() {
     </>
   );
 }
+

@@ -195,15 +195,36 @@ export function CatalogueContent() {
   return (
     <>
       <PageBanner 
-        title="Catalogue de formations"
-        subtitle={`Découvrez nos ${stats.total} formations adaptées aux besoins des entreprises ivoiriennes`}
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Catalogue" }
         ]}
-        buttons={[
-          { label: "Voir toutes les formations", href: "#formations", icon: <BookOpen className="h-5 w-5" /> },
-          { label: "Solutions entreprises", href: "/entreprises", variant: "outline", icon: <Building className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Catalogue de formations",
+            subtitle: `Découvrez nos ${stats.total} formations adaptées aux besoins des entreprises ivoiriennes`,
+            buttons: [
+              { label: "Voir toutes les formations", href: "#formations", icon: <BookOpen className="h-5 w-5" /> },
+              { label: "Solutions entreprises", href: "/entreprises", variant: "outline", icon: <Building className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Formation Continue d'Excellence",
+            subtitle: "Développez vos compétences avec des formations certifiantes",
+            buttons: [
+              { label: "Explorer le catalogue", href: "#formations", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Solutions Pour Entreprises",
+            subtitle: "Des programmes adaptés aux besoins de votre organisation",
+            buttons: [
+              { label: "Contactez-nous", href: "/entreprises", icon: <Building className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
       
@@ -223,25 +244,7 @@ export function CatalogueContent() {
               />
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-2xl hover:border-cpu-orange transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-100">
-                <div className="text-3xl font-bold text-cpu-orange mb-1 group-hover:scale-110 transition-transform duration-300">{stats.total}</div>
-                <div className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Formations</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-2xl hover:border-green-500 transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-200">
-                <div className="text-3xl font-bold text-green-500 mb-1 group-hover:scale-110 transition-transform duration-300">{stats.gratuit}</div>
-                <div className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Gratuites</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-2xl hover:border-blue-500 transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-300">
-                <div className="text-3xl font-bold text-blue-500 mb-1 group-hover:scale-110 transition-transform duration-300">{stats.certifiant}</div>
-                <div className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Certifiantes</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 border-2 border-slate-100 shadow-md hover:shadow-2xl hover:border-purple-500 transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-400">
-                <div className="text-3xl font-bold text-purple-500 mb-1 group-hover:scale-110 transition-transform duration-300">{stats.regions}</div>
-                <div className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Régions</div>
-              </div>
-            </div>
+
           </div>
 
           {/* Mobile Filter Button */}
@@ -288,7 +291,7 @@ export function CatalogueContent() {
             {/* Main Content */}
             <main className="flex-1 min-w-0">
               {/* Toolbar */}
-              <div className="bg-white rounded-2xl p-4 mb-6 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200">
+              <div className="bg-white rounded-2xl p-4 mb-6 border-2 border-slate-100 shadow-lg transition-all duration-300 animate-fade-in-up animation-delay-200">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                   <p className="text-slate-600 font-medium" aria-live="polite" aria-atomic="true" role="status">
                     <span className="text-cpu-orange font-bold text-lg">{resultCount}</span> formation{resultCount > 1 ? "s" : ""} trouvée{resultCount > 1 ? "s" : ""}
@@ -356,7 +359,7 @@ export function CatalogueContent() {
                     )}
                     {region && region !== "all" && (
                       <Badge variant="secondary" className="flex items-center gap-2">
-                        📍 {region}
+                        {region}
                         <button onClick={() => setRegion("all")} className="cursor-pointer hover:text-red-600">
                           <X className="h-3 w-3" />
                         </button>
@@ -364,7 +367,7 @@ export function CatalogueContent() {
                     )}
                     {secteur && secteur !== "all" && (
                       <Badge variant="secondary" className="flex items-center gap-2">
-                        🏢 {secteur}
+                        {secteur}
                         <button onClick={() => setSecteur("all")} className="cursor-pointer hover:text-red-600">
                           <X className="h-3 w-3" />
                         </button>
@@ -372,7 +375,7 @@ export function CatalogueContent() {
                     )}
                     {niveau && niveau !== "all" && (
                       <Badge variant="secondary" className="flex items-center gap-2">
-                        📊 {niveau}
+                        {niveau}
                         <button onClick={() => setNiveau("all")} className="cursor-pointer hover:text-red-600">
                           <X className="h-3 w-3" />
                         </button>
@@ -380,7 +383,7 @@ export function CatalogueContent() {
                     )}
                     {format && format !== "all" && (
                       <Badge variant="secondary" className="flex items-center gap-2">
-                        💻 {format}
+                        {format}
                         <button onClick={() => setFormat("all")} className="cursor-pointer hover:text-red-600">
                           <X className="h-3 w-3" />
                         </button>
@@ -394,9 +397,9 @@ export function CatalogueContent() {
               {formationsFiltrees.length > 0 ? (
                 <>
                   <div className={(viewMode === "grid" 
-                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
                       : viewMode === "compact"
-                      ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+                      ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"
                       : "flex flex-col gap-4")}>
                     {formationsPage.map((formation, index) => (
                       <div
@@ -489,7 +492,7 @@ export function CatalogueContent() {
               )}
 
               {/* CTA Formation sur mesure */}
-              <div className="mt-12 relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl animate-fade-in-up animation-delay-400 hover:shadow-3xl transition-all duration-500">
+              <div className="mt-12 relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl animate-fade-in-up animation-delay-400 transition-all duration-500">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:40px_40px]" />
                 <div className="absolute top-0 right-0 w-72 h-72 bg-cpu-orange/20 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-72 h-72 bg-cpu-green/20 rounded-full blur-3xl" />
@@ -511,7 +514,7 @@ export function CatalogueContent() {
                     <Button 
                       asChild
                       size="lg"
-                      className="cursor-pointer bg-cpu-orange hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all duration-200 border-0 hover:scale-105 shine-effect"
+                      className="cursor-pointer bg-cpu-orange hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30-500/40 transition-all duration-200 border-0 hover:scale-105 shine-effect"
                     >
                       <a href="/entreprises" className="flex items-center gap-2">
                         <Building className="w-5 h-5" />
@@ -596,3 +599,4 @@ export function CatalogueContent() {
     </>
   );
 }
+

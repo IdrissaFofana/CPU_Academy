@@ -163,3 +163,4 @@ export function ReviewForm({ formationId, onSubmit }: ReviewFormProps) {
     </Card>
   );
 }
+

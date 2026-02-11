@@ -81,12 +81,37 @@ export default function WebinairePage({
   return (
     <>
       <PageBanner
-        title={webinaire.titre}
-        subtitle={webinaire.description}
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Webinaires", href: "/webinaires" },
           { label: webinaire.titre }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: webinaire.titre,
+            subtitle: webinaire.description,
+            trustBadges: [
+              {
+                icon: "users",
+                color: "orange",
+                title: `${webinaire.inscrits} inscrits`,
+                subtitle: webinaire.publicCible
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: webinaire.gratuit ? "Gratuit" : `${webinaire.prix} FCFA`,
+                subtitle: "Tarif"
+              },
+              {
+                icon: "users",
+                color: "blue",
+                title: `${webinaire.duree} min`,
+                subtitle: "Durée"
+              }
+            ]
+          }
         ]}
       />
 

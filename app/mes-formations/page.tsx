@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PageBanner } from "@/components/layout/PageBanner";
 import {
   BookOpen,
   Clock,
@@ -187,67 +188,81 @@ export default function MesFormationsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <PageBanner
+        breadcrumb={[
+          { label: "Accueil", href: "/" },
+          { label: "Mon Espace", href: "/dashboard" },
+          { label: "Mes Formations" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Mes Formations",
+            subtitle: "Suivez votre progression et reprenez là où vous vous êtes arrêté",
+            buttons: [
+              { label: "Découvrir plus", href: "/catalogue", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Continue Learning",
+            subtitle: "Ne perdez pas votre élan, continuez votre parcours",
+            buttons: [
+              { label: "Parcourir le catalogue", href: "/catalogue", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          }
+        ]}
+      />
+
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-16">
+      <div className="bg-white border-b py-8">
         <div className="container mx-auto px-8 lg:px-16">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-sm">
-              <BookOpen className="w-10 h-10" />
-            </div>
-            <div>
-              <h1 className="text-5xl font-bold mb-2">Mes Formations</h1>
-              <p className="text-slate-300 text-lg">
-                Suivez votre progression et reprenez là où vous vous êtes arrêté
-              </p>
-            </div>
-          </div>
-
           {/* Stats */}
-          <div className="grid md:grid-cols-4 gap-6 mt-8">
+          <div className="grid md:grid-cols-4 gap-6">
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
               <div className="flex items-center gap-4">
-                <div className="bg-blue-500/20 p-3 rounded-lg">
-                  <BookOpen className="w-6 h-6 text-blue-300" />
+                <div className="bg-blue-500 p-3 rounded-lg text-white">
+                  <BookOpen className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold">{stats.enCours}</div>
-                  <div className="text-sm text-slate-300">En cours</div>
+                  <div className="text-3xl font-bold text-slate-900">{stats.enCours}</div>
+                  <div className="text-sm text-slate-600">En cours</div>
                 </div>
               </div>
             </Card>
 
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 p-6">
               <div className="flex items-center gap-4">
-                <div className="bg-green-500/20 p-3 rounded-lg">
-                  <CheckCircle2 className="w-6 h-6 text-green-300" />
+                <div className="bg-green-500 p-3 rounded-lg text-white">
+                  <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold">{stats.completees}</div>
-                  <div className="text-sm text-slate-300">Complétées</div>
+                  <div className="text-3xl font-bold text-slate-900">{stats.completees}</div>
+                  <div className="text-sm text-slate-600">Complétées</div>
                 </div>
               </div>
             </Card>
 
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 p-6">
               <div className="flex items-center gap-4">
-                <div className="bg-orange-500/20 p-3 rounded-lg">
-                  <Clock className="w-6 h-6 text-orange-300" />
+                <div className="bg-orange-500 p-3 rounded-lg text-white">
+                  <Clock className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold">{stats.heuresTotal}h</div>
-                  <div className="text-sm text-slate-300">Total heures</div>
+                  <div className="text-3xl font-bold text-slate-900">{stats.heuresTotal}h</div>
+                  <div className="text-sm text-slate-600">Total heures</div>
                 </div>
               </div>
             </Card>
 
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 p-6">
               <div className="flex items-center gap-4">
-                <div className="bg-purple-500/20 p-3 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-purple-300" />
+                <div className="bg-purple-500 p-3 rounded-lg text-white">
+                  <TrendingUp className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-3xl font-bold">{stats.moyenneProgression}%</div>
-                  <div className="text-sm text-slate-300">Progression moy.</div>
+                  <div className="text-3xl font-bold text-slate-900">{stats.moyenneProgression}%</div>
+                  <div className="text-sm text-slate-600">Progression moy.</div>
                 </div>
               </div>
             </Card>
@@ -334,7 +349,7 @@ export default function MesFormationsPage() {
             {filteredFormations.map((formation, index) => (
               <Card
                 key={formation.id}
-                className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-xl transition-all duration-300 group"
+                className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 group"
               >
                 <div className="flex flex-col lg:flex-row gap-6">
                   {/* Image */}
@@ -438,7 +453,7 @@ export default function MesFormationsPage() {
                               {formation.prochainChapitre}
                             </p>
                             <p className="text-sm text-blue-700 mt-1">
-                              📚 {formation.prochainLecon}
+                              {formation.prochainLecon}
                             </p>
                           </div>
                         )}
@@ -516,3 +531,4 @@ export default function MesFormationsPage() {
     </div>
   );
 }
+

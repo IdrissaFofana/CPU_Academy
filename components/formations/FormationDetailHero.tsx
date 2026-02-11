@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Formation } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { Trophy } from "lucide-react";
 
 interface FormationDetailHeroProps {
   formation: Formation;
@@ -49,8 +50,8 @@ export function FormationDetailHero({ formation }: FormationDetailHeroProps) {
                 {formation.format}
               </Badge>
               {formation.certifiant && (
-                <Badge variant="secondary" className="bg-green-600 text-white">
-                  🏆 Certifiant
+                <Badge variant="secondary" className="bg-green-600 text-white flex items-center gap-1 w-fit">
+                  <Trophy className="w-3 h-3" /> Certifiant
                 </Badge>
               )}
             </div>
@@ -157,3 +158,4 @@ export function FormationDetailHero({ formation }: FormationDetailHeroProps) {
     </div>
   );
 }
+

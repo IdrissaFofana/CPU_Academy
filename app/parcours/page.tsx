@@ -104,15 +104,113 @@ export default function ParcoursPage() {
   return (
     <>
       <PageBanner
-        title="Parcours de Formation"
-        subtitle="Accélérez votre carrière avec nos parcours certifiants"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Parcours" }
         ]}
-        buttons={[
-          { label: "Commencer maintenant", href: "/inscription", icon: <Rocket className="h-5 w-5" /> },
-          { label: "Voir le catalogue", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Parcours de Formation",
+            subtitle: "Accélérez votre carrière avec nos parcours certifiants",
+            badge: {
+              icon: "+",
+              number: "12",
+              text: "Parcours disponibles",
+              subtext: "Pour tous les profils"
+            },
+            trustBadges: [
+              {
+                icon: "check",
+                color: "green",
+                title: "Certifications officielles",
+                subtitle: "Reconnues par l'État"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "10,000+",
+                subtitle: "Apprenants formés"
+              },
+              {
+                icon: "check",
+                color: "blue",
+                title: "Accompagnement personnalisé",
+                subtitle: "Suivi individuel"
+              }
+            ],
+            buttons: [
+              { label: "Commencer maintenant", href: "/inscription", icon: <Rocket className="h-5 w-5" /> },
+              { label: "Voir le catalogue", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Formation Continue d'Excellence",
+            subtitle: "Des parcours adaptés à vos objectifs professionnels",
+            badge: {
+              number: "92%",
+              text: "Taux de réussite",
+              subtext: "À nos certifications"
+            },
+            trustBadges: [
+              {
+                icon: "users",
+                color: "purple",
+                title: "Flexibilité totale",
+                subtitle: "À votre rythme"
+              },
+              {
+                icon: "building",
+                color: "orange",
+                title: "Entreprises partenaires",
+                subtitle: "Débouchés garantis"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Contenu mis à jour",
+                subtitle: "Selon les tendances"
+              }
+            ],
+            buttons: [
+              { label: "Explorer les parcours", href: "#parcours", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Certifications Professionnelles",
+            subtitle: "Obtenez une reconnaissance officielle de vos compétences",
+            badge: {
+              icon: "🏆 ",
+              number: "98%",
+              text: "Recommandation",
+              subtext: "Par nos alumni"
+            },
+            trustBadges: [
+              {
+                icon: "check",
+                color: "blue",
+                title: "Diplômes reconnus",
+                subtitle: "Secteur public et privé"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Réseau d'experts",
+                subtitle: "Professionnels aguerris"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Évaluation continue",
+                subtitle: "Progression mesurée"
+              }
+            ],
+            buttons: [
+              { label: "Voir les certifications", href: "/certifications", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 
@@ -140,60 +238,7 @@ export default function ParcoursPage() {
               </p>
             </div>
 
-            {/* Statistiques améliorées */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-12">
-              <Card className="relative overflow-hidden p-6 text-center border-2 border-slate-100 hover:border-cpu-orange shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-100">
-                <div className="absolute inset-0 bg-gradient-to-br from-cpu-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-cpu-orange/10 to-cpu-orange/5 mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <BookOpen className="w-7 h-7 text-cpu-orange" />
-                  </div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-cpu-orange to-orange-600 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">
-                    {parcoursMock.reduce((acc, p) => acc + p.formationsIds.length, 0)}
-                  </div>
-                  <div className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Formations</div>
-                </div>
-              </Card>
-              
-              <Card className="relative overflow-hidden p-6 text-center border-2 border-slate-100 hover:border-blue-500 shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-200">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-cpu-orange/10 to-cpu-orange/5 mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <Users className="w-7 h-7 text-cpu-orange" />
-                  </div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-cpu-orange to-orange-600 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">
-                    {parcoursMock.reduce((acc, p) => acc + (p.nbInscrits || 0), 0)}
-                  </div>
-                  <div className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Apprenants</div>
-                </div>
-              </Card>
-              
-              <Card className="relative overflow-hidden p-6 text-center border-2 border-slate-100 hover:border-green-500 shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-cpu-green/10 to-cpu-green/5 mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <Trophy className="w-7 h-7 text-cpu-green" />
-                  </div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-cpu-green to-green-600 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">
-                    {parcoursMock.filter(p => p.certifiant).length}
-                  </div>
-                  <div className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Certifiants</div>
-                </div>
-              </Card>
-              
-              <Card className="relative overflow-hidden p-6 text-center border-2 border-slate-100 hover:border-purple-500 shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group animate-fade-in-up animation-delay-400">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-cpu-orange/10 to-cpu-orange/5 mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <TrendingUp className="w-7 h-7 text-cpu-orange" />
-                  </div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-cpu-orange to-orange-600 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform duration-300">
-                    {parcoursMock.length > 0 ? Math.round(parcoursMock.reduce((acc, p) => acc + (p.tauxCompletion || 0), 0) / parcoursMock.length) : 0}%
-                  </div>
-                  <div className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Réussite</div>
-                </div>
-              </Card>
-            </div>
+
           </div>
         </section>
 
@@ -304,7 +349,7 @@ export default function ParcoursPage() {
                   {/* Info helper */}
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-xs text-blue-800 leading-relaxed">
-                      <span className="font-semibold">💡 Astuce:</span> Combinez recherche et filtres pour trouver le parcours idéal
+                      <span className="font-semibold">Astuce:</span> Combinez recherche et filtres pour trouver le parcours idéal
                     </p>
                   </div>
                 </Card>
@@ -381,7 +426,7 @@ export default function ParcoursPage() {
                           setSearchTerm("");
                           setFiltreNiveau("all");
                         }}
-                        className="bg-gradient-to-r from-cpu-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 shine-effect"
+                        className="bg-gradient-to-r from-cpu-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:scale-105 transition-all duration-200 shine-effect"
                       >
                         <Zap className="mr-2 h-5 w-5" />
                         Réinitialiser les filtres
@@ -415,7 +460,7 @@ export default function ParcoursPage() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              <Card className="relative overflow-hidden p-8 text-center border-2 border-slate-100 hover:border-cpu-orange shadow-lg hover:shadow-2xl transition-all duration-300 group animate-fade-in-up animation-delay-100">
+              <Card className="relative overflow-hidden p-8 text-center border-2 border-slate-100 hover:border-cpu-orange shadow-lg transition-all duration-300 group animate-fade-in-up animation-delay-100">
                 <div className="absolute inset-0 bg-gradient-to-br from-cpu-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative">
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cpu-orange/10 to-cpu-orange/5 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
@@ -430,7 +475,7 @@ export default function ParcoursPage() {
                 </div>
               </Card>
 
-              <Card className="relative overflow-hidden p-8 text-center border-2 border-slate-100 hover:border-blue-500 shadow-lg hover:shadow-2xl transition-all duration-300 group animate-fade-in-up animation-delay-200">
+              <Card className="relative overflow-hidden p-8 text-center border-2 border-slate-100 hover:border-blue-500 shadow-lg transition-all duration-300 group animate-fade-in-up animation-delay-200">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative">
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
@@ -445,7 +490,7 @@ export default function ParcoursPage() {
                 </div>
               </Card>
 
-              <Card className="relative overflow-hidden p-8 text-center border-2 border-slate-100 hover:border-green-500 shadow-lg hover:shadow-2xl transition-all duration-300 group animate-fade-in-up animation-delay-300">
+              <Card className="relative overflow-hidden p-8 text-center border-2 border-slate-100 hover:border-green-500 shadow-lg transition-all duration-300 group animate-fade-in-up animation-delay-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative">
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500/10 to-green-500/5 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
@@ -530,3 +575,4 @@ export default function ParcoursPage() {
     </>
   );
 }
+

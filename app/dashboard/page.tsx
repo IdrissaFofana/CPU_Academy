@@ -265,7 +265,7 @@ export default function DashboardPage() {
       value: `${user.streak}`,
       subtext: "Continuez comme ça!",
       icon: Zap,
-      trend: "🔥",
+      trend: "Sur une série",
       color: "text-cpu-orange",
     },
   ];
@@ -291,24 +291,53 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50">
       {/* PageBanner identique à celui de la page parcours */}
       <PageBanner
-        title="Mon Espace Apprentissage"
-        subtitle="Suivez votre progression et continuez votre parcours de formation"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Mon Espace" },
         ]}
-        buttons={[
+        slides={[
           {
-            label: "Explorer les formations",
-            href: "/catalogue",
-            icon: <Rocket className="h-5 w-5" />,
+            image: "/images/formation-tech.png",
+            title: "Mon Espace Apprentissage",
+            subtitle: "Suivez votre progression et continuez votre parcours de formation",
+            buttons: [
+              {
+                label: "Explorer les formations",
+                href: "/catalogue",
+                icon: <Rocket className="h-5 w-5" />,
+              },
+              {
+                label: "Mes certifications",
+                href: "/mes-certifications",
+                variant: "outline",
+                icon: <Award className="h-5 w-5" />,
+              },
+            ]
           },
           {
-            label: "Mes certifications",
-            href: "/mes-certifications",
-            variant: "outline",
-            icon: <Award className="h-5 w-5" />,
+            image: "/images/formation-agriculture.png",
+            title: "Continuez Votre Formation",
+            subtitle: "Reprenez là où vous vous êtes arrêté",
+            buttons: [
+              {
+                label: "Mes formations",
+                href: "/mes-formations",
+                icon: <BookOpen className="h-5 w-5" />,
+              },
+            ]
           },
+          {
+            image: "/images/formation-tech.png",
+            title: "Atteignez Vos Objectifs",
+            subtitle: "Découvrez de nouvelles compétences pour progresser",
+            buttons: [
+              {
+                label: "Catalogue",
+                href: "/catalogue",
+                icon: <Rocket className="h-5 w-5" />,
+              },
+            ]
+          }
         ]}
       />
 
@@ -335,7 +364,7 @@ export default function DashboardPage() {
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
-                <Card key={index} className="p-6 hover:shadow-md transition-shadow">
+                <Card key={index} className="p-6 transition-shadow">
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-2 bg-orange-50 rounded-lg">
                       <Icon className={`w-5 h-5 ${stat.color}`} />
@@ -518,7 +547,7 @@ export default function DashboardPage() {
                 // MODE LIST - Horizontal
                 <Card
                   key={course.id}
-                  className="group hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-row"
+                  className="group transition-all duration-300 overflow-hidden flex flex-row"
                 >
                   <div className="relative w-48 flex-shrink-0 bg-gradient-to-br from-slate-200 to-slate-300">
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -565,7 +594,7 @@ export default function DashboardPage() {
                 // MODE COMPACT - 4 colonnes minimal
                 <Card
                   key={course.id}
-                  className="group hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  className="group transition-all duration-300 overflow-hidden"
                 >
                   <div className="relative h-32 bg-gradient-to-br from-slate-200 to-slate-300">
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -603,7 +632,7 @@ export default function DashboardPage() {
                 // MODE GRID - par défaut
                 <Card
                   key={course.id}
-                  className="group hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  className="group transition-all duration-300 overflow-hidden"
                 >
                   <div className="relative h-48 bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -722,7 +751,7 @@ export default function DashboardPage() {
               <div className="pt-4 border-t border-slate-200">
                 <div className="flex items-center gap-2 text-sm text-slate-600 mb-3">
                   <Trophy className="w-4 h-4 text-cpu-orange" />
-                  <span>Série de {user.streak} jours 🔥</span>
+                  <span>Série de {user.streak} jours (chaud!)</span>
                 </div>
                 <p className="text-xs text-slate-500">
                   Encore 3 jours pour atteindre votre prochain jalon!
@@ -741,7 +770,7 @@ export default function DashboardPage() {
               return (
                 <Card
                   key={index}
-                  className={`p-4 transition-all duration-300 hover:shadow-md ${
+                  className={`p-4 transition-all duration-300 ${
                     notif.urgent
                       ? "border-2 border-cpu-orange/50 bg-orange-50"
                       : "border border-slate-200"
@@ -797,7 +826,7 @@ export default function DashboardPage() {
             {recommendations.map((course) => (
               <Card
                 key={course.id}
-                className="group hover:shadow-xl transition-all duration-300 overflow-hidden"
+                className="group transition-all duration-300 overflow-hidden"
               >
                 {/* Thumbnail */}
                 <div className="relative h-40 bg-gradient-to-br from-orange-100 to-orange-200">
@@ -846,3 +875,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

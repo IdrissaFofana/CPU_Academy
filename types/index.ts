@@ -581,3 +581,4 @@ export interface Review {
   };
   photos?: string[];
 }
+

@@ -17,7 +17,7 @@ export function PersistenceTest() {
 
   return (
     <div className="fixed bottom-20 right-4 z-50 bg-slate-900 text-white p-4 rounded-lg text-xs max-w-sm shadow-lg max-h-96 overflow-y-auto">
-      <h3 className="font-bold mb-3">📊 Persistence Test</h3>
+      <h3 className="font-bold mb-3">Persistence Test</h3>
       
       {/* View Mode */}
       <div className="mb-4 pb-4 border-b border-slate-700">
@@ -72,3 +72,4 @@ export function PersistenceTest() {
     </div>
   );
 }
+

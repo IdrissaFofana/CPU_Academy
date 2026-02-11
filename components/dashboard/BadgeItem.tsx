@@ -23,7 +23,7 @@ export function BadgeItem({
     <div
       className={`p-3 rounded-xl border-2 text-center transition-all ${
         unlocked
-          ? "border-slate-200 hover:border-cpu-orange hover:shadow-md cursor-pointer bg-white"
+          ? "border-slate-200 hover:border-cpu-orange cursor-pointer bg-white"
           : "border-slate-100 opacity-50 bg-slate-50"
       }`}
       aria-label={`Badge: ${nom} ${unlocked ? "débloqué" : "verrouillé"}`}
@@ -43,3 +43,4 @@ export function BadgeItem({
     </div>
   );
 }
+

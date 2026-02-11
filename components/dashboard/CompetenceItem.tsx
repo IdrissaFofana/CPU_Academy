@@ -27,3 +27,4 @@ export function CompetenceItem({ nom, niveau, couleur }: CompetenceItemProps) {
     </div>
   );
 }
+

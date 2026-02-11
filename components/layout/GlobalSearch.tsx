@@ -54,9 +54,10 @@ const getColorByType = (type: string) => {
 
 interface GlobalSearchProps {
   isMobile?: boolean;
+  onClose?: () => void;
 }
 
-export function GlobalSearch({ isMobile = false }: GlobalSearchProps) {
+export function GlobalSearch({ isMobile = false, onClose }: GlobalSearchProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -64,6 +65,13 @@ export function GlobalSearch({ isMobile = false }: GlobalSearchProps) {
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // Focus automatique quand le composant est monté (mode desktop)
+  useEffect(() => {
+    if (!isMobile && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isMobile]);
 
   // Recherche avec debounce
   useEffect(() => {
@@ -86,12 +94,15 @@ export function GlobalSearch({ isMobile = false }: GlobalSearchProps) {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        if (onClose && !isMobile) {
+          onClose();
+        }
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [onClose, isMobile]);
 
   // Navigation clavier
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -117,6 +128,9 @@ export function GlobalSearch({ isMobile = false }: GlobalSearchProps) {
       case "Escape":
         setIsOpen(false);
         inputRef.current?.blur();
+        if (onClose && !isMobile) {
+          onClose();
+        }
         break;
     }
   };
@@ -126,6 +140,15 @@ export function GlobalSearch({ isMobile = false }: GlobalSearchProps) {
     setResults([]);
     setIsOpen(false);
     inputRef.current?.focus();
+  };
+
+  const handleClose = () => {
+    setQuery("");
+    setResults([]);
+    setIsOpen(false);
+    if (onClose && !isMobile) {
+      onClose();
+    }
   };
 
   return (
@@ -148,14 +171,25 @@ export function GlobalSearch({ isMobile = false }: GlobalSearchProps) {
         {query && (
           <button
             onClick={clearSearch}
-            className="absolute right-14 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            className={`absolute ${!isMobile && onClose ? 'right-12' : 'right-14'} top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200`}
           >
             <X className="w-4 h-4" />
           </button>
         )}
-        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded border border-gray-300 hidden lg:inline-block">
-          ⌘K
-        </kbd>
+        {!isMobile && onClose && (
+          <button
+            onClick={handleClose}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors duration-200"
+            title="Fermer la recherche"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+        {!onClose && (
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded border border-gray-300 hidden lg:inline-block">
+            ⌘K
+          </kbd>
+        )}
       </div>
 
       {/* Résultats de recherche */}
@@ -222,3 +256,4 @@ export function GlobalSearch({ isMobile = false }: GlobalSearchProps) {
     </div>
   );
 }
+

@@ -179,3 +179,4 @@ export function VideoPlayer({ lecon }: VideoPlayerProps) {
     </div>
   );
 }
+

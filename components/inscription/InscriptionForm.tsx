@@ -87,7 +87,7 @@ export function InscriptionForm() {
             </p>
             <a
               href="/catalogue"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg transition-all"
             >
               <BookOpen className="w-5 h-5" />
               Voir le catalogue
@@ -172,7 +172,7 @@ export function InscriptionForm() {
                 </div>
 
                 <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
-                  <p className="text-xs text-orange-800 font-semibold mb-2">✓ Inclus dans votre formation :</p>
+                  <p className="text-xs text-orange-800 font-semibold mb-2">Inclus dans votre formation :</p>
                   <ul className="text-xs text-orange-700 space-y-1">
                     <li>• Support de cours complet</li>
                     <li>• Accès plateforme e-learning</li>
@@ -292,7 +292,7 @@ export function InscriptionForm() {
                         <button
                           type="button"
                           onClick={() => setStep(2)}
-                          className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
+                          className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition-all"
                         >
                           Continuer
                         </button>
@@ -439,7 +439,7 @@ export function InscriptionForm() {
                         <button
                           type="button"
                           onClick={() => setStep(3)}
-                          className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
+                          className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition-all"
                         >
                           Continuer
                         </button>
@@ -539,7 +539,7 @@ export function InscriptionForm() {
                         </button>
                         <button
                           type="submit"
-                          className="px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                          className="px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg transition-all flex items-center gap-2"
                         >
                           <CheckCircle2 className="w-5 h-5" />
                           Confirmer mon inscription
@@ -556,3 +556,4 @@ export function InscriptionForm() {
     </div>
   );
 }
+

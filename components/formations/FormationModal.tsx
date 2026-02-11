@@ -131,7 +131,7 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
                   </div>
                   <div className="space-y-3">
                     {formation.chapitres.map((chapitre, index) => (
-                      <div key={chapitre.id} className="group border-2 border-gray-200 rounded-xl p-5 hover:border-cpu-orange/50 hover:shadow-md transition-all duration-200">
+                      <div key={chapitre.id} className="group border-2 border-gray-200 rounded-xl p-5 hover:border-cpu-orange/50 transition-all duration-200">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex items-start gap-4 flex-1">
                             <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-cpu-orange to-cpu-orange/70 flex items-center justify-center text-white font-bold shrink-0 group-hover:scale-110 transition-transform">
@@ -252,7 +252,7 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
                     )}
                     <a href={`/inscription?formation=${formation.id}`}>
                       <Button 
-                        className="group cursor-pointer bg-gradient-to-r from-cpu-orange via-cpu-orange to-cpu-orange/80 hover:from-cpu-orange hover:via-cpu-orange/90 hover:to-cpu-orange font-bold px-10 py-6 text-lg rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 text-black hover:text-white border-2 border-cpu-orange/50 hover:border-white relative overflow-hidden"
+                        className="group cursor-pointer bg-gradient-to-r from-cpu-orange via-cpu-orange to-cpu-orange/80 hover:from-cpu-orange hover:via-cpu-orange/90 hover:to-cpu-orange font-bold px-10 py-6 text-lg rounded-xl shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 text-black hover:text-white border-2 border-cpu-orange/50 hover:border-white relative overflow-hidden"
                       >
                         <span className="relative z-10 flex items-center gap-2">
                           S'inscrire maintenant
@@ -284,7 +284,7 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
                   </div>
                   <a href={`/inscription?formation=${formation.id}`}>
                     <Button 
-                      className="group cursor-pointer bg-gradient-to-r from-cpu-orange via-cpu-orange to-cpu-orange/80 hover:from-cpu-orange hover:via-cpu-orange/90 hover:to-cpu-orange font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 text-black hover:text-white border-2 border-cpu-orange/50 hover:border-white relative overflow-hidden"
+                      className="group cursor-pointer bg-gradient-to-r from-cpu-orange via-cpu-orange to-cpu-orange/80 hover:from-cpu-orange hover:via-cpu-orange/90 hover:to-cpu-orange font-bold px-8 py-4 rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 text-black hover:text-white border-2 border-cpu-orange/50 hover:border-white relative overflow-hidden"
                     >
                       <span className="relative z-10 flex items-center gap-2">
                         S'inscrire maintenant
@@ -335,7 +335,7 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
 
                 <a href={`/inscription?formation=${formation.id}`}>
                   <Button 
-                    className="cursor-pointer w-full bg-gradient-to-r from-cpu-orange to-cpu-orange/90 hover:from-cpu-orange/90 hover:to-cpu-orange text-black hover:text-white font-bold py-6 text-lg rounded-xl shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-200"
+                    className="cursor-pointer w-full bg-gradient-to-r from-cpu-orange to-cpu-orange/90 hover:from-cpu-orange/90 hover:to-cpu-orange text-black hover:text-white font-bold py-6 text-lg rounded-xl shadow-lg hover:scale-[1.02] transition-all duration-200"
                   >
                     S'inscrire maintenant
                   </Button>
@@ -402,3 +402,4 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
     </Dialog>
   );
 }
+

@@ -274,7 +274,7 @@ export default function QuizResultsPage({
                           )}
                           {question.explication && (
                             <div className="mt-2 p-3 bg-white/50 rounded text-sm text-slate-700">
-                              <span className="font-medium">💡 Explication : </span>
+                              <span className="font-medium">Explication : </span>
                               {question.explication}
                             </div>
                           )}

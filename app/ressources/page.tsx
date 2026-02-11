@@ -46,15 +46,113 @@ export default function RessourcesPage() {
   return (
     <>
       <PageBanner 
-        title="Ressources"
-        subtitle="Accédez à tous nos outils et supports pour réussir votre développement"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Ressources" }
         ]}
-        buttons={[
-          { label: "Télécharger guides", href: "/ressources/guides", icon: <Download className="h-5 w-5" /> },
-          { label: "Voir webinaires", href: "/webinaires", variant: "outline", icon: <Video className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Ressources Pédagogiques",
+            subtitle: "Accédez à tous nos outils et supports pour réussir votre développement",
+            badge: {
+              icon: "+",
+              number: "500",
+              text: "Ressources disponibles",
+              subtext: "Gratuitement"
+            },
+            trustBadges: [
+              {
+                icon: "check",
+                color: "green",
+                title: "Téléchargement gratuit",
+                subtitle: "Aucun frais"
+              },
+              {
+                icon: "check",
+                color: "blue",
+                title: "Contenu premium",
+                subtitle: "Qualité professionnelle"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "20,000+",
+                subtitle: "Téléchargements"
+              }
+            ],
+            buttons: [
+              { label: "Télécharger guides", href: "/ressources/guides", icon: <Download className="h-5 w-5" /> },
+              { label: "Voir webinaires", href: "/webinaires", variant: "outline", icon: <Video className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Guides et Documents",
+            subtitle: "Téléchargez nos supports de formation et guides pratiques",
+            badge: {
+              icon: "📚 ",
+              number: "150+",
+              text: "Guides téléchargeables",
+              subtext: "PDF, Excel, Word"
+            },
+            trustBadges: [
+              {
+                icon: "building",
+                color: "purple",
+                title: "Business plans",
+                subtitle: "Modèles personnalisables"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Templates prêts",
+                subtitle: "À l'emploi immédiat"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Mis à jour",
+                subtitle: "Régulièrement"
+              }
+            ],
+            buttons: [
+              { label: "Accéder aux guides", href: "/ressources/guides", icon: <Download className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Webinaires et Replays",
+            subtitle: "Participez à nos sessions live ou consultez nos replays",
+            badge: {
+              number: "200+",
+              text: "Vidéos disponibles",
+              subtext: "HD et sous-titres"
+            },
+            trustBadges: [
+              {
+                icon: "users",
+                color: "blue",
+                title: "Experts reconnus",
+                subtitle: "Intervenants de qualité"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Sessions mensuelles",
+                subtitle: "Calendrier régulier"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Accès illimité",
+                subtitle: "Replay à vie"
+              }
+            ],
+            buttons: [
+              { label: "Voir les webinaires", href: "/webinaires", icon: <Video className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 
@@ -76,7 +174,7 @@ export default function RessourcesPage() {
                 return (
                   <Card
                     key={ressource.id}
-                    className="group relative hover:shadow-2xl transition-all duration-500 border-2 border-slate-100 hover:border-orange-200 overflow-hidden animate-fade-in hover:-translate-y-2"
+                    className="group relative transition-all duration-500 border-2 border-slate-100 hover:border-orange-200 overflow-hidden animate-fade-in "
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-50/0 via-orange-50/0 to-orange-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -100,7 +198,7 @@ export default function RessourcesPage() {
                       {/* Button */}
                       <Button
                         asChild
-                        className={`cursor-pointer w-full bg-gradient-to-r ${ressource.gradient} hover:opacity-90 text-white shadow-md group-hover:shadow-xl transition-all duration-300`}
+                        className={`cursor-pointer w-full bg-gradient-to-r ${ressource.gradient} hover:opacity-90 text-white shadow-md transition-all duration-300`}
                       >
                         <Link href={ressource.href} className="flex items-center justify-center">
                           Découvrir
@@ -118,3 +216,4 @@ export default function RessourcesPage() {
     </>
   );
 }
+

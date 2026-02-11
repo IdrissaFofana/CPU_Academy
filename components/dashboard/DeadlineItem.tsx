@@ -42,3 +42,4 @@ export function DeadlineItem({ deadline }: DeadlineItemProps) {
     </div>
   );
 }
+

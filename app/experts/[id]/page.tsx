@@ -141,12 +141,37 @@ export default function ExpertDetailPage() {
   return (
     <>
       <PageBanner 
-        title={expert.nom}
-        subtitle={expert.specialite}
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Experts", href: "/experts" },
           { label: expert.nom }
+        ]}
+        slides={[
+          {
+            image: expert.coverPhoto || "/images/formation-tech.png",
+            title: expert.nom,
+            subtitle: expert.specialite,
+            trustBadges: [
+              {
+                icon: "users",
+                color: "orange",
+                title: `${expert.studentsCount}+ étudiants`,
+                subtitle: "Formés avec succès"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: `${expert.rating}/5`,
+                subtitle: "Note moyenne"
+              },
+              {
+                icon: "building",
+                color: "blue",
+                title: expert.specialite,
+                subtitle: "Domaine d'expertise"
+              }
+            ]
+          }
         ]}
       />
 
@@ -465,7 +490,7 @@ export default function ExpertDetailPage() {
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               {expert.formationsPopulaires.map((formation) => (
-                <Card key={formation.id} className="p-6 hover:shadow-xl transition-shadow">
+                <Card key={formation.id} className="p-6 transition-shadow">
                   <h3 className="font-bold text-lg mb-3">{formation.titre}</h3>
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center justify-between text-sm">

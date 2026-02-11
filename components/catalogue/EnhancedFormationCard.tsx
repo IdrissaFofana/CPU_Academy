@@ -1,5 +1,6 @@
 import React from 'react';
-import { X, Bookmark } from 'lucide-react';
+import Link from 'next/link';
+import { X, Bookmark, Zap, Star, Trophy, BookOpen, Check, Clock, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -30,10 +31,9 @@ export function EnhancedFormationCard({
         bg-white
         border border-slate-100
         hover:border-cpu-orange/30
-        hover:shadow-2xl hover:shadow-cpu-orange/10
+       -orange/10
         shadow-md
         transition-all duration-300
-        hover:-translate-y-1
         h-full flex flex-col
       `}
     >
@@ -41,18 +41,18 @@ export function EnhancedFormationCard({
       {(isPopular || isNew || isBestSeller) && (
         <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
           {isNew && (
-            <Badge className="bg-cpu-orange text-white text-xs font-semibold">
-              🆕 Nouveau
+            <Badge className="bg-cpu-orange text-white text-xs font-semibold flex items-center gap-1">
+              <Zap className="w-3 h-3" /> Nouveau
             </Badge>
           )}
           {isPopular && (
             <Badge className="bg-amber-500 text-white text-xs flex items-center gap-1 font-semibold">
-              🔥 {formation.nbInscrits || 0} inscrits
+              <Star className="w-3 h-3 fill-current" /> {formation.nbInscrits || 0} inscrits
             </Badge>
           )}
           {isBestSeller && (
-            <Badge className="bg-cpu-green text-white text-xs font-semibold">
-              ⭐ Mieux notée
+            <Badge className="bg-cpu-green text-white text-xs font-semibold flex items-center gap-1">
+              <Trophy className="w-3 h-3" /> Mieux notée
             </Badge>
           )}
         </div>
@@ -93,8 +93,9 @@ export function EnhancedFormationCard({
       <div className="p-4 flex flex-col gap-3 flex-1">
         {/* Provider + Verification */}
         <div className="flex items-center gap-2 text-xs text-gray-500">
-          <span>📚 {formation.niveau}</span>
-          {formation.certifiant && <span className="text-cpu-green font-semibold">✓ Certifié</span>}
+          <BookOpen className="w-3 h-3" />
+          <span>{formation.niveau}</span>
+          {formation.certifiant && <span className="text-cpu-green font-semibold flex items-center gap-1"><Check className="w-3 h-3" /> Certifié</span>}
         </div>
 
         {/* Title - Prominent */}
@@ -122,10 +123,10 @@ export function EnhancedFormationCard({
         {/* Meta Info Grid */}
         <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
           <div className="flex items-center gap-1">
-            <span>⏱️ {formation.duree}h</span>
+            <Clock className="w-3 h-3" /> {formation.duree}h
           </div>
           <div className="flex items-center gap-1">
-            <span>👥 {formation.nbInscrits || 0}</span>
+            <Users className="w-3 h-3" /> {formation.nbInscrits || 0}
           </div>
         </div>
 
@@ -136,18 +137,20 @@ export function EnhancedFormationCard({
               {formation.gratuit ? "Gratuit" : `${formation.prixPublic || 0}€`}
             </span>
           </div>
-          <Button 
-            className="cursor-pointer rounded-full px-4 bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold" 
-            size="sm"
-          >
-            Voir →
-          </Button>
+          <Link href={`/formations/${formation.slug}`}>
+            <Button 
+              className="cursor-pointer rounded-full px-4 bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold" 
+              size="sm"
+            >
+              Voir →
+            </Button>
+          </Link>
         </div>
 
         {/* Certification Badge */}
         {formation.certifiant && (
           <div className="mt-2 flex items-center gap-2 px-3 py-1.5 bg-cpu-green/10 rounded-lg border border-cpu-green/30">
-            <span className="text-lg">🏆</span>
+            <Trophy className="w-4 h-4 text-cpu-green" />
             <span className="text-xs text-cpu-green font-semibold">
               Certificat inclus
             </span>
@@ -157,3 +160,4 @@ export function EnhancedFormationCard({
     </article>
   );
 }
+

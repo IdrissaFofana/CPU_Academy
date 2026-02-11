@@ -139,7 +139,7 @@ export function CalendarSection() {
                   className={`group relative px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300
                     ${selectedCategory === category.id
                       ? 'bg-cpu-orange text-white shadow-lg shadow-cpu-orange/30 scale-105'
-                      : 'bg-white text-slate-700 border-2 border-slate-200 hover:border-cpu-orange/50 hover:shadow-md hover:scale-105'
+                      : 'bg-white text-slate-700 border-2 border-slate-200 hover:border-cpu-orange/50 hover:scale-105'
                     }`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -205,7 +205,7 @@ export function CalendarSection() {
             <div
               key={session.id}
               className={`group bg-white rounded-2xl p-8 border border-slate-200 
-                hover:border-cpu-orange hover:shadow-2xl hover:shadow-cpu-orange/10
+                hover:border-cpu-orange-orange/10
                 hover:-translate-y-1 transition-all duration-500
                 animate-slide-up animation-delay-${(index + 3) * 100}`}
             >
@@ -287,3 +287,4 @@ export function CalendarSection() {
     </section>
   );
 }
+

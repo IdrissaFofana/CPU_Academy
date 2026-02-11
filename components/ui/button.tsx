@@ -16,8 +16,8 @@ const buttonVariants = cva(
         link: "text-slate-900 underline-offset-4 hover:underline",
         primary: "bg-blue-600 text-white hover:bg-blue-700",
         success: "bg-green-600 text-white hover:bg-green-700",
-        "cpu-orange": "bg-cpu-orange text-white hover:bg-cpu-orange/90 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30",
-        "cpu-green": "bg-cpu-green text-white hover:bg-cpu-green/90 shadow-lg shadow-green-500/20 hover:shadow-green-500/30",
+        "cpu-orange": "bg-cpu-orange text-white hover:bg-cpu-orange/90 shadow-lg shadow-orange-500/20-500/30",
+        "cpu-green": "bg-cpu-green text-white hover:bg-cpu-green/90 shadow-lg shadow-green-500/20-500/30",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -54,3 +54,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
+

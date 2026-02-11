@@ -289,7 +289,7 @@ function CertificationsGrid({ certifications, viewMode }: { certifications: Cert
         {certifications.map((cert, idx) => (
           <Card
             key={cert.id}
-            className="group hover:shadow-2xl transition-all duration-300 overflow-hidden"
+            className="group transition-all duration-300 overflow-hidden"
             style={{ animationDelay: `${idx * 100}ms` }}
           >
             <div className="flex flex-col md:flex-row">
@@ -413,7 +413,7 @@ function CertificationsGrid({ certifications, viewMode }: { certifications: Cert
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
         {certifications.map((cert) => (
-          <Card key={cert.id} className="group hover:shadow-xl transition-all p-3 md:p-4">
+          <Card key={cert.id} className="group transition-all p-3 md:p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${cert.gradient} flex items-center justify-center flex-shrink-0`}>
                 <Award className="w-5 h-5 text-white" />
@@ -467,7 +467,7 @@ function CertificationsGrid({ certifications, viewMode }: { certifications: Cert
       {certifications.map((cert, idx) => (
         <div
           key={cert.id}
-          className="group bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-md hover:shadow-2xl transition-all duration-300 animate-slide-up overflow-hidden flex flex-col"
+          className="group bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-md transition-all duration-300 animate-slide-up overflow-hidden flex flex-col"
           style={{ animationDelay: `${idx * 100}ms` }}
         >
           {/* Icon & Category Badge */}
@@ -629,44 +629,118 @@ export default function CertificationsPage() {
   return (
     <>
       <PageBanner 
-        title="Certifications"
-        subtitle="Validez vos compétences avec nos certifications reconnues"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Certifications" }
         ]}
-        buttons={[
-          { label: "Voir les formations", href: "/catalogue", icon: <BookOpen className="h-5 w-5" /> },
-          { label: "Nous contacter", href: "/support", variant: "outline", icon: <Send className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Certifications Professionnelles",
+            subtitle: "Validez vos compétences avec nos certifications reconnues",
+            badge: {
+              icon: "+",
+              number: "25",
+              text: "Certifications disponibles",
+              subtext: "Tous secteurs"
+            },
+            trustBadges: [
+              {
+                icon: "check",
+                color: "green",
+                title: "Reconnues État",
+                subtitle: "Officielles et agréées"
+              },
+              {
+                icon: "building",
+                color: "blue",
+                title: "Standards internationaux",
+                subtitle: "ISO & AFNOR"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "8,000+",
+                subtitle: "Certifiés actifs"
+              }
+            ],
+            buttons: [
+              { label: "Voir les formations", href: "/catalogue", icon: <BookOpen className="h-5 w-5" /> },
+              { label: "Nous contacter", href: "/support", variant: "outline", icon: <Send className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Reconnaissance Officielle",
+            subtitle: "Obtenez des certifications valorisées par les employeurs",
+            badge: {
+              number: "96%",
+              text: "Employabilité",
+              subtext: "De nos certifiés"
+            },
+            trustBadges: [
+              {
+                icon: "building",
+                color: "purple",
+                title: "Employeurs partenaires",
+                subtitle: "Recrutement facilité"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Valeur ajoutée CV",
+                subtitle: "Compétences prouvées"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Évaluation rigoureuse",
+                subtitle: "Examens certifiants"
+              }
+            ],
+            buttons: [
+              { label: "Découvrir", href: "#certifications", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Excellence et Qualité",
+            subtitle: "Des programmes conformes aux standards internationaux",
+            badge: {
+              icon: "🌍 ",
+              number: "100%",
+              text: "Conformité internationale",
+              subtext: "Standards respectés"
+            },
+            trustBadges: [
+              {
+                icon: "check",
+                color: "blue",
+                title: "Qualité certifiée",
+                subtitle: "Processus audité"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Jury d'experts",
+                subtitle: "Professionnels reconnus"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Validité permanente",
+                subtitle: "Sans expiration"
+              }
+            ],
+            buttons: [
+              { label: "En savoir plus", href: "/support", icon: <Send className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
-        {/* Stats Section */}
-        <section className="container mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto">
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in">
-              <Award className="w-10 h-10 mx-auto mb-3 text-orange-600" />
-              <div className="text-3xl font-bold mb-1 text-slate-900">6</div>
-              <div className="text-sm text-slate-600">Certifications</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in animation-delay-100">
-              <Users className="w-10 h-10 mx-auto mb-3 text-blue-600" />
-              <div className="text-3xl font-bold mb-1 text-slate-900">500+</div>
-              <div className="text-sm text-slate-600">Certifiés</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in animation-delay-200">
-              <Star className="w-10 h-10 mx-auto mb-3 text-yellow-600" />
-              <div className="text-3xl font-bold mb-1 text-slate-900">4.8/5</div>
-              <div className="text-sm text-slate-600">Satisfaction</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in animation-delay-300">
-              <TrendingUp className="w-10 h-10 mx-auto mb-3 text-green-600" />
-              <div className="text-3xl font-bold mb-1 text-slate-900">95%</div>
-              <div className="text-sm text-slate-600">Réussite</div>
-            </div>
-          </div>
-        </section>
+
 
         {/* Hero Section - Valorisez vos compétences */}
         <section className="container mx-auto px-4 md:px-6 lg:px-8 py-10 md:py-16">
@@ -850,7 +924,7 @@ export default function CertificationsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {/* Badge 1 - Prêt pour AO */}
-              <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border border-slate-200 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-slide-up">
+              <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border border-slate-200 shadow-md transition-all  animate-slide-up">
                 <div className="flex justify-center mb-6">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
                     <FileText className="w-10 h-10 text-white" />
@@ -880,7 +954,7 @@ export default function CertificationsPage() {
               </div>
 
               {/* Badge 2 - Vendeur Vérifié */}
-              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-slide-up animation-delay-100">
+              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-md transition-all  animate-slide-up animation-delay-100">
                 <div className="flex justify-center mb-6">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
                     <ShoppingBag className="w-10 h-10 text-white" />
@@ -910,7 +984,7 @@ export default function CertificationsPage() {
               </div>
 
               {/* Badge 3 - Bancable */}
-              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-slide-up animation-delay-200">
+              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-md transition-all  animate-slide-up animation-delay-200">
                 <div className="flex justify-center mb-6">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                     <Wallet className="w-10 h-10 text-white" />
@@ -940,7 +1014,7 @@ export default function CertificationsPage() {
               </div>
 
               {/* Badge 4 - Made in CI Ready */}
-              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-slide-up animation-delay-300">
+              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-md transition-all  animate-slide-up animation-delay-300">
                 <div className="flex justify-center mb-6">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg">
                     <Star className="w-10 h-10 text-white" />
@@ -996,7 +1070,7 @@ export default function CertificationsPage() {
                   className="flex-1 px-4 md:px-6 py-3 md:py-4 rounded-lg md:rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:outline-none text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
                 />
                 <Button
-                  className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl shadow-lg hover:shadow-xl transition-all text-sm md:text-base"
+                  className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl shadow-lg transition-all text-sm md:text-base"
                 >
                   <Search className="mr-2 h-5 w-5" />
                   Vérifier
@@ -1062,7 +1136,7 @@ export default function CertificationsPage() {
                   className="relative animate-slide-up"
                   style={{ animationDelay: `${idx * 150}ms` }}
                 >
-                  <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 text-center">
+                  <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border-2 border-slate-100 shadow-lg transition-all  text-center">
                     <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white text-2xl font-bold mb-4 shadow-lg">
                       {etape.numero}
                     </div>
@@ -1100,7 +1174,7 @@ export default function CertificationsPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto mb-12">
             {/* Témoignage 1 */}
-            <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in">
+            <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-lg transition-all  animate-fade-in">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
                   AK
@@ -1130,7 +1204,7 @@ export default function CertificationsPage() {
             </div>
 
             {/* Témoignage 2 */}
-            <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in animation-delay-100">
+            <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-lg transition-all  animate-fade-in animation-delay-100">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
                   YK
@@ -1160,7 +1234,7 @@ export default function CertificationsPage() {
             </div>
 
             {/* Témoignage 3 */}
-            <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in animation-delay-200">
+            <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-lg transition-all  animate-fade-in animation-delay-200">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
                   MT
@@ -1230,3 +1304,4 @@ export default function CertificationsPage() {
     </>
   );
 }
+

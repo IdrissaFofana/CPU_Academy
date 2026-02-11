@@ -652,18 +652,98 @@ export const formationsMock: Formation[] = [
     ],
     chapitres: [
       {
-        id: "chap-1",
+        id: "chap-2-1",
         titre: "Introduction à l'e-commerce",
+        description: "Découvrez les fondamentaux de la vente en ligne en Afrique",
         ordre: 1,
         duree: 120,
-        lecons: []
+        lecons: [
+          {
+            id: "lecon-2-1-1",
+            titre: "L'e-commerce en Afrique",
+            type: "video",
+            ordre: 1,
+            duree: 30,
+            videoUrl: "https://example.com/video-ecommerce.mp4",
+            contenu: "Panorama du marché de l'e-commerce en Afrique et opportunités pour les entrepreneurs."
+          },
+          {
+            id: "lecon-2-1-2",
+            titre: "Les principales plateformes",
+            type: "video",
+            ordre: 2,
+            duree: 35,
+            videoUrl: "https://example.com/video-plateformes.mp4",
+            contenu: "Découvrez Jumia, Glotelho, et autres plateformes de vente en ligne.",
+            ressources: [
+              {
+                id: "res-2-1-2",
+                nom: "Comparatif plateformes.pdf",
+                type: "pdf",
+                url: "/ressources/comparatif-plateformes.pdf",
+                taille: "1.5 MB"
+              }
+            ]
+          },
+          {
+            id: "lecon-2-1-3",
+            titre: "Quiz : E-commerce basics",
+            type: "quiz",
+            ordre: 3,
+            duree: 15,
+            quiz: {
+              id: "quiz-ecommerce-chap-1",
+              noteMinimale: 70,
+              tentativesMax: 3,
+              questions: [
+                {
+                  id: "q2-1-1",
+                  question: "Quelle est la plateforme e-commerce la plus populaire en Afrique ?",
+                  type: "qcm",
+                  options: ["Amazon", "Jumia", "Alibaba", "eBay"],
+                  reponseCorrecte: "Jumia",
+                  explication: "Jumia est la plus grande plateforme panafricaine de vente en ligne."
+                }
+              ]
+            }
+          }
+        ]
       },
       {
-        id: "chap-2",
+        id: "chap-2-2",
         titre: "Créer sa boutique",
+        description: "Mise en place et optimisation de votre boutique en ligne",
         ordre: 2,
         duree: 180,
-        lecons: []
+        lecons: [
+          {
+            id: "lecon-2-2-1",
+            titre: "Créer son compte vendeur",
+            type: "video",
+            ordre: 1,
+            duree: 25,
+            videoUrl: "https://example.com/video-compte-vendeur.mp4",
+            contenu: "Guide étape par étape pour créer votre compte vendeur sur les principales plateformes."
+          },
+          {
+            id: "lecon-2-2-2",
+            titre: "Optimiser vos fiches produits",
+            type: "video",
+            ordre: 2,
+            duree: 40,
+            videoUrl: "https://example.com/video-fiches-produits.mp4",
+            contenu: "Techniques pour créer des fiches produits qui convertissent."
+          },
+          {
+            id: "lecon-2-2-3",
+            titre: "Gestion logistique et livraison",
+            type: "video",
+            ordre: 3,
+            duree: 35,
+            videoUrl: "https://example.com/video-logistique.mp4",
+            contenu: "Organiser votre logistique et les livraisons efficacement."
+          }
+        ]
       }
     ],
     nbInscrits: 892,
@@ -772,18 +852,137 @@ export const formationsMock: Formation[] = [
     ],
     chapitres: [
       {
-        id: "chap-1",
+        id: "chap-3-1",
         titre: "Fondamentaux du business plan",
+        description: "Structure et importance du business plan pour obtenir des financements",
         ordre: 1,
         duree: 240,
-        lecons: []
+        lecons: [
+          {
+            id: "lecon-3-1-1",
+            titre: "Qu'est-ce qu'un business plan ?",
+            type: "video",
+            ordre: 1,
+            duree: 30,
+            videoUrl: "https://example.com/video-bp-intro.mp4",
+            contenu: "Introduction au business plan et son importance pour convaincre les investisseurs."
+          },
+          {
+            id: "lecon-3-1-2",
+            titre: "Les sections essentielles",
+            type: "video",
+            ordre: 2,
+            duree: 45,
+            videoUrl: "https://example.com/video-sections-bp.mp4",
+            contenu: "Les différentes parties d'un business plan et leur contenu.",
+            ressources: [
+              {
+                id: "res-3-1-2",
+                nom: "Modèle Business Plan.docx",
+                type: "doc",
+                url: "/ressources/modele-bp.docx",
+                taille: "850 KB"
+              }
+            ]
+          },
+          {
+            id: "lecon-3-1-3",
+            titre: "Ce que les banques recherchent",
+            type: "video",
+            ordre: 3,
+            duree: 35,
+            videoUrl: "https://example.com/video-attentes-banques.mp4",
+            contenu: "Comprendre les critères d'évaluation des banques et institutions financières."
+          },
+          {
+            id: "lecon-3-1-4",
+            titre: "Quiz : Comprendre le business plan",
+            type: "quiz",
+            ordre: 4,
+            duree: 20,
+            quiz: {
+              id: "quiz-bp-chap-1",
+              noteMinimale: 75,
+              tentativesMax: 3,
+              questions: [
+                {
+                  id: "q3-1-1",
+                  question: "Quelle est la principale fonction d'un business plan ?",
+                  type: "qcm",
+                  options: [
+                    "Décorer le bureau",
+                    "Convaincre les investisseurs et banques",
+                    "Satisfaire une obligation légale",
+                    "Impressionner les clients"
+                  ],
+                  reponseCorrecte: "Convaincre les investisseurs et banques",
+                  explication: "Le business plan est avant tout un outil de conviction pour obtenir des financements."
+                },
+                {
+                  id: "q3-1-2",
+                  question: "Un business plan doit faire au minimum 50 pages.",
+                  type: "vrai-faux",
+                  options: ["Vrai", "Faux"],
+                  reponseCorrecte: "Faux",
+                  explication: "La qualité prime sur la quantité. Un bon BP fait généralement 20-30 pages."
+                }
+              ]
+            }
+          }
+        ]
       },
       {
-        id: "chap-2",
+        id: "chap-3-2",
         titre: "Projections financières",
+        description: "Élaborer des prévisions financières réalistes et convaincantes",
         ordre: 2,
         duree: 300,
-        lecons: []
+        lecons: [
+          {
+            id: "lecon-3-2-1",
+            titre: "Le compte de résultat prévisionnel",
+            type: "video",
+            ordre: 1,
+            duree: 50,
+            videoUrl: "https://example.com/video-compte-resultat.mp4",
+            contenu: "Construire un compte de résultat prévisionnel sur 3 ans.",
+            ressources: [
+              {
+                id: "res-3-2-1",
+                nom: "Template Prévisions Financières.xlsx",
+                type: "xls",
+                url: "/ressources/template-previsions.xlsx",
+                taille: "450 KB"
+              }
+            ]
+          },
+          {
+            id: "lecon-3-2-2",
+            titre: "Le plan de trésorerie",
+            type: "video",
+            ordre: 2,
+            duree: 45,
+            videoUrl: "https://example.com/video-tresorerie.mp4",
+            contenu: "Gérer et prévoir votre trésorerie mois par mois."
+          },
+          {
+            id: "lecon-3-2-3",
+            titre: "Le bilan prévisionnel",
+            type: "video",
+            ordre: 3,
+            duree: 40,
+            videoUrl: "https://example.com/video-bilan.mp4",
+            contenu: "Établir le bilan prévisionnel de votre entreprise."
+          },
+          {
+            id: "lecon-3-2-4",
+            titre: "Étude de cas pratique",
+            type: "texte",
+            ordre: 4,
+            duree: 50,
+            contenu: "Exercice complet : construire les projections financières d'une PME ivoirienne."
+          }
+        ]
       }
     ],
     nbInscrits: 567,
@@ -830,18 +1029,184 @@ export const formationsMock: Formation[] = [
     gratuit: true,
     chapitres: [
       {
-        id: "chap-1",
+        id: "chap-4-1",
         titre: "Qu'est-ce que la qualité?",
+        description: "Découvrez les concepts fondamentaux de la qualité et son importance",
         ordre: 1,
         duree: 120,
-        lecons: []
+        lecons: [
+          {
+            id: "lecon-4-1-1",
+            titre: "Introduction à la qualité",
+            type: "video",
+            ordre: 1,
+            duree: 25,
+            videoUrl: "https://example.com/video-qualite-intro.mp4",
+            contenu: "Découvrez ce qu'est la qualité et pourquoi elle est essentielle pour toute entreprise moderne.",
+            ressources: [
+              {
+                id: "res-4-1-1",
+                nom: "Guide Introduction à la Qualité.pdf",
+                type: "pdf",
+                url: "/ressources/guide-qualite.pdf",
+                taille: "1.8 MB"
+              }
+            ]
+          },
+          {
+            id: "lecon-4-1-2",
+            titre: "Les principes de la gestion qualité",
+            type: "video",
+            ordre: 2,
+            duree: 30,
+            videoUrl: "https://example.com/video-principes-qualite.mp4",
+            contenu: "Les 7 principes de management de la qualité selon ISO 9001."
+          },
+          {
+            id: "lecon-4-1-3",
+            titre: "L'importance de la qualité pour les PME",
+            type: "texte",
+            ordre: 3,
+            duree: 20,
+            contenu: "Pourquoi investir dans la qualité est un avantage compétitif majeur pour votre entreprise."
+          },
+          {
+            id: "lecon-4-1-4",
+            titre: "Quiz : Comprendre la qualité",
+            type: "quiz",
+            ordre: 4,
+            duree: 15,
+            quiz: {
+              id: "quiz-iso-chap-1",
+              noteMinimale: 70,
+              tentativesMax: 3,
+              questions: [
+                {
+                  id: "q4-1-1",
+                  question: "Qu'est-ce que la qualité selon ISO 9000 ?",
+                  type: "qcm",
+                  options: [
+                    "L'absence de défauts dans un produit",
+                    "L'aptitude d'un ensemble de caractéristiques à satisfaire des exigences",
+                    "Le respect des normes légales",
+                    "La perfection absolue"
+                  ],
+                  reponseCorrecte: "L'aptitude d'un ensemble de caractéristiques à satisfaire des exigences",
+                  explication: "Selon ISO 9000, la qualité est définie comme l'aptitude d'un ensemble de caractéristiques intrinsèques à satisfaire des exigences."
+                },
+                {
+                  id: "q4-1-2",
+                  question: "Combien de principes de management de la qualité sont définis par ISO 9001 ?",
+                  type: "qcm",
+                  options: ["5 principes", "7 principes", "10 principes", "12 principes"],
+                  reponseCorrecte: "7 principes",
+                  explication: "ISO 9001 définit 7 principes fondamentaux du management de la qualité."
+                }
+              ]
+            }
+          }
+        ]
       },
       {
-        id: "chap-2",
+        id: "chap-4-2",
         titre: "Les normes ISO",
+        description: "Comprendre les normes ISO 9001 et leur application",
         ordre: 2,
         duree: 180,
-        lecons: []
+        lecons: [
+          {
+            id: "lecon-4-2-1",
+            titre: "Introduction aux normes ISO",
+            type: "video",
+            ordre: 1,
+            duree: 35,
+            videoUrl: "https://example.com/video-normes-iso.mp4",
+            contenu: "Découvrez ce que sont les normes ISO et leur rôle dans le commerce international."
+          },
+          {
+            id: "lecon-4-2-2",
+            titre: "La norme ISO 9001 en détail",
+            type: "video",
+            ordre: 2,
+            duree: 45,
+            videoUrl: "https://example.com/video-iso-9001.mp4",
+            contenu: "Explorez en profondeur la norme ISO 9001 - Systèmes de management de la qualité.",
+            ressources: [
+              {
+                id: "res-4-2-2",
+                nom: "ISO 9001 - Résumé des exigences.pdf",
+                type: "pdf",
+                url: "/ressources/iso-9001-resume.pdf",
+                taille: "2.1 MB"
+              }
+            ]
+          },
+          {
+            id: "lecon-4-2-3",
+            titre: "Les bénéfices de la certification ISO",
+            type: "video",
+            ordre: 3,
+            duree: 25,
+            videoUrl: "https://example.com/video-benefices-iso.mp4",
+            contenu: "Les avantages concrets d'obtenir une certification ISO 9001 pour votre entreprise."
+          },
+          {
+            id: "lecon-4-2-4",
+            titre: "Étude de cas : PME certifiée ISO",
+            type: "texte",
+            ordre: 4,
+            duree: 30,
+            contenu: "Découvrez le parcours d'une PME ivoirienne qui a obtenu sa certification ISO 9001 et les résultats obtenus."
+          },
+          {
+            id: "lecon-4-2-5",
+            titre: "Quiz : Les normes ISO",
+            type: "quiz",
+            ordre: 5,
+            duree: 20,
+            quiz: {
+              id: "quiz-iso-chap-2",
+              noteMinimale: 70,
+              tentativesMax: 3,
+              questions: [
+                {
+                  id: "q4-2-1",
+                  question: "ISO 9001 est la norme internationale pour :",
+                  type: "qcm",
+                  options: [
+                    "La sécurité alimentaire",
+                    "Le management de la qualité",
+                    "La protection environnementale",
+                    "La santé et sécurité au travail"
+                  ],
+                  reponseCorrecte: "Le management de la qualité",
+                  explication: "ISO 9001 est la norme de référence pour les systèmes de management de la qualité (SMQ)."
+                },
+                {
+                  id: "q4-2-2",
+                  question: "Une certification ISO 9001 est valable à vie.",
+                  type: "vrai-faux",
+                  options: ["Vrai", "Faux"],
+                  reponseCorrecte: "Faux",
+                  explication: "Une certification ISO 9001 doit être renouvelée régulièrement, généralement tous les 3 ans, avec des audits de surveillance entre-temps."
+                },
+                {
+                  id: "q4-2-3",
+                  question: "Quel est le principal bénéfice d'une certification ISO 9001 ?",
+                  type: "qcm",
+                  options: [
+                    "Augmentation automatique des prix",
+                    "Amélioration de la crédibilité et de la confiance client",
+                    "Réduction des impôts",
+                    "Exemption de contrôles qualité"
+                  ],
+                  reponseCorrecte: "Amélioration de la crédibilité et de la confiance client",
+                  explication: "La certification ISO 9001 améliore significativement la crédibilité de l'entreprise et la confiance des clients."
+                }
+              ]
+            }
+          }
+        ]
       }
     ],
     nbInscrits: 1234,
@@ -1645,4 +2010,5 @@ export const reviewsMock: Review[] = [
     },
   },
 ];
+
 

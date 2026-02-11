@@ -142,15 +142,28 @@ export default function FAQPage() {
   return (
     <>
       <PageBanner 
-        title="Foire aux questions"
-        subtitle="Trouvez rapidement les réponses à vos questions"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "FAQ" }
         ]}
-        buttons={[
-          { label: "Contactez-nous", href: "/support", icon: <Send className="h-5 w-5" /> },
-          { label: "Voir les formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Foire aux Questions",
+            subtitle: "Trouvez rapidement les réponses à vos questions",
+            buttons: [
+              { label: "Contactez-nous", href: "/support", icon: <Send className="h-5 w-5" /> },
+              { label: "Voir les formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Besoin d'Aide ?",
+            subtitle: "Consultez nos réponses ou contactez notre équipe support",
+            buttons: [
+              { label: "Support direct", href: "/support", icon: <Send className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 
@@ -168,7 +181,7 @@ export default function FAQPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group"
+                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-md transition-all duration-500  animate-fade-in group"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
@@ -202,7 +215,7 @@ export default function FAQPage() {
               )}
             </div>
             <p className="text-center text-sm text-slate-500 mt-3">
-              💡 Tapez des mots-clés comme "inscription", "paiement", "certification"...
+              Tapez des mots-clés comme "inscription", "paiement", "certification"...
             </p>
           </div>
 
@@ -234,7 +247,7 @@ export default function FAQPage() {
                 {filteredFAQs.map((faq, idx) => (
                   <Card
                     key={faq.id}
-                    className="overflow-hidden border-2 border-slate-100 hover:border-orange-200 transition-all duration-300 hover:shadow-xl animate-slide-up"
+                    className="overflow-hidden border-2 border-slate-100 hover:border-orange-200 transition-all duration-300 animate-slide-up"
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
                     <button
@@ -307,7 +320,7 @@ export default function FAQPage() {
               <div className="grid md:grid-cols-3 gap-6 mb-12">
                 <a
                   href="mailto:contact@cpuformation.ci"
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-300 transition-all duration-300 "
                 >
                   <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mb-3 group-hover:bg-orange-500 transition-colors">
                     <Mail className="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
@@ -318,7 +331,7 @@ export default function FAQPage() {
 
                 <a
                   href="tel:+22527000000"
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-300 transition-all duration-300 "
                 >
                   <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:bg-blue-500 transition-colors">
                     <Phone className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
@@ -334,7 +347,7 @@ export default function FAQPage() {
                     // Ici vous pouvez ouvrir un widget de chat
                     alert("Chat en direct disponible bientôt !");
                   }}
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-green-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-green-300 transition-all duration-300  cursor-pointer"
                 >
                   <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:bg-green-500 transition-colors">
                     <MessageCircle className="w-6 h-6 text-green-600 group-hover:text-white transition-colors" />
@@ -419,7 +432,7 @@ export default function FAQPage() {
 
                   <button
                     type="submit"
-                    className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+                    className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition-all duration-300 .5"
                   >
                     <div className="flex items-center justify-center gap-2">
                       <Mail className="w-5 h-5" />
@@ -435,3 +448,4 @@ export default function FAQPage() {
     </>
   );
 }
+

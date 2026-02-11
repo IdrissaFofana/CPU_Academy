@@ -221,44 +221,117 @@ export default function ExpertsPage() {
   return (
     <>
       <PageBanner 
-        title="Nos experts"
-        subtitle="Découvrez nos formateurs experts dans leur domaine"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Experts" }
         ]}
-        buttons={[
-          { label: "Devenir expert", href: "/support", icon: <UserPlus className="h-5 w-5" /> },
-          { label: "Voir les formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Nos Formateurs Experts",
+            subtitle: "Découvrez nos formateurs experts dans leur domaine",
+            badge: {
+              icon: "+",
+              number: "150",
+              text: "Experts formateurs",
+              subtext: "À votre service"
+            },
+            trustBadges: [
+              {
+                icon: "users",
+                color: "blue",
+                title: "15+ années",
+                subtitle: "Expérience moyenne"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "4.8/5",
+                subtitle: "Note moyenne étudiants"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "100% qualifiés",
+                subtitle: "Experts certifiés"
+              }
+            ],
+            buttons: [
+              { label: "Devenir expert", href: "/support", icon: <UserPlus className="h-5 w-5" /> },
+              { label: "Voir les formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Excellence Pédagogique",
+            subtitle: "Des professionnels reconnus qui partagent leur expertise",
+            badge: {
+              number: "92%",
+              text: "Satisfaction apprenants",
+              subtext: "Pédagogie unique"
+            },
+            trustBadges: [
+              {
+                icon: "building",
+                color: "purple",
+                title: "Issus d'entreprises",
+                subtitle: "Leaders du secteur"
+              },
+              {
+                icon: "check",
+                color: "blue",
+                title: "Méthodologie éprouvée",
+                subtitle: "Cas pratiques"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Disponibilité",
+                subtitle: "Accompagnement actif"
+              }
+            ],
+            buttons: [
+              { label: "Rencontrer nos experts", href: "#experts", icon: <UserPlus className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Rejoignez Notre Équipe",
+            subtitle: "Devenez formateur et partagez votre savoir-faire",
+            badge: {
+              icon: "💼 ",
+              number: "50+",
+              text: "Postes ouverts",
+              subtext: "Rejoignez-nous"
+            },
+            trustBadges: [
+              {
+                icon: "users",
+                color: "orange",
+                title: "Réseau professionnel",
+                subtitle: "Croissance continue"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Rémunération attractive",
+                subtitle: "Selon expertise"
+              },
+              {
+                icon: "building",
+                color: "blue",
+                title: "Développement continu",
+                subtitle: "Formation formateurs"
+              }
+            ],
+            buttons: [
+              { label: "Candidater", href: "/support", icon: <UserPlus className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
-        {/* Stats Section */}
-        <section className="container mx-auto px-4 md:px-8 lg:px-16 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto">
-            <div className="bg-white rounded-xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
-              <Users className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-orange-600" />
-              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900">{resultsCount}</div>
-              <div className="text-xs md:text-sm text-slate-600">Experts</div>
-            </div>
-            <div className="bg-white rounded-xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
-              <GraduationCap className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-blue-600" />
-              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900">{totalFormations}+</div>
-              <div className="text-xs md:text-sm text-slate-600">Formations</div>
-            </div>
-            <div className="bg-white rounded-xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
-              <Star className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-yellow-600" />
-              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900">{avgRating}/5</div>
-              <div className="text-xs md:text-sm text-slate-600">Satisfaction</div>
-            </div>
-            <div className="bg-white rounded-xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
-              <Award className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 text-green-600" />
-              <div className="text-2xl md:text-3xl font-bold mb-1 text-slate-900">{avgExperience}+</div>
-              <div className="text-xs md:text-sm text-slate-600">Ans d'expérience</div>
-            </div>
-          </div>
-        </section>
 
         {/* Experts Directory with Sidebar */}
         <section className="container mx-auto px-4 md:px-8 lg:px-16 py-8 md:py-12">
@@ -442,3 +515,4 @@ export default function ExpertsPage() {
     </>
   );
 }
+

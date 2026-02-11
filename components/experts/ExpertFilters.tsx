@@ -211,8 +211,9 @@ export function ExpertFilters({
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-cpu-orange"
           />
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">
-              {filters.minRating === 0 ? "Toutes" : `${filters.minRating}+ ⭐`}
+            <span className="text-sm text-gray-600 flex items-center gap-1">
+              {filters.minRating === 0 ? "Toutes" : `${filters.minRating}+`}
+              <Star className="w-4 h-4 fill-current text-amber-500" />
             </span>
             {filters.minRating > 0 && (
               <button
@@ -336,3 +337,4 @@ export function ExpertFilters({
     </Card>
   );
 }
+

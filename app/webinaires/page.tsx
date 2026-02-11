@@ -87,64 +87,118 @@ export default function WebinairesPage() {
   return (
     <>
       <PageBanner
-        title="Webinaires Live"
-        subtitle="Participez à nos sessions live avec des experts et posez vos questions en direct"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Webinaires" }
         ]}
-        buttons={[
-          { label: "S'inscrire maintenant", href: "#webinaires", icon: <Calendar className="h-5 w-5" /> },
-          { label: "Voir formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Webinaires Live",
+            subtitle: "Participez à nos sessions live avec des experts et posez vos questions en direct",
+            badge: {
+              icon: "+",
+              number: "60",
+              text: "Webinaires par mois",
+              subtext: "Thématiques variées"
+            },
+            trustBadges: [
+              {
+                icon: "users",
+                color: "orange",
+                title: "5,000+",
+                subtitle: "Participants actifs"
+              },
+              {
+                icon: "users",
+                color: "purple",
+                title: "Sessions quotidiennes",
+                subtitle: "Horaires flexibles"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Certificat offert",
+                subtitle: "Attestation de présence"
+              }
+            ],
+            buttons: [
+              { label: "S'inscrire maintenant", href: "#webinaires", icon: <Calendar className="h-5 w-5" /> },
+              { label: "Voir formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Sessions Interactives",
+            subtitle: "Échangez en direct avec nos formateurs experts",
+            badge: {
+              number: "100%",
+              text: "Interaction garantie",
+              subtext: "Q&A en direct"
+            },
+            trustBadges: [
+              {
+                icon: "users",
+                color: "blue",
+                title: "Experts reconnus",
+                subtitle: "Leaders du secteur"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Petits groupes",
+                subtitle: "Max 100 participants"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Documentation fournie",
+                subtitle: "Support PDF inclus"
+              }
+            ],
+            buttons: [
+              { label: "Voir le calendrier", href: "#webinaires", icon: <Calendar className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Replays Disponibles",
+            subtitle: "Accédez aux enregistrements de nos sessions passées",
+            badge: {
+              icon: "📺 ",
+              number: "200+",
+              text: "Replays disponibles",
+              subtext: "Bibliothèque complète"
+            },
+            trustBadges: [
+              {
+                icon: "users",
+                color: "purple",
+                title: "Accès illimité",
+                subtitle: "24/7 à la demande"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Qualité HD",
+                subtitle: "Vidéo optimisée"
+              },
+              {
+                icon: "building",
+                color: "blue",
+                title: "Ressources incluses",
+                subtitle: "Slides et documents"
+              }
+            ],
+            buttons: [
+              { label: "Voir les replays", href: "/ressources/webinaires", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 
       <div className="min-h-screen bg-slate-50">
         <div className="container mx-auto px-6 lg:px-16 max-w-7xl py-8 lg:py-12">
-        {/* Stats */}
-        <div className="grid md:grid-cols-3 gap-4 md:gap-6 mb-8 lg:mb-12">
-          <Card className="p-6 bg-blue-50 border-blue-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-blue-500 text-white p-3 rounded-lg">
-                <Calendar className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-blue-900">
-                  {webinairesMock.filter((w) => w.statut === "a-venir").length}
-                </p>
-                <p className="text-sm text-blue-700">À venir</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-red-50 border-red-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-red-500 text-white p-3 rounded-lg animate-pulse">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-red-900">
-                  {webinairesMock.filter((w) => w.statut === "live").length}
-                </p>
-                <p className="text-sm text-red-700">En direct maintenant</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-green-50 border-green-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-green-600 text-white p-3 rounded-lg">
-                <Play className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-green-900">
-                  {webinairesMock.filter((w) => w.statut === "termine" && w.replay).length}
-                </p>
-                <p className="text-sm text-green-700">Replays disponibles</p>
-              </div>
-            </div>
-          </Card>
-        </div>
 
         {/* Main layout with sidebar */}
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -276,7 +330,7 @@ export default function WebinairesPage() {
               {/* Info helper */}
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-xs text-blue-800 leading-relaxed">
-                  <span className="font-semibold">💡 Astuce:</span> Combinez plusieurs filtres pour affiner votre recherche
+                  <span className="font-semibold">Astuce:</span> Combinez plusieurs filtres pour affiner votre recherche
                 </p>
               </div>
             </Card>
@@ -328,7 +382,7 @@ export default function WebinairesPage() {
             const isCompactMode = viewMode === "compact";
             const isLive = webinaire.statut === "live";
             const borderColor = isLive ? "border-red-500 shadow-lg shadow-red-100" : "border-slate-100 hover:border-cpu-orange";
-            const cardClassName = "border-2 hover:shadow-xl transition-all duration-300 " + borderColor + " " + (isListMode ? "flex flex-row p-0 overflow-hidden" : isCompactMode ? "p-3" : "p-4 md:p-5");
+            const cardClassName = "border-2 transition-all duration-300 " + borderColor + " " + (isListMode ? "flex flex-row p-0 overflow-hidden" : isCompactMode ? "p-3" : "p-4 md:p-5");
             const imageHeight = isListMode ? "h-full w-48" : isCompactMode ? "h-24" : "h-32 md:h-40";
             const padding = isCompactMode ? "p-3" : isListMode ? "p-4 flex-1" : "p-0";
             const titleSize = isCompactMode ? "text-sm" : "text-lg md:text-xl";
@@ -458,3 +512,4 @@ export default function WebinairesPage() {
     </>
   );
 }
+

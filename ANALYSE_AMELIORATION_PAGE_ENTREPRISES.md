@@ -1,8 +1,8 @@
-# 📊 Analyse & Propositions d'amélioration - Page Entreprises
+# [Analyse] Propositions d'amélioration - Page Entreprises
 
-## 🔍 État actuel de la page
+## [État actuel de la page]
 
-### ✅ Points forts existants
+### [Fait] Points forts existants
 
 1. **Structure claire** : Sections bien définies (Stats, Services, Packs, Avantages, Contact)
 2. **Design moderne** : Gradients, cards, animations, badges
@@ -11,40 +11,40 @@
 5. **Stats crédibles** : 200+ entreprises, 3500+ collaborateurs formés
 6. **Responsive** : Grid adaptatif
 
-### ❌ Faiblesses & Manques identifiés
+### [Manque] Faiblesses & Manques identifiés
 
 #### 1. Contenu
-- ❌ Pas de témoignages clients réels
-- ❌ Pas de cas d'usage/success stories
-- ❌ Pas de logos de clients prestigieux
-- ❌ Pas de chiffres ROI ou résultats concrets
-- ❌ Pas d'explications sur le processus de collaboration
-- ❌ Pas de section FDFP/financement
+- [Manque] Pas de témoignages clients réels
+- [Manque] Pas de cas d'usage/success stories
+- [Manque] Pas de logos de clients prestigieux
+- [Manque] Pas de chiffres ROI ou résultats concrets
+- [Manque] Pas d'explications sur le processus de collaboration
+- [Manque] Pas de section FDFP/financement
 
 #### 2. Conversion
-- ❌ Formulaire de contact absent (seulement des CTAs)
-- ❌ Pas de lead magnet (brochure PDF, guide, etc.)
-- ❌ Pas de calculateur ROI
-- ❌ Pas de démo/présentation vidéo
-- ❌ Manque d'urgence/scarcity
+- [Manque] Formulaire de contact absent (seulement des CTAs)
+- [Manque] Pas de lead magnet (brochure PDF, guide, etc.)
+- [Manque] Pas de calculateur ROI
+- [Manque] Pas de démo/présentation vidéo
+- [Manque] Manque d'urgence/scarcity
 
 #### 3. Réassurance
-- ❌ Pas de certifications/labels affichés
-- ❌ Pas de garanties explicites
-- ❌ Pas d'accréditations
-- ❌ Manque de preuves sociales
+- [Manque] Pas de certifications/labels affichés
+- [Manque] Pas de garanties explicites
+- [Manque] Pas d'accréditations
+- [Manque] Manque de preuves sociales
 
 #### 4. Informations pratiques
-- ❌ Pas de grille tarifaire (même indicative)
-- ❌ Pas de FAQ entreprises
-- ❌ Pas de calendrier de disponibilité
-- ❌ Manque de détails sur les modalités
+- [Manque] Pas de grille tarifaire (même indicative)
+- [Manque] Pas de FAQ entreprises
+- [Manque] Pas de calendrier de disponibilité
+- [Manque] Manque de détails sur les modalités
 
 ---
 
-## 🎯 Propositions d'amélioration
+## [Propositions d'amélioration]
 
-### **PRIORITÉ 1 - CONVERSION & TRUST** ⭐⭐⭐⭐⭐
+### **PRIORITÉ 1 - CONVERSION & TRUST** [Priorité très haute]
 
 #### 1. **Ajouter une section Témoignages Clients** 
 **Impact : TRÈS FORT - Urgence : HAUTE**
@@ -315,7 +315,7 @@ const optionsFinancement = [
 
 ---
 
-### **PRIORITÉ 2 - CONTENU & VALEUR AJOUTÉE** ⭐⭐⭐⭐
+### **PRIORITÉ 2 - CONTENU & VALEUR AJOUTÉE** [Priorité haute]
 
 #### 5. **Ajouter section "Résultats & ROI"**
 **Impact : FORT**
@@ -536,7 +536,7 @@ const ressourcesEntreprises = [
 
 ---
 
-### **PRIORITÉ 3 - DESIGN & UX** ⭐⭐⭐
+### **PRIORITÉ 3 - DESIGN & UX** [Priorité moyenne]
 
 #### 9. **Améliorer la section Hero/Banner**
 
@@ -662,7 +662,7 @@ const certificationsLabels = [
 
 ---
 
-### **PRIORITÉ 4 - FONCTIONNALITÉS AVANCÉES** ⭐⭐
+### **PRIORITÉ 4 - FONCTIONNALITÉS AVANCÉES** [Priorité basse]
 
 #### 13. **Ajouter comparateur de packs**
 
@@ -682,7 +682,7 @@ const [packsCompares, setPacksCompares] = useState([]);
 | Prix/pers | 450k | 380k | 420k |
 | Modules | 6 | 5 | 5 |
 | Niveau | Direction | Commercial | Finance |
-| FDFP | ✓ | ✓ | ✓ |
+| FDFP | [Oui] | [Oui] | [Oui] |
 
 ---
 
@@ -734,7 +734,7 @@ Modal avis avec :
 
 ---
 
-### **PRIORITÉ 5 - SEO & PERFORMANCE** ⭐⭐
+### **PRIORITÉ 5 - SEO & PERFORMANCE** [Priorité basse]
 
 #### 16. **Améliorer le SEO**
 
@@ -858,7 +858,7 @@ import Image from 'next/image';
 
 ---
 
-## 🎯 KPIs à suivre après implémentation
+## [KPIs à suivre après implémentation]
 
 | Métrique | Avant | Objectif | Mesure |
 |----------|-------|----------|--------|
@@ -872,7 +872,7 @@ import Image from 'next/image';
 
 ---
 
-## 💡 Inspiration de pages Entreprises best-in-class
+## [Inspiration de pages Entreprises best-in-class]
 
 ### Benchmarks nationaux/internationaux :
 1. **OpenClassrooms Enterprise** - Design moderne, calculateur ROI
@@ -882,12 +882,12 @@ import Image from 'next/image';
 5. **Cegos** - FAQ détaillée, process clair
 
 ### Points à copier :
-- ✅ Sticky CTA "Demander un devis"
-- ✅ Exit-intent popup (ressource gratuite)
-- ✅ Live chat
-- ✅ Trust badges partout
-- ✅ Video testimonials
-- ✅ Interactive ROI calculator
+- [Fait] Sticky CTA "Demander un devis"
+- [Fait] Exit-intent popup (ressource gratuite)
+- [Fait] Live chat
+- [Fait] Trust badges partout
+- [Fait] Video testimonials
+- [Fait] Interactive ROI calculator
 
 ---
 
@@ -897,13 +897,13 @@ import Image from 'next/image';
 
 | Amélioration | Impact Business | Priorité |
 |--------------|-----------------|----------|
-| Formulaire inline | +40% leads | ⭐⭐⭐⭐⭐ |
-| Témoignages clients | +25% conversion | ⭐⭐⭐⭐⭐ |
-| Section FDFP | +30% demandes | ⭐⭐⭐⭐⭐ |
-| FAQ détaillée | -20% questions support | ⭐⭐⭐⭐ |
-| Calculateur ROI | +15% engagement | ⭐⭐⭐⭐ |
-| Ressources PDF | +200% leads qualifiés | ⭐⭐⭐⭐ |
-| Process 5 étapes | +20% confiance | ⭐⭐⭐⭐ |
+| Formulaire inline | +40% leads | [Priorité très haute] |
+| Témoignages clients | +25% conversion | [Priorité très haute] |
+| Section FDFP | +30% demandes | [Priorité très haute] |
+| FAQ détaillée | -20% questions support | [Priorité haute] |
+| Calculateur ROI | +15% engagement | [Priorité haute] |
+| Ressources PDF | +200% leads qualifiés | [Priorité haute] |
+| Process 5 étapes | +20% confiance | [Priorité haute] |
 
 ### Budget estimé :
 - **Phase 1 (Quick Wins)** : 2-3 jours dev
@@ -920,5 +920,5 @@ import Image from 'next/image';
 
 ---
 
-**📞 Contact pour validation :**
+**[Contact] Validation :****
 CEO / Responsable Marketing pour priorisation et validation du budget.

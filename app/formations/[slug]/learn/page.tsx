@@ -9,6 +9,7 @@ import { ChaptersSidebar } from "@/components/learn/ChaptersSidebar";
 import { VideoPlayer } from "@/components/learn/VideoPlayer";
 import { ContentTabs } from "@/components/learn/ContentTabs";
 import { Button } from "@/components/ui/button";
+import { CheckCircle2, ChevronLeft, ChevronRight, X, Play, BookOpen, Award, Clock } from "lucide-react";
 
 export default function LearnPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -148,90 +149,82 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
 
   return (
     <div className="h-screen flex flex-col bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4 flex-1">
+      {/* Header moderne */}
+      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <Link
             href={`/formations/${formation.slug}`}
-            className="text-cpu-orange hover:text-cpu-orange/80"
+            className="text-slate-600 hover:text-cpu-orange transition-colors flex-shrink-0"
+            title="Quitter le cours"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X className="w-6 h-6" />
           </Link>
-          <div className="flex-1">
-            <h1 className="font-semibold text-slate-900 truncate">
+          
+          <div className="flex-1 min-w-0">
+            <h1 className="font-semibold text-slate-900 truncate text-sm sm:text-base">
               {formation.titre}
             </h1>
-            <p className="text-sm text-slate-600">{currentLecon.titre}</p>
+            <p className="text-xs sm:text-sm text-slate-600 truncate">{currentLecon.titre}</p>
           </div>
         </div>
 
-        {/* Progress */}
-        <div className="flex items-center gap-4">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-medium text-slate-900">
-              Progression: {progressPercentage}%
-            </p>
-            <div className="w-32 h-2 bg-slate-200 rounded-full mt-1">
-              <div
-                className="h-full bg-cpu-orange rounded-full transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              />
+        {/* Progress et navigation */}
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          {/* Progress circulaire */}
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-xs text-slate-500">Progression</p>
+              <p className="text-sm font-bold text-cpu-orange">{progressPercentage}%</p>
+            </div>
+            <div className="relative w-12 h-12">
+              <svg className="transform -rotate-90 w-12 h-12">
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                  className="text-slate-200"
+                />
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 20}`}
+                  strokeDashoffset={`${2 * Math.PI * 20 * (1 - progressPercentage / 100)}`}
+                  className="text-cpu-orange transition-all duration-300"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs font-bold text-cpu-orange">{progressPercentage}</span>
+              </div>
             </div>
           </div>
 
-          {/* Navigation buttons */}
-          <div className="flex gap-2">
+          {/* Boutons de navigation */}
+          <div className="flex gap-1">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handlePrevious}
               disabled={currentChapitreIndex === 0 && 
                 formation.chapitres?.[0]?.lecons.findIndex((l) => l.id === currentLeconId) === 0}
+              className="h-9 w-9 p-0"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
+              <ChevronLeft className="w-5 h-5" />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleNext}
+              className="h-9 w-9 p-0"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <ChevronRight className="w-5 h-5" />
             </Button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { 
   Building, 
   Users, 
@@ -48,12 +49,6 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-const stats = [
-  { icon: Building, value: "200+", label: "Entreprises formées" },
-  { icon: Users, value: "3,500+", label: "Collaborateurs formés" },
-  { icon: Award, value: "95%", label: "Taux de satisfaction" },
-  { icon: TrendingUp, value: "12 ans", label: "D'expérience" }
-];
 
 const services = [
   {
@@ -563,81 +558,118 @@ const criteres = [
 export default function EntreprisesPage() {
   return (
     <>
-      {/* Hero Section amélioré */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900 text-white overflow-hidden">
-        {/* Logo en background - visible comme page experts */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <Image 
-              src="/images/cpu-logo.png" 
-              alt="CPU Formation Logo" 
-              width={650} 
-              height={650}
-              className="w-auto h-[70%] object-contain opacity-60"
-              priority
-            />
-          </div>
-        </div>
-        
-        {/* Overlay gradient pour lisibilité du texte */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/30 to-orange-900/50" />
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-4 md:mb-6 bg-orange-500 text-white border-0 px-4 py-2">
-              <Building className="w-4 h-4 mr-2" />
-              Solutions Entreprises
-            </Badge>
-            
-            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6 leading-tight">
-              Investissez dans vos équipes,<br />
-              <span className="text-orange-400">récoltez la performance</span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-slate-300 mb-6 md:mb-8 leading-relaxed max-w-3xl mx-auto">
-              200+ entreprises nous font confiance pour développer les compétences de leurs collaborateurs
-            </p>
+      <PageBanner
+        breadcrumb={[
+          { label: "Accueil", href: "/" },
+          { label: "Entreprises" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Investissez dans vos équipes, récoltez la performance",
+            subtitle: "200+ entreprises nous font confiance pour développer les compétences de leurs collaborateurs",
+            badge: {
+              icon: "+",
+              number: "200",
+              text: "Entreprises partenaires",
+              subtext: "Vous accompagnent"
+            },
+            trustBadges: [
+              {
+                icon: "check",
+                color: "green",
+                title: "FDFP 70%",
+                subtitle: "Prise en charge formation"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "3,500+",
+                subtitle: "Collaborateurs formés"
+              },
+              {
+                icon: "check",
+                color: "blue",
+                title: "95%",
+                subtitle: "Taux de satisfaction"
+              }
+            ],
+            buttons: [
+              { label: "Demander un devis", href: "#contact", icon: <Send className="h-5 w-5" /> },
+              { label: "Télécharger le catalogue", href: "#ressources", variant: "outline", icon: <Download className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Solutions Sur Mesure pour Entreprises",
+            subtitle: "Prise en charge FDFP jusqu'à 70% - Formations adaptées à vos besoins",
+            badge: {
+              icon: "🎯 ",
+              number: "70%",
+              text: "Prise en charge FDFP",
+              subtext: "Sur vos formations"
+            },
+            trustBadges: [
+              {
+                icon: "building",
+                color: "purple",
+                title: "PME & Grandes entreprises",
+                subtitle: "Tous secteurs d'activité"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Certifications officielles",
+                subtitle: "Reconnues par l'État"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Formations flexibles",
+                subtitle: "Présentiel ou en ligne"
+              }
+            ],
+            buttons: [
+              { label: "Nous contacter", href: "#contact", icon: <Send className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "ROI Mesurable & Certifications",
+            subtitle: "Formations certifiantes avec suivi des performances de vos équipes",
+            badge: {
+              number: "85%",
+              text: "ROI positif en 6 mois",
+              subtext: "Selon nos clients"
+            },
+            trustBadges: [
+              {
+                icon: "check",
+                color: "blue",
+                title: "Qualité certifiée",
+                subtitle: "Organisme agréé"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Experts métiers",
+                subtitle: "15+ années d'expérience"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Suivi personnalisé",
+                subtitle: "Avant, pendant, après"
+              }
+            ],
+            buttons: [
+              { label: "Voir nos offres", href: "#services", icon: <Building className="h-5 w-5" /> }
+            ]
+          }
+        ]}
+      />
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 md:mb-12">
-              <Button
-                asChild
-                size="lg"
-                className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white shadow-xl w-full sm:w-auto"
-              >
-                <Link href="#contact">
-                  <Send className="mr-2 h-5 w-5" />
-                  Demander un devis gratuit
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="cursor-pointer border-2 border-white bg-white text-slate-900 hover:bg-white hover:text-orange-500 w-full sm:w-auto"
-              >
-                <Link href="#ressources">
-                  <Download className="mr-2 h-5 w-5" />
-                  Télécharger le catalogue
-                </Link>
-              </Button>
-            </div>
-
-            <div className="inline-flex items-center gap-2 bg-green-500/20 border border-green-500/30 rounded-xl px-6 py-3">
-              <Shield className="w-5 h-5 text-green-400" />
-              <span className="text-sm md:text-base text-green-100 font-semibold">
-                Prise en charge FDFP jusqu'à 70%
-              </span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Vague décorative */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
-          </svg>
-        </div>
-      </section>
-
+      {/* Content */}
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/20">
         {/* Logos Clients Section */}
         <section className="container mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12 border-b border-slate-100">
@@ -661,25 +693,6 @@ export default function EntreprisesPage() {
             ))}
           </div>
         </section>
-        {/* Stats Section */}
-        <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto">
-            {stats.map((stat, idx) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={idx}
-                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in"
-                  style={{ animationDelay: `${idx * 100}ms` }}
-                >
-                  <Icon className="w-10 h-10 mx-auto mb-3 text-orange-600" />
-                  <div className="text-3xl font-bold mb-1 text-slate-900">{stat.value}</div>
-                  <div className="text-sm text-slate-600">{stat.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
 
         {/* Témoignages Clients Section */}
         <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
@@ -700,7 +713,7 @@ export default function EntreprisesPage() {
             {temoignages.map((temoignage, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in"
+                className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-lg transition-all  animate-fade-in"
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 {/* Header */}
@@ -780,7 +793,7 @@ export default function EntreprisesPage() {
                     className="relative z-10 animate-slide-up"
                     style={{ animationDelay: `${idx * 150}ms` }}
                   >
-                    <div className="bg-white rounded-2xl p-6 border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 text-center">
+                    <div className="bg-white rounded-2xl p-6 border-2 border-slate-100 shadow-lg transition-all  text-center">
                       {/* Numéro avec icône */}
                       <div className="relative inline-flex mb-4">
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
@@ -855,7 +868,7 @@ export default function EntreprisesPage() {
               return (
                 <Card
                   key={idx}
-                  className="p-6 hover:shadow-2xl transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up"
+                  className="p-6 transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-${service.color}-100 mb-3`}>
@@ -898,7 +911,7 @@ export default function EntreprisesPage() {
               return (
                 <Card
                   key={idx}
-                  className="group relative bg-white hover:shadow-2xl transition-all duration-300 border-2 border-slate-100 hover:border-orange-200 animate-slide-up overflow-hidden"
+                  className="group relative bg-white transition-all duration-300 border-2 border-slate-100 hover:border-orange-200 animate-slide-up overflow-hidden"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   {/* Barre colorée en haut */}
@@ -1029,7 +1042,7 @@ export default function EntreprisesPage() {
                 return (
                   <Card
                     key={idx}
-                    className="relative p-6 md:p-8 hover:shadow-2xl transition-all border-2 hover:border-orange-200 animate-slide-up"
+                    className="relative p-6 md:p-8 transition-all border-2 hover:border-orange-200 animate-slide-up"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     {option.badge && (
@@ -1108,7 +1121,7 @@ export default function EntreprisesPage() {
                 return (
                   <div
                     key={idx}
-                    className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in"
+                    className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-lg transition-all  animate-fade-in"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-orange-100 mb-4">
@@ -1194,7 +1207,7 @@ export default function EntreprisesPage() {
               {partenaires.map((partenaire, idx) => (
                 <div
                   key={idx}
-                  className="bg-white rounded-xl p-6 text-center border border-slate-200 shadow-sm hover:shadow-md transition-all animate-fade-in"
+                  className="bg-white rounded-xl p-6 text-center border border-slate-200 shadow-sm transition-all animate-fade-in"
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div className="text-2xl font-bold text-orange-600 mb-1">{partenaire.count}</div>
@@ -1238,7 +1251,7 @@ export default function EntreprisesPage() {
               {faqEntreprises.map((faq, idx) => (
                 <details
                   key={idx}
-                  className="group bg-white rounded-xl md:rounded-2xl border-2 border-slate-100 overflow-hidden hover:shadow-lg transition-all animate-fade-in"
+                  className="group bg-white rounded-xl md:rounded-2xl border-2 border-slate-100 overflow-hidden transition-all animate-fade-in"
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <summary className="flex items-center justify-between p-5 md:p-6 cursor-pointer list-none">
@@ -1295,7 +1308,7 @@ export default function EntreprisesPage() {
                 return (
                   <div
                     key={idx}
-                    className="bg-white rounded-2xl p-6 border-2 border-slate-100 hover:shadow-xl transition-all hover:-translate-y-1 animate-slide-up"
+                    className="bg-white rounded-2xl p-6 border-2 border-slate-100 transition-all  animate-slide-up"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     <div className="flex items-start gap-4">
@@ -1374,7 +1387,7 @@ export default function EntreprisesPage() {
               {certificationsLabels.map((certif, idx) => (
                 <div
                   key={idx}
-                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 hover:shadow-xl transition-all hover:-translate-y-1 animate-fade-in"
+                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 transition-all  animate-fade-in"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center">
@@ -1682,3 +1695,4 @@ export default function EntreprisesPage() {
     </>
   );
 }
+

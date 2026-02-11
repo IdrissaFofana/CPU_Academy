@@ -96,12 +96,37 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
   return (
     <>
       <PageBanner
-        title={parcours.titre}
-        subtitle={parcours.description}
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Parcours", href: "/parcours" },
           { label: parcours.titre }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: parcours.titre,
+            subtitle: parcours.description,
+            trustBadges: [
+              {
+                icon: "users",
+                color: "orange",
+                title: `${parcours.formations.length} formations`,
+                subtitle: "Dans ce parcours"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: parcours.niveau,
+                subtitle: "Niveau requis"
+              },
+              {
+                icon: "building",
+                color: "blue",
+                title: parcours.duree,
+                subtitle: "Durée totale"
+              }
+            ]
+          }
         ]}
       />
 
@@ -191,7 +216,7 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                         {/* Modules of Formation */}
                         {formation.modules && formation.modules.length > 0 && (
                           <div className="ml-16 space-y-3">
-                            <p className="text-sm font-semibold text-slate-700 mb-3">📚 Modules:</p>
+                            <p className="text-sm font-semibold text-slate-700 mb-3">Modules:</p>
                             {formation.modules.map((module: any, modIdx: number) => (
                               <div key={module.id} className="flex gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">
                                 <div className="flex-shrink-0 w-8 h-8 rounded bg-cpu-green/20 text-cpu-green flex items-center justify-center text-xs font-semibold">
@@ -201,9 +226,9 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                                   <h4 className="font-medium text-slate-900 text-sm">{module.titre}</h4>
                                   <p className="text-xs text-slate-600 mt-1">{module.description}</p>
                                   <div className="flex gap-3 mt-2 text-xs text-slate-500">
-                                    <span>⏱️ {module.duree}h</span>
+                                    <span>{module.duree}h</span>
                                     {module.objectifs && module.objectifs.length > 0 && (
-                                      <span>🎯 {module.objectifs.length} objectif{module.objectifs.length > 1 ? 's' : ''}</span>
+                                      <span>{module.objectifs.length} objectif{module.objectifs.length > 1 ? 's' : ''}</span>
                                     )}
                                   </div>
                                 </div>

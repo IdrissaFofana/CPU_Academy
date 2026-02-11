@@ -81,3 +81,4 @@ export async function GET(request: NextRequest) {
     events: telemetryStore.slice(-100) // Return last 100 events
   });
 }
+

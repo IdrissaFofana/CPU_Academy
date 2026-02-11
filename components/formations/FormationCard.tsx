@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FormationModal } from "./FormationModal";
 import type { Formation } from "@/types";
-import { Clock, MapPin, Users, Star } from "lucide-react";
+import { Clock, MapPin, Users, Star, BookOpen, ShoppingCart, Check } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 interface FormationCardProps {
   formation: Formation;
@@ -17,6 +18,22 @@ interface FormationCardProps {
 
 export function FormationCard({ formation, variant = "default" }: FormationCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addItem, isInCart } = useCart();
+  const inCart = isInCart(formation.id.toString());
+
+  const handleAddToCart = () => {
+    addItem({
+      id: formation.id.toString(),
+      titre: formation.titre,
+      categorie: formation.secteur || "Formation",
+      duree: `${formation.duree} semaines`,
+      prix: formation.prixMembre || formation.prixPublic || 0,
+      image: formation.image,
+      certifiant: formation.badges?.includes("Certifiant") || false,
+      niveau: formation.niveau,
+    });
+  };
+
   const getModaliteBadgeColor = (modalite?: string) => {
     switch (modalite) {
       case "Hybride":
@@ -52,7 +69,7 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
   };
 
   return (
-    <Card className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden animate-slide-up">
+    <Card className="h-full transition-all duration-300  overflow-hidden animate-slide-up">
       {/* Image de la formation */}
       <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
         {formation.image ? (
@@ -66,7 +83,7 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cpu-orange/10 to-cpu-green/10">
-            <span className="text-4xl text-gray-400">📚</span>
+            <BookOpen className="w-12 h-12 text-gray-400" />
           </div>
         )}
         
@@ -148,16 +165,35 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
         </div>
 
         <div className="flex flex-col gap-2">
-          <a href={`/inscription?formation=${formation.id}`} className="w-full">
+          {/* Bouton Ajouter au panier */}
+          {!formation.gratuit && (
             <Button 
-              className="cursor-pointer w-full bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-md shadow-lg hover:shadow-xl transition-all duration-200" 
+              onClick={handleAddToCart}
+              disabled={inCart}
+              className={`w-full font-semibold rounded-md shadow-sm transition-all duration-200 ${
+                inCart 
+                  ? "bg-green-600 hover:bg-green-600 text-white cursor-default" 
+                  : "bg-cpu-orange hover:bg-cpu-orange/90 text-white cursor-pointer"
+              }`}
             >
-              S'inscrire maintenant
+              {inCart ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Dans le panier
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Ajouter au panier
+                </>
+              )}
             </Button>
-          </a>
+          )}
+          
+          {/* Bouton Voir le détail */}
           <Link href={`/formations/${formation.slug}`} className="w-full">
             <Button 
-              className="cursor-pointer w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold rounded-md shadow-sm hover:shadow-lg transition-all duration-200" 
+              className="cursor-pointer w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-md shadow-sm transition-all duration-200" 
             >
               Voir le détail
             </Button>
@@ -173,3 +209,4 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
     </Card>
   );
 }
+

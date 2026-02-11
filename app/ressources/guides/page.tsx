@@ -136,12 +136,22 @@ export default function GuidesPage() {
   return (
     <>
       <PageBanner 
-        title="Guides & Modèles"
-        subtitle="Téléchargez nos ressources gratuites pour développer votre entreprise"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Ressources", href: "/ressources/guides" },
           { label: "Guides & Modèles" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Guides & Modèles",
+            subtitle: "Téléchargez nos ressources gratuites pour développer votre entreprise",
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Outils Pratiques",
+            subtitle: "Modèles, checklist et guides pour votre réussite",
+          }
         ]}
       />
 
@@ -228,7 +238,7 @@ export default function GuidesPage() {
               filteredRessources.map((ressource, idx) => (
                 <Card
                   key={ressource.id}
-                  className="group flex flex-col hover:shadow-2xl transition-all duration-500 border-2 border-slate-100 hover:border-orange-200 bg-white overflow-hidden animate-fade-in hover:-translate-y-2"
+                  className="group flex flex-col transition-all duration-500 border-2 border-slate-100 hover:border-orange-200 bg-white overflow-hidden animate-fade-in "
                   style={{ 
                     animationDelay: `${idx * 80}ms`,
                     transformOrigin: 'center'
@@ -242,7 +252,7 @@ export default function GuidesPage() {
                       <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
                         <FileText className="w-7 h-7 text-orange-600 group-hover:scale-110 transition-transform" />
                       </div>
-                      <Badge className={`${ressource.formatColor} text-white border-0 text-xs font-semibold px-3 py-1 shadow-md group-hover:shadow-lg transition-all`}>
+                      <Badge className={`${ressource.formatColor} text-white border-0 text-xs font-semibold px-3 py-1 shadow-md transition-all`}>
                         {ressource.format}
                       </Badge>
                     </div>
@@ -278,7 +288,7 @@ export default function GuidesPage() {
 
                     {/* Bouton télécharger */}
                     <Button
-                      className="w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300 group-hover:scale-105"
+                      className="w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold shadow-md transition-all duration-300 group-hover:scale-105"
                     >
                       <Download className="mr-2 h-4 w-4 group-hover:animate-bounce" />
                       Télécharger
@@ -299,3 +309,4 @@ export default function GuidesPage() {
     </>
   );
 }
+

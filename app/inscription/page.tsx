@@ -7,16 +7,29 @@ export default function InscriptionPage() {
   return (
     <>
       <PageBanner 
-        title="Inscription à la formation"
-        subtitle="Complétez votre inscription en quelques étapes"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Catalogue", href: "/catalogue" },
           { label: "Inscription" }
         ]}
-        buttons={[
-          { label: "Commencer", href: "#formulaire", icon: <Rocket className="h-5 w-5" /> },
-          { label: "Retour au catalogue", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Inscription à la formation",
+            subtitle: "Complétez votre inscription en quelques étapes",
+            buttons: [
+              { label: "Commencer", href: "#formulaire", icon: <Rocket className="h-5 w-5" /> },
+              { label: "Retour au catalogue", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Démarrez Votre Parcours",
+            subtitle: "Rejoignez des milliers d'apprenants qui ont transformé leur carrière",
+            buttons: [
+              { label: "S'inscrire maintenant", href: "#formulaire", icon: <Rocket className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 

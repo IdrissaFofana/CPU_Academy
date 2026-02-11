@@ -4,6 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { Formation } from "@/types";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { ShoppingCart, Check } from "lucide-react";
 
 interface FormationSidebarProps {
   formation: Formation;
@@ -11,6 +14,46 @@ interface FormationSidebarProps {
 
 export function FormationSidebar({ formation }: FormationSidebarProps) {
   const [isEnrolled] = useState(false); // TODO: Vérifier si l'utilisateur est inscrit
+  const { addItem, isInCart, removeItem } = useCart();
+  const { addNotification } = useNotifications();
+  const inCart = isInCart(formation.id.toString());
+
+  const handleAddToCart = () => {
+    addItem({
+      id: formation.id.toString(),
+      titre: formation.titre,
+      categorie: formation.secteur || "Formation",
+      duree: `${formation.duree}h`,
+      prix: formation.prixMembre || 0,
+      image: formation.image,
+      certifiant: formation.certifiant || false,
+      niveau: formation.niveau,
+    });
+    
+    // Notification pour ajout au panier
+    addNotification({
+      type: "info",
+      titre: "Formation ajoutée au panier",
+      message: `"${formation.titre}" a été ajouté à votre panier.`,
+      icon: "🛒",
+      link: "/checkout",
+    });
+  };
+
+  const handleRemoveFromCart = () => {
+    removeItem(formation.id.toString());
+  };
+  
+  const handleStartFreeFormation = () => {
+    // Notification pour formation gratuite
+    addNotification({
+      type: "success",
+      titre: "Inscription réussie !",
+      message: `Vous êtes maintenant inscrit à "${formation.titre}". Commencez dès maintenant !`,
+      icon: "🎓",
+      link: `/formations/${formation.slug}/learn`,
+    });
+  };
 
   return (
     <div className="sticky top-24">
@@ -60,20 +103,61 @@ export function FormationSidebar({ formation }: FormationSidebarProps) {
             )}
           </div>
 
-          {/* CTA Button */}
-          {isEnrolled ? (
-            <Link href={`/formations/${formation.slug}/learn`}>
-              <Button className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white">
-                Continuer la formation
-              </Button>
-            </Link>
-          ) : (
-            <Link href={`/formations/${formation.slug}/learn`}>
-              <Button className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white">
-                Commencer maintenant
-              </Button>
-            </Link>
-          )}
+          {/* CTA Buttons */}
+          <div className="space-y-3">
+            {isEnrolled ? (
+              <Link href={`/formations/${formation.slug}/learn`}>
+                <Button className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white">
+                  Continuer la formation
+                </Button>
+              </Link>
+            ) : formation.gratuit ? (
+              <Link href={`/formations/${formation.slug}/learn`}>
+                <Button 
+                  onClick={handleStartFreeFormation}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                >
+                  Commencer gratuitement
+                </Button>
+              </Link>
+            ) : (
+              <>
+                {inCart ? (
+                  <div className="space-y-2">
+                    <Button 
+                      className="w-full bg-green-600 hover:bg-green-700 text-white cursor-default"
+                      disabled
+                    >
+                      <Check className="w-5 h-5 mr-2" />
+                      Ajouté au panier
+                    </Button>
+                    <div className="flex gap-2">
+                      <Link href="/checkout" className="flex-1">
+                        <Button className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white">
+                          Voir le panier
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        onClick={handleRemoveFromCart}
+                        className="px-4"
+                      >
+                        Retirer
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button 
+                    onClick={handleAddToCart}
+                    className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white cursor-pointer"
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Ajouter au panier
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
 
           {/* Included */}
           <div className="space-y-3 pt-6 border-t border-slate-200">
@@ -220,3 +304,4 @@ export function FormationSidebar({ formation }: FormationSidebarProps) {
     </div>
   );
 }
+

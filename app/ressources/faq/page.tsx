@@ -177,12 +177,22 @@ export default function FAQPage() {
   return (
     <>
       <PageBanner 
-        title="Foire aux questions"
-        subtitle="Trouvez rapidement les réponses à vos questions"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Ressources", href: "/ressources/guides" },
           { label: "FAQ" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Foire aux Questions",
+            subtitle: "Trouvez rapidement les réponses à vos questions",
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Centre d'Aide",
+            subtitle: "Toutes les réponses aux questions fréquentes sur nos services",
+          }
         ]}
       />
 
@@ -190,7 +200,7 @@ export default function FAQPage() {
         <section className="container mx-auto px-8 lg:px-16 py-12">
           {/* Stats rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
-            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group">
+            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md transition-all duration-500  animate-fade-in group">
               <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                 <HelpCircle className="w-6 h-6 md:w-8 md:h-8 text-orange-600" />
               </div>
@@ -198,7 +208,7 @@ export default function FAQPage() {
               <div className="text-xs md:text-sm text-slate-600">Questions fréquentes</div>
             </div>
             
-            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group" style={{ animationDelay: "100ms" }}>
+            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md transition-all duration-500  animate-fade-in group" style={{ animationDelay: "100ms" }}>
               <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                 <MessageCircle className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
               </div>
@@ -206,7 +216,7 @@ export default function FAQPage() {
               <div className="text-xs md:text-sm text-slate-600">Support disponible</div>
             </div>
             
-            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group" style={{ animationDelay: "200ms" }}>
+            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md transition-all duration-500  animate-fade-in group" style={{ animationDelay: "200ms" }}>
               <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-2xl bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                 <Phone className="w-6 h-6 md:w-8 md:h-8 text-green-600" />
               </div>
@@ -214,7 +224,7 @@ export default function FAQPage() {
               <div className="text-xs md:text-sm text-slate-600">Temps de réponse</div>
             </div>
             
-            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in group" style={{ animationDelay: "300ms" }}>
+            <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md transition-all duration-500  animate-fade-in group" style={{ animationDelay: "300ms" }}>
               <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                 <Users className="w-6 h-6 md:w-8 md:h-8 text-purple-600" />
               </div>
@@ -244,7 +254,7 @@ export default function FAQPage() {
               )}
             </div>
             <p className="text-center text-sm text-slate-500 mt-3">
-              💡 Tapez des mots-clés comme "inscription", "paiement", "certification"...
+              Tapez des mots-clés comme "inscription", "paiement", "certification"...
             </p>
           </div>
 
@@ -298,7 +308,7 @@ export default function FAQPage() {
                 {filteredFAQs.map((faq, idx) => (
                   <Card
                     key={faq.id}
-                    className="overflow-hidden border-2 border-slate-100 hover:border-orange-200 transition-all duration-300 hover:shadow-xl animate-slide-up"
+                    className="overflow-hidden border-2 border-slate-100 hover:border-orange-200 transition-all duration-300 animate-slide-up"
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
                     <button
@@ -371,7 +381,7 @@ export default function FAQPage() {
               <div className="grid md:grid-cols-3 gap-6 mb-12">
                 <a
                   href="mailto:contact@cpuformation.ci"
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-300 transition-all duration-300 "
                 >
                   <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mb-3 group-hover:bg-orange-500 transition-colors">
                     <Mail className="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
@@ -382,7 +392,7 @@ export default function FAQPage() {
 
                 <a
                   href="tel:+22527000000"
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-300 transition-all duration-300 "
                 >
                   <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:bg-blue-500 transition-colors">
                     <Phone className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
@@ -398,7 +408,7 @@ export default function FAQPage() {
                     // Ici vous pouvez ouvrir un widget de chat
                     alert("Chat en direct disponible bientôt !");
                   }}
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-green-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-green-300 transition-all duration-300  cursor-pointer"
                 >
                   <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:bg-green-500 transition-colors">
                     <MessageCircle className="w-6 h-6 text-green-600 group-hover:text-white transition-colors" />
@@ -483,7 +493,7 @@ export default function FAQPage() {
 
                   <button
                     type="submit"
-                    className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+                    className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition-all duration-300 .5"
                   >
                     <div className="flex items-center justify-center gap-2">
                       <Mail className="w-5 h-5" />
@@ -499,3 +509,4 @@ export default function FAQPage() {
     </>
   );
 }
+

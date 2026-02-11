@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Lightbulb } from "lucide-react";
 import { Lecon } from "@/types";
 
 interface ContentTabsProps {
@@ -93,8 +94,9 @@ export function ContentTabs({ lecon, notes, onNotesChange }: ContentTabsProps) {
               placeholder="Écrivez vos notes ici... Elles seront automatiquement sauvegardées."
               className="w-full h-64 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cpu-orange focus:border-transparent resize-none"
             />
-            <p className="text-xs text-slate-500">
-              💡 Astuce : Utilisez cette section pour noter les points clés et vos
+            <p className="text-xs text-slate-500 flex items-center gap-2">
+              <Lightbulb className="w-3 h-3" />
+              Astuce : Utilisez cette section pour noter les points clés et vos
               réflexions personnelles.
             </p>
           </div>
@@ -223,3 +225,4 @@ export function ContentTabs({ lecon, notes, onNotesChange }: ContentTabsProps) {
     </div>
   );
 }
+

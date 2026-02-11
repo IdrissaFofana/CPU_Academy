@@ -130,3 +130,4 @@ export function SkeletonParcoursGrid({ count = 12, variant = "grid" }: SkeletonP
     </div>
   );
 }
+

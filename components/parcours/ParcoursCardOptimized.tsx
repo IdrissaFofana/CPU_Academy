@@ -40,7 +40,7 @@ function ParcoursCardGrid({
 }: Omit<ParcoursCardOptimizedProps, "variant">) {
   return (
     <Link href={`/parcours/${parcours.id}`} className="block h-full">
-      <Card className="group relative overflow-hidden bg-white h-full shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 border-0">
+      <Card className="group relative overflow-hidden bg-white h-full shadow-lg transition-all duration-500 border-0">
         {/* CONTAINER PRINCIPAL */}
         <div className="relative h-full flex flex-col">
           {/* ═══════════════════════════════════════════ */}
@@ -235,7 +235,7 @@ function ParcoursCardGrid({
                   e.stopPropagation();
                   onInscription?.(parcours.id);
                 }}
-                className="flex-1 bg-cpu-orange hover:bg-cpu-orange/90 text-white text-sm h-9 font-semibold shadow-md hover:shadow-lg transition-all"
+                className="flex-1 bg-cpu-orange hover:bg-cpu-orange/90 text-white text-sm h-9 font-semibold shadow-md transition-all"
               >
                 Inscrire
                 <ChevronRight className="w-3.5 h-3.5 ml-1" />
@@ -270,7 +270,7 @@ function ParcoursCardList({
 }: Omit<ParcoursCardOptimizedProps, "variant">) {
   return (
     <Link href={`/parcours/${parcours.id}`} className="block">
-      <Card className="group relative overflow-hidden bg-white shadow-md hover:shadow-lg transition-all border-0">
+      <Card className="group relative overflow-hidden bg-white shadow-md transition-all border-0">
         <div className="flex items-center gap-4 p-4">
           {/* IMAGE MINI */}
           <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
@@ -380,7 +380,7 @@ function ParcoursCardCompact({
 }: Omit<ParcoursCardOptimizedProps, "variant">) {
   return (
     <Link href={`/parcours/${parcours.id}`} className="block">
-      <Card className="group relative overflow-hidden bg-white shadow-sm hover:shadow-md transition-all border-0">
+      <Card className="group relative overflow-hidden bg-white shadow-sm transition-all border-0">
         <div className="flex items-center gap-3 p-3">
           {/* IMAGE INLINE */}
           <div className="relative w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-slate-100">
@@ -514,3 +514,4 @@ export function ViewModeToggle({
     </div>
   );
 }
+

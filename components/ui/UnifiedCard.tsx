@@ -27,7 +27,7 @@ export function UnifiedCard({
   };
 
   const hoverEffect = hover
-    ? "hover:-translate-y-1 hover:shadow-2xl"
+    ? "hover:-translate-y-1"
     : "";
   
   const cursorEffect = clickable ? "cursor-pointer" : "";
@@ -48,3 +48,4 @@ export function UnifiedCard({
     </Card>
   );
 }
+

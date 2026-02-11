@@ -22,8 +22,8 @@ export const TYPOGRAPHY = {
 } as const;
 
 export const SHADOWS = {
-  card: 'shadow-lg hover:shadow-xl',
-  cardHover: 'shadow-xl hover:shadow-2xl',
+  card: 'shadow-lg',
+  cardHover: 'shadow-xl',
   subtle: 'shadow-sm',
   strong: 'shadow-2xl',
   glow: 'shadow-2xl shadow-cpu-orange/20',
@@ -89,3 +89,4 @@ export const ACCESSIBLE_COLORS = {
     outline: 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-cpu-orange focus-visible:outline-offset-2',
   },
 } as const;
+

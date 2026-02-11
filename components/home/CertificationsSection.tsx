@@ -41,7 +41,7 @@ export function CertificationsSection() {
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
               className={`group relative bg-white rounded-2xl p-6 border border-slate-200 
-                hover:border-cpu-orange hover:shadow-2xl hover:shadow-cpu-orange/20
+                hover:border-cpu-orange-orange/20
                 hover:-translate-y-2 transition-all duration-500 cursor-pointer
                 animate-scale-in animation-delay-${(index + 1) * 100}`}
             >
@@ -179,4 +179,5 @@ export function CertificationsSection() {
     </section>
   );
 }
+
 

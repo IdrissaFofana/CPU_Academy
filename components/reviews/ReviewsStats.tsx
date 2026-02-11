@@ -71,3 +71,4 @@ export function ReviewsStats({ reviews }: ReviewsStatsProps) {
     </Card>
   );
 }
+

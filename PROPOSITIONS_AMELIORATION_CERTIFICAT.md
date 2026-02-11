@@ -1,16 +1,16 @@
 # Propositions d'amélioration pour la page Certificat
 
-## 📊 État actuel
+## [État actuel]
 La page certificat possède déjà :
-- ✅ 3 vues (Grid, List, Compact)
-- ✅ 6 certifications affichées
-- ✅ Processus de certification en 4 étapes
-- ✅ Avantages de la certification
-- ✅ Design cohérent avec les couleurs CPU
+- [Fait] 3 vues (Grid, List, Compact)
+- [Fait] 6 certifications affichées
+- [Fait] Processus de certification en 4 étapes
+- [Fait] Avantages de la certification
+- [Fait] Design cohérent avec les couleurs CPU
 
-## 🎯 Propositions d'amélioration
+## [Propositions d'amélioration]
 
-### 1. **Ajout d'une barre de recherche et de filtres** ⭐⭐⭐⭐⭐
+### 1. **Ajout d'une barre de recherche et de filtres** [Priorité très haute]
 **Priorité : HAUTE - Impact : FORT**
 
 #### Implémentation :
@@ -27,7 +27,7 @@ La page certificat possède déjà :
 
 ---
 
-### 2. **Système de comparaison de certifications** ⭐⭐⭐⭐
+### 2. **Système de comparaison de certifications** [Priorité haute]
 **Priorité : MOYENNE - Impact : FORT**
 
 #### Fonctionnalités :
@@ -54,7 +54,7 @@ const toggleSelection = (id: number) => {
 
 ---
 
-### 3. **Calendrier des sessions et inscriptions** ⭐⭐⭐⭐⭐
+### 3. **Calendrier des sessions et inscriptions** [Priorité très haute]
 **Priorité : HAUTE - Impact : TRÈS FORT**
 
 #### Contenu :
@@ -66,15 +66,15 @@ const toggleSelection = (id: number) => {
 
 #### Exemple visuel :
 ```
-📅 Prochaine session : 15 Mars 2026
-👥 23/30 places (77%)
-⏰ Inscriptions jusqu'au 10 Mars
-📍 Abidjan - Plateau (Campus CPU)
+[Date] Prochaine session : 15 Mars 2026
+[Places] 23/30 places (77%)
+[Inscription] Jusqu'au 10 Mars
+[Lieu] Abidjan - Plateau (Campus CPU)
 ```
 
 ---
 
-### 4. **Témoignages de certifiés** ⭐⭐⭐⭐
+### 4. **Témoignages de certifiés** [Priorité haute]
 **Priorité : MOYENNE - Impact : FORT**
 
 #### Contenu :
@@ -93,7 +93,7 @@ const toggleSelection = (id: number) => {
 
 ---
 
-### 5. **Détails de la certification en modal** ⭐⭐⭐
+### 5. **Détails de la certification en modal** [Priorité moyenne]
 **Priorité : MOYENNE - Impact : MOYEN**
 
 Au clic sur "En savoir plus", afficher un modal avec :
@@ -119,7 +119,7 @@ Au clic sur "En savoir plus", afficher un modal avec :
 
 ---
 
-### 6. **Badge numérique et vérification** ⭐⭐⭐⭐
+### 6. **Badge numérique et vérification** [Priorité haute]
 **Priorité : MOYENNE - Impact : FORT**
 
 #### Système de badges :
@@ -135,7 +135,7 @@ Au clic sur "En savoir plus", afficher un modal avec :
 
 ---
 
-### 7. **Prix transparent et plans de financement** ⭐⭐⭐⭐⭐
+### 7. **Prix transparent et plans de financement** [Priorité très haute]
 **Priorité : HAUTE - Impact : TRÈS FORT**
 
 #### Affichage des prix :
@@ -150,7 +150,7 @@ Au clic sur "En savoir plus", afficher un modal avec :
 
 ---
 
-### 8. **Progression et gamification** ⭐⭐⭐
+### 8. **Progression et gamification** [Priorité moyenne]
 **Priorité : BASSE - Impact : MOYEN**
 
 #### Parcours de certification :
@@ -165,7 +165,7 @@ Au clic sur "En savoir plus", afficher un modal avec :
 
 ---
 
-### 9. **Section FAQ dynamique** ⭐⭐⭐⭐
+### 9. **Section FAQ dynamique** [Priorité haute]
 **Priorité : MOYENNE - Impact : MOYEN**
 
 Questions fréquentes par certification :
@@ -177,7 +177,7 @@ Questions fréquentes par certification :
 
 ---
 
-### 10. **Intégration avec le dashboard utilisateur** ⭐⭐⭐⭐⭐
+### 10. **Intégration avec le dashboard utilisateur** [Priorité très haute]
 **Priorité : HAUTE - Impact : FORT**
 
 Si l'utilisateur est connecté :
@@ -242,7 +242,7 @@ Après implémentation :
 
 ---
 
-## 💡 Code à ajouter
+## [Code à ajouter]
 
 ### 1. Filtres et recherche (à intégrer)
 ```typescript
@@ -317,20 +317,20 @@ const filteredCertifications = certifications.filter(cert => {
 
 ---
 
-## 🎯 Résumé des impacts attendus
+## [Résumé des impacts attendus]
 
 | Amélioration | Priorité | Complexité | Impact utilisateur | Impact conversion |
 |--------------|----------|------------|-------------------|-------------------|
-| Recherche + Filtres | ⭐⭐⭐⭐⭐ | Faible | ++++ | ++++ |
-| Calendrier sessions | ⭐⭐⭐⭐⭐ | Moyenne | +++++ | +++++ |
-| Prix transparent | ⭐⭐⭐⭐⭐ | Faible | +++++ | +++++ |
-| Comparaison | ⭐⭐⭐⭐ | Moyenne | ++++ | +++ |
-| Témoignages | ⭐⭐⭐⭐ | Faible | +++ | ++++ |
-| Modal détail | ⭐⭐⭐ | Moyenne | +++ | ++ |
-| Badge numérique | ⭐⭐⭐⭐ | Élevée | ++ | +++ |
-| Gamification | ⭐⭐⭐ | Élevée | +++ | ++ |
-| FAQ | ⭐⭐⭐⭐ | Faible | +++ | ++ |
-| Dashboard intégration | ⭐⭐⭐⭐⭐ | Moyenne | +++++ | +++++ |
+| Recherche + Filtres | [Priorité très haute] | Faible | ++++ | ++++ |
+| Calendrier sessions | [Priorité très haute] | Moyenne | +++++ | +++++ |
+| Prix transparent | [Priorité très haute] | Faible | +++++ | +++++ |
+| Comparaison | [Priorité haute] | Moyenne | ++++ | +++ |
+| Témoignages | [Priorité haute] | Faible | +++ | ++++ |
+| Modal détail | [Priorité moyenne] | Moyenne | +++ | ++ |
+| Badge numérique | [Priorité haute] | Élevée | ++ | +++ |
+| Gamification | [Priorité moyenne] | Élevée | +++ | ++ |
+| FAQ | [Priorité haute] | Faible | +++ | ++ |
+| Dashboard intégration | [Priorité très haute] | Moyenne | +++++ | +++++ |
 
 ---
 

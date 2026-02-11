@@ -23,7 +23,7 @@ export function PracticalInfo({ formationMode = "presentiel" }: PracticalInfoPro
       {/* Modalités */}
       <Card className="p-6">
         <h3 className="text-2xl font-bold text-slate-900 mb-6">
-          📍 Format de la formation
+          Format de la formation
         </h3>
 
         <div className="space-y-4">
@@ -107,7 +107,7 @@ export function PracticalInfo({ formationMode = "presentiel" }: PracticalInfoPro
       {/* Équipements */}
       <Card className="p-6">
         <h3 className="text-2xl font-bold text-slate-900 mb-6">
-          🏢 Nos équipements
+          Nos équipements
         </h3>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -197,3 +197,4 @@ export function PracticalInfo({ formationMode = "presentiel" }: PracticalInfoPro
     </div>
   );
 }
+

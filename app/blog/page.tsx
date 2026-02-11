@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { PageBanner } from "@/components/layout/PageBanner";
 import {
   Calendar,
   Clock,
@@ -140,24 +141,30 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      {/* Header */}
-      <section className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:40px_40px]"></div>
-        <div className="container mx-auto px-8 lg:px-16 relative">
-          <div className="max-w-3xl">
-            <Badge className="bg-cpu-orange text-white border-0 mb-6 px-4 py-2">
-              <Lightbulb className="w-4 h-4 mr-2" />
-              Blog & Actualités
-            </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Restez informés
-            </h1>
-            <p className="text-xl text-slate-300 leading-relaxed">
-              Conseils, actualités et success stories pour vous accompagner dans votre développement professionnel
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageBanner
+        breadcrumb={[
+          { label: "Accueil", href: "/" },
+          { label: "Blog" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Blog & Actualités",
+            subtitle: "Conseils, actualités et success stories pour votre développement professionnel",
+            buttons: [
+              { label: "Lire les articles", href: "#articles", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Restez Informés",
+            subtitle: "Découvrez nos dernières publications et tendances",
+            buttons: [
+              { label: "Explorer", href: "#articles", icon: <Lightbulb className="h-5 w-5" /> }
+            ]
+          }
+        ]}
+      />
 
       <div className="container mx-auto px-8 lg:px-16 py-12">
         {/* Recherche et filtres */}
@@ -210,7 +217,7 @@ export default function BlogPage() {
               {featuredArticles.map((article, index) => (
                 <Card
                   key={article.id}
-                  className="group overflow-hidden border-2 border-slate-100 hover:border-cpu-orange hover:shadow-2xl transition-all duration-500 animate-fade-in-up"
+                  className="group overflow-hidden border-2 border-slate-100 hover:border-cpu-orange transition-all duration-500 animate-fade-in-up"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Image */}
@@ -286,7 +293,7 @@ export default function BlogPage() {
             {filteredArticles.map((article, index) => (
               <Card
                 key={article.id}
-                className="group overflow-hidden border-2 border-slate-100 hover:border-cpu-orange hover:shadow-xl transition-all duration-500 animate-fade-in-up"
+                className="group overflow-hidden border-2 border-slate-100 hover:border-cpu-orange transition-all duration-500 animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* Image */}
@@ -375,3 +382,4 @@ export default function BlogPage() {
     </div>
   );
 }
+

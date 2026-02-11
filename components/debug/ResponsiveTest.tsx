@@ -10,10 +10,11 @@ export function ResponsiveTest() {
   return (
     <div className="fixed bottom-4 right-4 z-50 bg-slate-900 text-white p-4 rounded-lg text-xs max-w-max shadow-lg">
       <div className="space-y-1">
-        <div>Mobile (≤640px): {isMobile ? "✓" : "✗"}</div>
-        <div>Tablet (≤1024px): {isTablet ? "✓" : "✗"}</div>
-        <div>Desktop (≥1025px): {isDesktop ? "✓" : "✗"}</div>
+        <div>Mobile (≤640px): {isMobile ? "YES" : "NO"}</div>
+        <div>Tablet (≤1024px): {isTablet ? "YES" : "NO"}</div>
+        <div>Desktop (≥1025px): {isDesktop ? "YES" : "NO"}</div>
       </div>
     </div>
   );
 }
+

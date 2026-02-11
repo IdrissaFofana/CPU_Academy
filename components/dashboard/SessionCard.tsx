@@ -31,3 +31,4 @@ export function SessionCard({ session }: SessionCardProps) {
     </div>
   );
 }
+

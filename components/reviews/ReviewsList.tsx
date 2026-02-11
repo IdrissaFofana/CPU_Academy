@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ReviewCard } from "./ReviewCard";
+import { Star } from "lucide-react";
 import type { Review } from "@/types";
 
 interface ReviewsListProps {
@@ -59,7 +60,7 @@ export function ReviewsList({ reviews }: ReviewsListProps) {
                     : ""
                 }
               >
-                {rating} ⭐
+                {rating} <Star className="w-4 h-4 fill-current inline" />
               </Button>
             ))}
           </div>
@@ -111,3 +112,4 @@ export function ReviewsList({ reviews }: ReviewsListProps) {
     </div>
   );
 }
+

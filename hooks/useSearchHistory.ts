@@ -54,3 +54,4 @@ export function useSearchHistory() {
 
   return { history, addSearch, clearHistory };
 }
+

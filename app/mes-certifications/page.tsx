@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PageBanner } from "@/components/layout/PageBanner";
 import {
   Award,
   Download,
@@ -103,24 +104,37 @@ export default function MesCertificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-16">
-        <div className="container mx-auto px-8 lg:px-16">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-sm">
-              <Award className="w-10 h-10" />
-            </div>
-            <div>
-              <h1 className="text-5xl font-bold mb-2">Mes Certifications</h1>
-              <p className="text-slate-300 text-lg">
-                Vos réussites et certifications officielles CPU Formation
-              </p>
-            </div>
-          </div>
+    <>
+      <PageBanner
+        breadcrumb={[
+          { label: "Accueil", href: "/" },
+          { label: "Mon Espace", href: "/dashboard" },
+          { label: "Mes Certifications" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Mes Certifications",
+            subtitle: "Vos réussites et certifications officielles CPU Formation",
+            buttons: [
+              { label: "Télécharger tout", href: "#", icon: <Download className="h-5 w-5" />, variant: "outline" }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Vos Accomplissements",
+            subtitle: "Partagez vos réussites avec le monde",
+            buttons: [
+              { label: "Partager", href: "#", icon: <Share2 className="h-5 w-5" /> }
+            ]
+          }
+        ]}
+      />
 
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-8">
+        <div className="container mx-auto px-8 lg:px-16">
           {/* Stats */}
-          <div className="grid md:grid-cols-4 gap-6 mt-8">
+          <div className="grid md:grid-cols-4 gap-6">
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
               <div className="flex items-center gap-4">
                 <div className="bg-yellow-500/20 p-3 rounded-lg">
@@ -190,7 +204,7 @@ export default function MesCertificationsPage() {
             {certifications.map((cert, index) => (
               <Card
                 key={cert.id}
-                className="relative overflow-hidden border-2 border-slate-100 hover:border-cpu-orange hover:shadow-2xl transition-all duration-500 group animate-fade-in-up"
+                className="relative overflow-hidden border-2 border-slate-100 hover:border-cpu-orange transition-all duration-500 group animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* Gradient Header */}
@@ -317,7 +331,7 @@ export default function MesCertificationsPage() {
               return (
                 <Card
                   key={badge.id}
-                  className="p-8 text-center border-2 border-slate-100 hover:border-purple-500 hover:shadow-xl transition-all duration-300 group animate-scale-in"
+                  className="p-8 text-center border-2 border-slate-100 hover:border-purple-500 transition-all duration-300 group animate-scale-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className={`inline-flex p-6 rounded-full bg-gradient-to-br ${badge.color} mb-6 group-hover:scale-110 transition-transform duration-300`}>
@@ -354,6 +368,7 @@ export default function MesCertificationsPage() {
           </div>
         </Card>
       </div>
-    </div>
+    </>
   );
 }
+

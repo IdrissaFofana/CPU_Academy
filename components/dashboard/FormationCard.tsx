@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +13,7 @@ interface FormationCardProps {
 
 export function FormationCard({ formation }: FormationCardProps) {
   return (
-    <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-lg transition-all duration-300 group">
+    <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 group">
       <div className="flex items-center gap-4 mb-4">
         <div className="w-16 h-16 rounded-lg bg-orange-50 flex items-center justify-center flex-shrink-0">
           <BookOpen className="w-8 h-8 text-cpu-orange" />
@@ -46,11 +47,14 @@ export function FormationCard({ formation }: FormationCardProps) {
             aria-label={`Progression: ${formation.progression}%`}
           ></div>
         </div>
-        <Button className="w-full bg-cpu-orange hover:bg-orange-600 text-white mt-3">
-          <Play className="w-4 h-4 mr-2" />
-          Continuer la formation
-        </Button>
+        <Link href={formation.slug ? `/formations/${formation.slug}/learn` : "#"}>
+          <Button className="w-full bg-cpu-orange hover:bg-orange-600 text-white mt-3">
+            <Play className="w-4 h-4 mr-2" />
+            Continuer la formation
+          </Button>
+        </Link>
       </div>
     </Card>
   );
 }
+

@@ -38,7 +38,7 @@ export function SessionCard({ session }: SessionCardProps) {
       className={`p-6 border-2 transition-all duration-300 ${
         placesRestantes === 0
           ? "border-red-200 bg-red-50/50"
-          : "border-slate-200 hover:border-cpu-orange hover:shadow-lg"
+          : "border-slate-200 hover:border-cpu-orange"
       }`}
     >
       <div className="flex flex-col lg:flex-row gap-6">
@@ -194,3 +194,4 @@ export function SessionCard({ session }: SessionCardProps) {
     </Card>
   );
 }
+

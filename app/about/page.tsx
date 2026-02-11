@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PageBanner } from "@/components/layout/PageBanner";
 import {
   Target,
   Eye,
@@ -110,28 +111,33 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:40px_40px]"></div>
-        <div className="container mx-auto px-8 lg:px-16 relative">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge className="bg-cpu-orange text-white border-0 mb-6 px-4 py-2 text-sm">
-              <Sparkles className="w-4 h-4 mr-2" />
-              À propos de nous
-            </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
-              Former les leaders de demain
-            </h1>
-            <p className="text-xl text-slate-300 leading-relaxed animate-fade-in animation-delay-200">
-              CPU Formation est la plateforme de référence pour le développement des compétences professionnelles
-              en Côte d'Ivoire. Nous accompagnons les individus et les entreprises dans leur montée en compétences.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageBanner
+        breadcrumb={[
+          { label: "Accueil", href: "/" },
+          { label: "À propos" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Former les leaders de demain",
+            subtitle: "CPU Formation: plateforme de référence pour le développement des compétences en Côte d'Ivoire",
+            buttons: [
+              { label: "Notre mission", href: "#mission", icon: <Target className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Excellence & Innovation",
+            subtitle: "Accompagnement des individus et entreprises dans leur montée en compétences",
+            buttons: [
+              { label: "Nos valeurs", href: "#valeurs", icon: <Heart className="h-5 w-5" /> }
+            ]
+          }
+        ]}
+      />
 
       {/* Stats Section */}
-      <section className="py-16 -mt-12 relative z-10">
+      <section className="py-16 relative z-10">
         <div className="container mx-auto px-8 lg:px-16">
           <div className="grid md:grid-cols-4 gap-6">
             {stats.map((stat, index) => {
@@ -139,7 +145,7 @@ export default function AboutPage() {
               return (
                 <Card
                   key={index}
-                  className="p-8 text-center border-2 border-slate-100 hover:border-cpu-orange hover:shadow-xl transition-all duration-300 animate-scale-in bg-white"
+                  className="p-8 text-center border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 animate-scale-in bg-white"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="inline-flex p-4 rounded-full bg-gradient-to-br from-cpu-orange/10 to-orange-100 mb-4">
@@ -158,7 +164,7 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="container mx-auto px-8 lg:px-16">
           <div className="grid md:grid-cols-2 gap-12">
-            <Card className="p-10 border-2 border-slate-100 hover:shadow-2xl transition-all duration-300 animate-slide-in-left">
+            <Card className="p-10 border-2 border-slate-100 transition-all duration-300 animate-slide-in-left">
               <div className="inline-flex p-4 rounded-full bg-gradient-to-br from-cpu-orange to-orange-600 mb-6">
                 <Target className="w-10 h-10 text-white" />
               </div>
@@ -170,7 +176,7 @@ export default function AboutPage() {
               </p>
             </Card>
 
-            <Card className="p-10 border-2 border-slate-100 hover:shadow-2xl transition-all duration-300 animate-slide-in-right">
+            <Card className="p-10 border-2 border-slate-100 transition-all duration-300 animate-slide-in-right">
               <div className="inline-flex p-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-6">
                 <Eye className="w-10 h-10 text-white" />
               </div>
@@ -204,7 +210,7 @@ export default function AboutPage() {
               return (
                 <Card
                   key={index}
-                  className="p-8 border-2 border-slate-100 hover:shadow-xl transition-all duration-300 group animate-fade-in-up"
+                  className="p-8 border-2 border-slate-100 transition-all duration-300 group animate-fade-in-up"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className={`inline-flex p-4 rounded-full bg-gradient-to-br ${value.color} mb-6 group-hover:scale-110 transition-transform duration-300`}>
@@ -241,7 +247,7 @@ export default function AboutPage() {
                   }`}
                   style={{ animationDelay: `${index * 0.15}s` }}
                 >
-                  <Card className="inline-block p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-xl transition-all duration-300">
+                  <Card className="inline-block p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300">
                     <div className="text-3xl font-bold text-cpu-orange mb-2">{milestone.year}</div>
                     <p className="text-lg text-slate-900 font-semibold">{milestone.event}</p>
                   </Card>
@@ -270,7 +276,7 @@ export default function AboutPage() {
             {team.map((member, index) => (
               <Card
                 key={index}
-                className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-xl transition-all duration-300 text-center group animate-scale-in"
+                className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 text-center group animate-scale-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="w-32 h-32 rounded-full bg-gradient-to-br from-cpu-orange/20 to-orange-100 mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -303,7 +309,7 @@ export default function AboutPage() {
             {partenaires.map((partner, index) => (
               <Card
                 key={index}
-                className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:shadow-lg transition-all duration-300 flex items-center justify-center aspect-square animate-fade-in"
+                className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 flex items-center justify-center aspect-square animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="text-center">
@@ -339,3 +345,4 @@ export default function AboutPage() {
     </div>
   );
 }
+

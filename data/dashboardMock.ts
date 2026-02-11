@@ -44,6 +44,7 @@ export const mockFormationsEnCours: Formation[] = [
   {
     id: 1,
     titre: "Marketing Digital Avancé",
+    slug: "marketing-digital-avance",
     categorie: "Marketing",
     duree: "8 semaines",
     progression: 65,
@@ -52,6 +53,7 @@ export const mockFormationsEnCours: Formation[] = [
   {
     id: 2,
     titre: "Gestion Financière",
+    slug: "gestion-financiere",
     categorie: "Finance",
     duree: "6 semaines",
     progression: 45,
@@ -60,6 +62,7 @@ export const mockFormationsEnCours: Formation[] = [
   {
     id: 3,
     titre: "Leadership & Management",
+    slug: "leadership-management",
     categorie: "Management",
     duree: "10 semaines",
     progression: 30,
@@ -185,6 +188,7 @@ export const mockRecommandations: FormationRecommandee[] = [
   {
     id: 1,
     titre: "E-commerce & Marketplace",
+    slug: "ecommerce-marketplace",
     niveau: "Intermédiaire",
     duree: "4 semaines",
     note: 4.8,
@@ -193,6 +197,7 @@ export const mockRecommandations: FormationRecommandee[] = [
   {
     id: 2,
     titre: "Data Analytics pour Marketeurs",
+    slug: "data-analytics-marketeurs",
     niveau: "Avancé",
     duree: "6 semaines",
     note: 4.9,
@@ -201,6 +206,7 @@ export const mockRecommandations: FormationRecommandee[] = [
   {
     id: 3,
     titre: "Gestion de Projet Agile",
+    slug: "gestion-projet-agile",
     niveau: "Débutant",
     duree: "3 semaines",
     note: 4.7,
@@ -209,6 +215,7 @@ export const mockRecommandations: FormationRecommandee[] = [
   {
     id: 4,
     titre: "Communication Corporate",
+    slug: "communication-corporate",
     niveau: "Intermédiaire",
     duree: "5 semaines",
     note: 4.6,
@@ -223,3 +230,4 @@ export const mockStatsEvolution: StatsEvolution = {
   evolutionModules: 8,
   evolutionCertificats: 2,
 };
+

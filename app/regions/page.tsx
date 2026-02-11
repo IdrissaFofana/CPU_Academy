@@ -188,15 +188,36 @@ export default function RegionsPage() {
   return (
     <>
       <PageBanner 
-        title="Formations par région"
-        subtitle="Trouvez des formations près de chez vous en Côte d'Ivoire"
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Régions" }
         ]}
-        buttons={[
-          { label: "Voir les formations", href: "/catalogue", icon: <BookOpen className="h-5 w-5" /> },
-          { label: "Trouver un centre", href: "/centres-formation", variant: "outline", icon: <MapPin className="h-5 w-5" /> }
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Formations par Région",
+            subtitle: "Trouvez des formations près de chez vous en Côte d'Ivoire",
+            buttons: [
+              { label: "Voir les formations", href: "/catalogue", icon: <BookOpen className="h-5 w-5" /> },
+              { label: "Trouver un centre", href: "/centres-formation", variant: "outline", icon: <MapPin className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Proximité et Accessibilité",
+            subtitle: "Des centres de formation dans toutes les régions de la Côte d'Ivoire",
+            buttons: [
+              { label: "Localiser un centre", href: "/centres-formation", icon: <MapPin className="h-5 w-5" /> }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Formation de Qualité Partout",
+            subtitle: "Les mêmes standards d'excellence dans toutes nos régions",
+            buttons: [
+              { label: "Découvrir l'offre", href: "/catalogue", icon: <BookOpen className="h-5 w-5" /> }
+            ]
+          }
         ]}
       />
 
@@ -227,7 +248,7 @@ export default function RegionsPage() {
               <Link
                 key={region.id}
                 href={`/catalogue?region=${region.nom}`}
-                className="group relative bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-200 hover:shadow-xl transition-all duration-300 animate-fade-in p-6 cursor-pointer overflow-hidden"
+                className="group relative bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-200 transition-all duration-300 animate-fade-in p-6 cursor-pointer overflow-hidden"
                 style={{ animationDelay: `${idx * 30}ms` }}
               >
                 {/* Effet de background au survol */}
@@ -328,7 +349,7 @@ export default function RegionsPage() {
             {prochainessessions.map((session, idx) => (
               <div
                 key={session.id}
-                className="group bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-200 hover:shadow-xl transition-all duration-300 p-6 animate-slide-up"
+                className="group bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-200 transition-all duration-300 p-6 animate-slide-up"
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center gap-6">
@@ -411,3 +432,4 @@ export default function RegionsPage() {
     </>
   );
 }
+

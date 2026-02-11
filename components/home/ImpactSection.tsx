@@ -60,6 +60,9 @@ export function ImpactSection() {
 
   // Détecter prefers-reduced-motion
   useEffect(() => {
+    // Vérifier que window existe (SSR protection)
+    if (typeof window === 'undefined') return;
+
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
 
@@ -101,6 +104,9 @@ export function ImpactSection() {
       return;
     }
 
+    // Tableau pour stocker tous les timers et les nettoyer correctement
+    const timers: NodeJS.Timeout[] = [];
+
     stats.forEach((stat, index) => {
       const duration = 2000;
       const steps = 60;
@@ -122,9 +128,14 @@ export function ImpactSection() {
         }
       }, duration / steps);
 
-      return () => clearInterval(timer);
+      timers.push(timer);
     });
-  }, [isVisible]);
+
+    // Nettoyage correct de TOUS les timers
+    return () => {
+      timers.forEach(timer => clearInterval(timer));
+    };
+  }, [isVisible, prefersReducedMotion]);
 
   return (
     <section ref={sectionRef} className="py-12 md:py-20 bg-[#f5f1ed]">
@@ -144,7 +155,7 @@ export function ImpactSection() {
             <div
               key={index}
               className={`group bg-white rounded-2xl p-6 border border-slate-200 
-                hover:border-cpu-orange hover:shadow-2xl hover:shadow-cpu-orange/20
+                hover:border-cpu-orange-orange/20
                 hover:-translate-y-2 hover:scale-105
                 transition-all duration-500 cursor-pointer
                 animate-scale-in animation-delay-${(index + 1) * 100}`}
@@ -154,7 +165,7 @@ export function ImpactSection() {
                   flex items-center justify-center text-cpu-orange
                   group-hover:scale-125 group-hover:rotate-12 group-hover:bg-gradient-to-br 
                   group-hover:from-cpu-orange group-hover:to-cpu-green group-hover:text-white
-                  transition-all duration-500 shadow-md group-hover:shadow-xl">
+                  transition-all duration-500 shadow-md">
                   {stat.icon}
                 </div>
                 <div className="text-4xl font-bold text-slate-900 tabular-nums group-hover:text-cpu-orange transition-colors duration-300">
@@ -191,7 +202,7 @@ export function ImpactSection() {
               <div
                 key={index}
                 className={`group bg-white rounded-xl p-6 border border-slate-200 
-                  hover:border-cpu-orange hover:shadow-xl hover:shadow-cpu-orange/10
+                  hover:border-cpu-orange-orange/10
                   hover:-translate-y-1 hover:scale-102
                   transition-all duration-500 cursor-pointer
                   animate-slide-up animation-delay-${(index + 5) * 100}`}
@@ -230,3 +241,4 @@ export function ImpactSection() {
     </section>
   );
 }
+

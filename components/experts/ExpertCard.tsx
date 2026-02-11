@@ -58,7 +58,7 @@ export function ExpertCard({
 
   if (variant === "compact") {
     return (
-      <Card className="group hover:shadow-lg transition-all duration-300 p-4">
+      <Card className="group transition-all duration-300 p-4">
         <Link href={`/experts/${expert.id}`} className="block">
           <div className="flex items-center gap-3 mb-3">
             <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
@@ -103,7 +103,7 @@ export function ExpertCard({
 
   if (variant === "list") {
     return (
-      <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
+      <Card className="group transition-all duration-300 overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Photo */}
           <div className="relative md:w-64 h-48 md:h-auto flex-shrink-0">
@@ -248,7 +248,7 @@ export function ExpertCard({
   // Grid variant (default)
   return (
     <Card 
-      className="group hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
+      className="group transition-all duration-300 overflow-hidden flex flex-col"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -387,3 +387,4 @@ export function ExpertCard({
     </Card>
   );
 }
+

@@ -238,3 +238,4 @@ export function FormationProgram({ chapitres }: FormationProgramProps) {
     </div>
   );
 }
+

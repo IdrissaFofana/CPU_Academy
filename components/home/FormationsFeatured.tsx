@@ -62,7 +62,7 @@ export function AboutSection() {
                 <div 
                   key={index}
                   className={`group flex items-start gap-4 p-5 bg-white rounded-xl border border-slate-200 
-                    hover:border-cpu-orange hover:shadow-lg hover:shadow-cpu-orange/10 
+                    hover:border-cpu-orange-orange/10 
                     transition-all duration-300 cursor-pointer
                     animate-fade-in animation-delay-${(index + 1) * 100}`}
                 >
@@ -87,7 +87,7 @@ export function AboutSection() {
               <Button 
                 variant="primary" 
                 size="lg" 
-                className="cursor-pointer group shadow-lg shadow-cpu-orange/20 hover:shadow-xl hover:shadow-cpu-orange/30 transition-all duration-300" 
+                className="cursor-pointer group shadow-lg shadow-cpu-orange/20-orange/30 transition-all duration-300" 
                 asChild
               >
                 <a href="https://cpupme.com/" target="_blank" rel="noopener noreferrer">
@@ -103,7 +103,7 @@ export function AboutSection() {
             {/* Effet de fond décoratif */}
             <div className="absolute -inset-4 bg-gradient-to-r from-cpu-orange/20 to-cpu-green/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl ring-1 ring-slate-200 group-hover:shadow-3xl transition-all duration-500">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl ring-1 ring-slate-200 transition-all duration-500">
               <div className="relative h-[550px]">
                 <img 
                   src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop"
@@ -156,3 +156,4 @@ export function AboutSection() {
     </section>
   );
 }
+

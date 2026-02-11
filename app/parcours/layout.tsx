@@ -40,3 +40,4 @@ export default function ParcoursLayout({
 }) {
   return <>{children}</>;
 }
+

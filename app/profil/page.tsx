@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PageBanner } from "@/components/layout/PageBanner";
 import {
   Award,
   BookOpen,
@@ -218,13 +219,29 @@ export default function ProfilPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <PageBanner
+        breadcrumb={[
+          { label: "Accueil", href: "/" },
+          { label: "Mon Profil" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: userProfile.name,
+            subtitle: userProfile.title,
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Votre parcours d'apprentissage",
+            subtitle: `${stats.coursesCompleted} formations complétées - ${stats.certificates} certifications`,
+          }
+        ]}
+      />
+
       {/* Cover Image & Profile Header */}
       <div className="relative">
-        {/* Cover Image */}
-        <div className="h-72 bg-gradient-to-r from-slate-900 via-slate-800 to-orange-900 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat"></div>
-          </div>
+        {/* Cover Image - Simplifiée */}
+        <div className="h-48 bg-gradient-to-r from-slate-100 to-slate-200 relative overflow-hidden">
           <Button
             variant="ghost"
             size="sm"
@@ -330,7 +347,7 @@ export default function ProfilPage() {
                         <span className="text-xs text-slate-600">Série</span>
                       </div>
                       <p className="text-2xl font-bold text-slate-900">{stats.streak}</p>
-                      <p className="text-xs text-slate-500">Jours 🔥</p>
+                      <p className="text-xs text-slate-500">Jours (chaud!)</p>
                     </div>
                   </div>
                 </div>
@@ -563,7 +580,7 @@ export default function ProfilPage() {
                   </div>
                   <div className="space-y-4">
                     {coursesInProgress.map((course) => (
-                      <Card key={course.id} className="p-4 hover:shadow-md transition-shadow">
+                      <Card key={course.id} className="p-4 transition-shadow">
                         <div className="flex gap-4">
                           <div className="w-24 h-24 bg-gradient-to-br from-slate-200 to-slate-300 rounded-lg flex items-center justify-center flex-shrink-0">
                             <BookOpen className="w-10 h-10 text-slate-400" />
@@ -629,7 +646,7 @@ export default function ProfilPage() {
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     {coursesInProgress.map((course) => (
-                      <Card key={course.id} className="p-4 hover:shadow-lg transition-all group">
+                      <Card key={course.id} className="p-4 transition-all group">
                         <div className="w-full h-40 bg-gradient-to-br from-slate-200 to-slate-300 rounded-lg flex items-center justify-center mb-4">
                           <BookOpen className="w-16 h-16 text-slate-400" />
                         </div>
@@ -668,7 +685,7 @@ export default function ProfilPage() {
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     {completedCourses.map((course) => (
-                      <Card key={course.id} className="p-4 hover:shadow-lg transition-all group">
+                      <Card key={course.id} className="p-4 transition-all group">
                         <div className="w-full h-40 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-4 relative">
                           <CheckCircle2 className="w-16 h-16 text-green-600" />
                           {course.certificate && (
@@ -715,7 +732,7 @@ export default function ProfilPage() {
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
                   {certificates.map((cert) => (
-                    <Card key={cert.id} className="p-6 hover:shadow-xl transition-all group">
+                    <Card key={cert.id} className="p-6 transition-all group">
                       <div className="w-full h-48 bg-gradient-to-br from-amber-50 to-orange-100 rounded-lg flex items-center justify-center mb-4 border-2 border-amber-200">
                         <Award className="w-20 h-20 text-amber-600" />
                       </div>
@@ -887,3 +904,4 @@ export default function ProfilPage() {
     </div>
   );
 }
+

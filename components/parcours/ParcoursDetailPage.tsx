@@ -136,17 +136,17 @@ export function ParcoursDetailPage({
       {/* Stats Section */}
       <section className="container mx-auto px-8 lg:px-16 py-12">
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md transition-shadow">
             <BookOpen className={`w-10 h-10 mx-auto mb-3 ${textColor}`} />
             <div className="text-3xl font-bold mb-1 text-slate-900">{stats.formations}</div>
             <div className="text-sm text-slate-600">Formations disponibles</div>
           </div>
-          <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md transition-shadow">
             <Clock className={`w-10 h-10 mx-auto mb-3 ${textColor}`} />
             <div className="text-3xl font-bold mb-1 text-slate-900">{stats.duree}</div>
             <div className="text-sm text-slate-600">Durée totale estimée</div>
           </div>
-          <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md transition-shadow">
             <Award className={`w-10 h-10 mx-auto mb-3 ${textColor}`} />
             <div className="text-xl font-bold mb-1 text-slate-900">{stats.niveau}</div>
             <div className="text-sm text-slate-600">Niveau recommandé</div>
@@ -200,7 +200,7 @@ export function ParcoursDetailPage({
             {competences.map((comp, idx) => (
               <div
                 key={idx}
-                className={`${bgLight} rounded-xl p-4 border ${borderColor} hover:shadow-md transition-shadow`}
+                className={`${bgLight} rounded-xl p-4 border ${borderColor} transition-shadow`}
               >
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${textColor}`} />
@@ -219,7 +219,7 @@ export function ParcoursDetailPage({
           </h2>
           <div className="space-y-4">
             {etapes.map((etape, idx) => (
-              <div key={idx} className="bg-white rounded-xl p-4 sm:p-6 border-2 border-slate-100 hover:shadow-md transition-shadow">
+              <div key={idx} className="bg-white rounded-xl p-4 sm:p-6 border-2 border-slate-100 transition-shadow">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${gradient} text-white flex items-center justify-center text-lg sm:text-xl font-bold shadow-md`}>
                     {etape.numero}
@@ -288,7 +288,7 @@ export function ParcoursDetailPage({
                 <Link
                   key={parcours.id}
                   href={parcours.href}
-                  className="group bg-white rounded-xl p-6 border-2 border-slate-100 shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
+                  className="group bg-white rounded-xl p-6 border-2 border-slate-100 shadow-md transition-all "
                 >
                   <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${parcours.gradient} text-white mb-4 group-hover:scale-110 transition-transform`}>
                     <ParcoursIcon className="w-7 h-7" />
@@ -312,3 +312,4 @@ export function ParcoursDetailPage({
     </div>
   );
 }
+

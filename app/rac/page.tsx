@@ -297,11 +297,103 @@ export default function RACPage() {
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Hero Section */}
       <PageBanner 
-        title="Reconnaissance des Acquis de Compétences"
-        subtitle="Obtenez une certification officielle basée sur votre expérience professionnelle et vos formations, sans avoir à suivre l'intégralité d'un programme de formation."
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "RAC" }
+        ]}
+        slides={[
+          {
+            image: "/images/formation-tech.png",
+            title: "Reconnaissance des Acquis de Compétences",
+            subtitle: "Obtenez une certification officielle basée sur votre expérience professionnelle",
+            badge: {
+              icon: "🎯 ",
+              number: "3-6",
+              text: "Mois pour être certifié",
+              subtext: "Processus accéléré"
+            },
+            trustBadges: [
+              {
+                icon: "check",
+                color: "green",
+                title: "Sans formation",
+                subtitle: "Valorisation directe"
+              },
+              {
+                icon: "check",
+                color: "blue",
+                title: "Certification officielle",
+                subtitle: "Reconnue par l'État"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "1,200+",
+                subtitle: "Certifiés par RAC"
+              }
+            ]
+          },
+          {
+            image: "/images/formation-agriculture.png",
+            title: "Valorisez Votre Expérience",
+            subtitle: "Transformez vos compétences en certifications reconnues",
+            badge: {
+              icon: "+",
+              number: "5",
+              text: "Années minimum",
+              subtext: "D'expérience requise"
+            },
+            trustBadges: [
+              {
+                icon: "building",
+                color: "purple",
+                title: "Tous secteurs",
+                subtitle: "Agriculture, Tech, Commerce..."
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Portfolio de preuves",
+                subtitle: "Dossier personnalisé"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Accompagnement",
+                subtitle: "Conseiller dédié"
+              }
+            ]
+          },
+          {
+            image: "/images/formation-tech.png",
+            title: "Certification Sans Formation Complète",
+            subtitle: "Gagnez du temps en validant directement vos acquis professionnels",
+            badge: {
+              number: "90%",
+              text: "Taux de réussite",
+              subtext: "Avec accompagnement"
+            },
+            trustBadges: [
+              {
+                icon: "users",
+                color: "blue",
+                title: "Jury d'experts",
+                subtitle: "Évaluation professionnelle"
+              },
+              {
+                icon: "users",
+                color: "orange",
+                title: "Entretien individuel",
+                subtitle: "Présentation de parcours"
+              },
+              {
+                icon: "check",
+                color: "green",
+                title: "Équivalence diplôme",
+                subtitle: "Même valeur"
+              }
+            ]
+          }
         ]}
       />
 
@@ -309,11 +401,11 @@ export default function RACPage() {
       <section className="bg-gradient-to-br from-orange-50 via-white to-green-50 py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+            <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg transition-all duration-300 hover:scale-105  group">
               Déposer ma candidature
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" className="border-2 border-gray-300 hover:border-orange-500 hover:bg-orange-50 px-8 py-6 text-lg rounded-xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+            <Button variant="outline" className="border-2 border-gray-300 hover:border-orange-500 hover:bg-orange-50 px-8 py-6 text-lg rounded-xl transition-all duration-300 hover:scale-105  group">
               Télécharger le guide
               <Download className="ml-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
             </Button>
@@ -408,7 +500,7 @@ export default function RACPage() {
               <Card
                 key={type.id}
                 onClick={() => setSelectedType(type.id)}
-                className={`p-6 cursor-pointer transition-all duration-300 hover:shadow-2xl animate-fade-in group relative overflow-hidden ${
+                className={`p-6 cursor-pointer transition-all duration-300 animate-fade-in group relative overflow-hidden ${
                   selectedType === type.id
                     ? "border-2 border-orange-500 shadow-xl scale-105 bg-gradient-to-br from-orange-50 to-white"
                     : "border-2 border-gray-200 hover:border-orange-300 hover:scale-105 hover:-translate-y-2"
@@ -460,7 +552,7 @@ export default function RACPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {avantages.map((avantage, index) => (
-              <Card key={index} className="p-6 hover:shadow-xl transition-all duration-300 border-2 border-gray-100 hover:border-orange-200 hover:scale-105 group animate-fade-in relative overflow-hidden" style={{ animationDelay: `${index * 100}ms` }}>
+              <Card key={index} className="p-6 transition-all duration-300 border-2 border-gray-100 hover:border-orange-200 hover:scale-105 group animate-fade-in relative overflow-hidden" style={{ animationDelay: `${index * 100}ms` }}>
                 {/* Background glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 
@@ -503,7 +595,7 @@ export default function RACPage() {
             {/* Deux options : Partielle vs Complète */}
             <div className="grid md:grid-cols-2 gap-6 mb-12">
               {/* Validation partielle */}
-              <Card className="p-8 border-2 border-orange-200 bg-white hover:shadow-xl transition-all">
+              <Card className="p-8 border-2 border-orange-200 bg-white transition-all">
                 <div className="flex items-start gap-4 mb-6">
                   <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
                     <Layers className="w-6 h-6 text-orange-600" />
@@ -535,7 +627,7 @@ export default function RACPage() {
               </Card>
 
               {/* Certification complète */}
-              <Card className="p-8 border-2 border-green-200 bg-gradient-to-br from-white to-green-50 hover:shadow-xl transition-all relative overflow-hidden">
+              <Card className="p-8 border-2 border-green-200 bg-gradient-to-br from-white to-green-50 transition-all relative overflow-hidden">
                 <div className="absolute top-4 right-4">
                   <div className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                     RECOMMANDÉ
@@ -589,7 +681,7 @@ export default function RACPage() {
                 ].map((bloc, index) => (
                   <div 
                     key={bloc.num}
-                    className="p-4 border-2 border-dashed border-gray-300 rounded-xl text-center hover:border-orange-400 hover:bg-orange-50 transition-all duration-300 group cursor-pointer animate-fade-in hover:scale-105 hover:-translate-y-1"
+                    className="p-4 border-2 border-dashed border-gray-300 rounded-xl text-center hover:border-orange-400 hover:bg-orange-50 transition-all duration-300 group cursor-pointer animate-fade-in hover:scale-105 "
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-orange-100 text-gray-700 group-hover:text-orange-600 flex items-center justify-center font-bold mx-auto mb-3 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
@@ -633,7 +725,7 @@ export default function RACPage() {
               {etapes.map((etape, index) => (
                 <Card 
                   key={index} 
-                  className="p-6 hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-orange-300 hover:scale-105 hover:-translate-y-2 group relative overflow-hidden animate-fade-in"
+                  className="p-6 transition-all duration-300 border-2 border-gray-100 hover:border-orange-300 hover:scale-105  group relative overflow-hidden animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   {/* Numéro en arrière-plan */}
@@ -685,7 +777,7 @@ export default function RACPage() {
 
             <div className="grid md:grid-cols-2 gap-4">
               {documentsRequis.map((doc, index) => (
-                <Card key={index} className="p-4 flex items-center gap-3 border-2 border-gray-100 hover:border-orange-300 hover:shadow-lg transition-all duration-300 group cursor-pointer hover:scale-105 animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+                <Card key={index} className="p-4 flex items-center gap-3 border-2 border-gray-100 hover:border-orange-300 transition-all duration-300 group cursor-pointer hover:scale-105 animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
                   <FileCheck className="w-6 h-6 text-orange-500 flex-shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
                   <span className="text-gray-700 font-medium group-hover:text-orange-600 transition-colors">{doc}</span>
                 </Card>
@@ -856,7 +948,7 @@ export default function RACPage() {
                           .map((metier, idx) => (
                           <div 
                             key={idx}
-                            className="p-4 bg-white border-2 border-gray-100 rounded-xl hover:border-orange-300 hover:shadow-xl transition-all duration-300 group cursor-pointer hover:scale-105 hover:-translate-y-1 animate-fade-in relative overflow-hidden"
+                            className="p-4 bg-white border-2 border-gray-100 rounded-xl hover:border-orange-300 transition-all duration-300 group cursor-pointer hover:scale-105  animate-fade-in relative overflow-hidden"
                             style={{ animationDelay: `${idx * 50}ms` }}
                           >
                             {/* Background glow */}
@@ -881,7 +973,7 @@ export default function RACPage() {
                                   <span>{metier.duree}</span>
                                 </div>
                               </div>
-                              <Button className="w-full mt-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm group-hover:shadow-lg transition-all">
+                              <Button className="w-full mt-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm transition-all">
                                 Postuler
                               </Button>
                             </div>
@@ -941,7 +1033,7 @@ export default function RACPage() {
                   r: "Oui, absolument. La certification obtenue via le RAC a exactement la même valeur et reconnaissance qu'une certification obtenue après la formation complète."
                 }
               ].map((faq, index) => (
-                <Card key={index} className="p-6 border-2 border-gray-100 hover:border-orange-300 hover:shadow-xl transition-all duration-300 group cursor-pointer hover:scale-102 animate-fade-in" style={{ animationDelay: `${index * 80}ms` }}>
+                <Card key={index} className="p-6 border-2 border-gray-100 hover:border-orange-300 transition-all duration-300 group cursor-pointer hover:scale-102 animate-fade-in" style={{ animationDelay: `${index * 80}ms` }}>
                   <h4 className="font-semibold text-gray-900 mb-3 flex items-start gap-3 group-hover:text-orange-600 transition-colors">
                     <CheckCircle2 className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300" />
                     {faq.q}
@@ -978,11 +1070,11 @@ export default function RACPage() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-6 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-semibold hover:scale-105 group">
+                <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-6 text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 font-semibold hover:scale-105 group">
                   Déposer ma candidature
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <Button className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-6 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-semibold hover:scale-105">
+                <Button className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-6 text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 font-semibold hover:scale-105">
                   Parler à un conseiller
                 </Button>
               </div>
@@ -993,3 +1085,4 @@ export default function RACPage() {
     </div>
   );
 }
+

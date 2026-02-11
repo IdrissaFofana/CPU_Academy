@@ -36,7 +36,7 @@ export function ParcoursCard({ parcours, onInscription, isFavorite = false, onTo
 
   return (
     <Link href={`/parcours/${parcours.id}`} className="block">
-      <Card className="group relative overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 animate-fade-in-up h-full">
+      <Card className="group relative overflow-hidden bg-white shadow-lg transition-all duration-500 border-0 animate-fade-in-up h-full">
         {/* Bouton Favori */}
         <button
           onClick={(e) => {
@@ -241,7 +241,7 @@ export function ParcoursCard({ parcours, onInscription, isFavorite = false, onTo
 
           <Button 
             onClick={handleInscription}
-            className="w-full bg-cpu-orange hover:bg-orange-600 text-white border-0 shadow-lg hover:shadow-xl group/btn py-6 font-semibold text-base shine-effect relative overflow-hidden"
+            className="w-full bg-cpu-orange hover:bg-orange-600 text-white border-0 shadow-lg group/btn py-6 font-semibold text-base shine-effect relative overflow-hidden"
           >
             <span className="relative z-10 flex items-center justify-center">
               S'inscrire au parcours
@@ -254,3 +254,4 @@ export function ParcoursCard({ parcours, onInscription, isFavorite = false, onTo
     </Link>
   );
 }
+

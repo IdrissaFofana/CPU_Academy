@@ -158,7 +158,7 @@ export function ImprovedTabs({
             ${
               activeTab === tab.id
                 ? "bg-cpu-orange text-white shadow-xl ring-2 ring-cpu-orange ring-offset-2"
-                : "bg-white text-slate-700 hover:shadow-lg border border-slate-200"
+                : "bg-white text-slate-700 border border-slate-200"
             }
             focus:outline-none focus-visible:ring-2 focus-visible:ring-cpu-orange focus-visible:ring-offset-2
           `}
@@ -181,3 +181,4 @@ export function ImprovedTabs({
     </div>
   );
 }
+

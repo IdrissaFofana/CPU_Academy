@@ -7,6 +7,9 @@ import { StickyCTA } from "@/components/layout/StickyCTA";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { CartProvider } from "@/contexts/CartContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
+import { NotificationBanner } from "@/components/layout/NotificationBanner";
 
 // Configuration des polices Google Fonts
 const inter = Inter({ 
@@ -35,16 +38,22 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} ${montserrat.variable}`}>
       <body className="font-sans antialiased bg-white text-gray-900">
-        <ScrollProgress />
-        <AnnouncementBar />
-        <Navbar />
-        <main className="min-h-screen pb-16 lg:pb-0">
-          {children}
-        </main>
-        <Footer />
-        <StickyCTA />
-        <BottomNavigation />
+        <NotificationProvider>
+          <CartProvider>
+            <NotificationBanner />
+            <ScrollProgress />
+            <AnnouncementBar />
+            <Navbar />
+            <main className="min-h-screen pb-16 lg:pb-0">
+              {children}
+            </main>
+            <Footer />
+            <StickyCTA />
+            <BottomNavigation />
+          </CartProvider>
+        </NotificationProvider>
       </body>
     </html>
   );
 }
+

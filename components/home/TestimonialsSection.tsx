@@ -103,6 +103,9 @@ export function TestimonialsSection() {
 
   // Détecter prefers-reduced-motion
   useEffect(() => {
+    // Vérifier que window existe (SSR protection)
+    if (typeof window === 'undefined') return;
+
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
 
@@ -197,7 +200,7 @@ export function TestimonialsSection() {
             onClick={scrollToPrev}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-20 
               bg-white text-slate-900
-              w-12 h-12 rounded-full shadow-lg hover:shadow-xl
+              w-12 h-12 rounded-full shadow-lg
               flex items-center justify-center transition-all duration-300
               border-2 border-slate-200
               group"
@@ -210,7 +213,7 @@ export function TestimonialsSection() {
             onClick={scrollToNext}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-20 
               bg-white text-slate-900
-              w-12 h-12 rounded-full shadow-lg hover:shadow-xl
+              w-12 h-12 rounded-full shadow-lg
               flex items-center justify-center transition-all duration-300
               border-2 border-slate-200
               group"
@@ -232,8 +235,8 @@ export function TestimonialsSection() {
               <div
                 key={`${testimonial.id}-${index}`}
                 className="group bg-white rounded-2xl p-8 border border-slate-200 
-                  hover:border-cpu-orange hover:shadow-xl hover:shadow-cpu-orange/10
-                  hover:-translate-y-2 transition-all duration-500 cursor-pointer
+                  hover:border-cpu-orange-orange/10
+                   transition-all duration-500 cursor-pointer
                   flex-shrink-0 w-[400px]"
               >
                 {/* Header with avatar */}
@@ -284,3 +287,4 @@ export function TestimonialsSection() {
     </section>
   );
 }
+

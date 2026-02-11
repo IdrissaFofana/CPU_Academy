@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X, Target, MapPin, Building2, BarChart3, Monitor, Check } from "lucide-react";
 import { objectifsMetier, regions } from "@/data/constants";
 import type { Niveau, Format } from "@/types";
 
@@ -81,8 +81,9 @@ export function CatalogueFilters({
 
       {/* Objectif */}
       <div className="mb-6">
-        <Label htmlFor={isMobile ? "objectif-mobile" : "objectif"} className="mb-3 block text-sm font-semibold text-slate-700">
-          🎯 Objectif métier
+        <Label htmlFor={isMobile ? "objectif-mobile" : "objectif"} className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <Target className="w-4 h-4 text-cpu-orange" />
+          Objectif métier
         </Label>
         <Select value={objectif} onValueChange={setObjectif}>
           <SelectTrigger id={isMobile ? "objectif-mobile" : "objectif"} className="h-11">
@@ -101,8 +102,9 @@ export function CatalogueFilters({
 
       {/* Région */}
       <div className="mb-6">
-        <Label htmlFor={isMobile ? "region-mobile" : "region"} className="mb-3 block text-sm font-semibold text-slate-700">
-          📍 Région
+        <Label htmlFor={isMobile ? "region-mobile" : "region"} className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-cpu-orange" />
+          Région
         </Label>
         <Select value={region} onValueChange={setRegion}>
           <SelectTrigger id={isMobile ? "region-mobile" : "region"} className="h-11">
@@ -121,8 +123,9 @@ export function CatalogueFilters({
 
       {/* Secteur */}
       <div className="mb-6">
-        <Label htmlFor={isMobile ? "secteur-mobile" : "secteur"} className="mb-3 block text-sm font-semibold text-slate-700">
-          🏢 Secteur
+        <Label htmlFor={isMobile ? "secteur-mobile" : "secteur"} className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <Building2 className="w-4 h-4 text-cpu-orange" />
+          Secteur
         </Label>
         <Select value={secteur} onValueChange={setSecteur}>
           <SelectTrigger id={isMobile ? "secteur-mobile" : "secteur"} className="h-11">
@@ -141,8 +144,9 @@ export function CatalogueFilters({
 
       {/* Niveau */}
       <div className="mb-6">
-        <Label htmlFor={isMobile ? "niveau-mobile" : "niveau"} className="mb-3 block text-sm font-semibold text-slate-700">
-          📊 Niveau
+        <Label htmlFor={isMobile ? "niveau-mobile" : "niveau"} className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <BarChart3 className="w-4 h-4 text-cpu-orange" />
+          Niveau
         </Label>
         <Select value={niveau} onValueChange={setNiveau}>
           <SelectTrigger id={isMobile ? "niveau-mobile" : "niveau"} className="h-11">
@@ -161,8 +165,9 @@ export function CatalogueFilters({
 
       {/* Format */}
       <div className="mb-6">
-        <Label htmlFor={isMobile ? "format-mobile" : "format"} className="mb-3 block text-sm font-semibold text-slate-700">
-          💻 Format
+        <Label htmlFor={isMobile ? "format-mobile" : "format"} className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <Monitor className="w-4 h-4 text-cpu-orange" />
+          Format
         </Label>
         <Select value={format} onValueChange={setFormat}>
           <SelectTrigger id={isMobile ? "format-mobile" : "format"} className="h-11">
@@ -191,7 +196,7 @@ export function CatalogueFilters({
         >
           <div className="flex items-center justify-between">
             <span className="font-semibold">Formations gratuites</span>
-            {gratuit === true && <Badge className="bg-cpu-orange text-white text-xs">✓</Badge>}
+            {gratuit === true && <Badge className="bg-cpu-orange text-white text-xs flex items-center gap-1"><Check className="w-3 h-3" /></Badge>}
           </div>
         </button>
 
@@ -205,7 +210,7 @@ export function CatalogueFilters({
         >
           <div className="flex items-center justify-between">
             <span className="font-semibold">Formations certifiantes</span>
-            {certifiant === true && <Badge className="bg-cpu-orange text-white text-xs">✓</Badge>}
+            {certifiant === true && <Badge className="bg-cpu-orange text-white text-xs flex items-center gap-1"><Check className="w-3 h-3" /></Badge>}
           </div>
         </button>
       </div>
@@ -234,3 +239,4 @@ export function CatalogueFilters({
     </div>
   );
 }
+

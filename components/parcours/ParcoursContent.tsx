@@ -111,7 +111,7 @@ export function ParcoursContent() {
             return (
               <div
                 key={parcours.id}
-                className={`group relative bg-white rounded-2xl border-2 ${parcours.borderColor} p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in`}
+                className={`group relative bg-white rounded-2xl border-2 ${parcours.borderColor} p-8 transition-all duration-300 hover:-translate-y-2 animate-fade-in`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {/* Icon */}
@@ -280,3 +280,4 @@ export function ParcoursContent() {
     </div>
   );
 }
+

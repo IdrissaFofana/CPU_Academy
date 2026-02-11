@@ -4,3 +4,4 @@ export { FormationDetailHero } from "./FormationDetailHero";
 export { FormationProgram } from "./FormationProgram";
 export { FormationInstructor } from "./FormationInstructor";
 export { FormationSidebar } from "./FormationSidebar";
+
