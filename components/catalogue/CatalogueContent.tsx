@@ -12,16 +12,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { formationsMock } from "@/data/mock";
-import { objectifsMetier } from "@/data/constants";
+import { objectifsMetier, regions } from "@/data/constants";
 import { Search, Filter, X, Grid3x3, List, LayoutGrid, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal, Clock, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useFormations } from "@/hooks/useFormations";
 
 type ViewMode = "grid" | "list" | "compact";
 type SortOption = "recent" | "popular" | "title" | "price";
 
 const ITEMS_PER_PAGE = 12; // 3 colonnes × 4 lignes en desktop
+const DEFAULT_SECTEURS = ["Secteur Primaire", "Secteur Secondaire", "Secteur Tertiaire", "Secteur Quaternaire"];
+const DEFAULT_NIVEAUX = ["Débutant", "Intermédiaire", "Avancé"] as const;
+const DEFAULT_FORMATS = ["Vidéo", "Live", "Présentiel", "Hybride"] as const;
+
+type CatalogueFormation = (typeof formationsMock)[number];
 
 export function CatalogueContent() {
   const searchParams = useSearchParams();
@@ -47,6 +53,118 @@ export function CatalogueContent() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [resultCount, setResultCount] = useState(0); // Pour aria-live
   const [currentPage, setCurrentPage] = useState(1); // Phase 3: Pagination
+  const { formations: apiFormations } = useFormations({ limit: 200 });
+
+  const mapApiFormation = (formation: any): CatalogueFormation => {
+    const levelMap: Record<string, CatalogueFormation["niveau"]> = {
+      beginner: "Débutant",
+      intermediate: "Intermédiaire",
+      advanced: "Avancé",
+      debutant: "Débutant",
+      intermediaire: "Intermédiaire",
+      avance: "Avancé",
+      "Débutant": "Débutant",
+      "Intermédiaire": "Intermédiaire",
+      "Avancé": "Avancé",
+    };
+
+    const modeMap: Record<string, CatalogueFormation["format"]> = {
+      presentiel: "Présentiel",
+      hybride: "Hybride",
+      live: "Live",
+      webinaire: "Live",
+      video: "Vidéo",
+      document: "Vidéo",
+    };
+
+    const now = new Date().toISOString();
+    const rawDuration = formation.duration ?? formation.duree ?? 0;
+    const durationHours = Math.max(1, Number(rawDuration) || 1);
+    const mode = (formation.mode || formation.format || "").toString().toLowerCase();
+
+    return {
+      id: formation.id?.toString() || formation._id?.toString() || "",
+      titre: formation.title || formation.titre || "Formation",
+      slug: formation.slug || formation.titre?.toString().toLowerCase().replace(/\s+/g, "-") || "",
+      description: formation.description || formation.resume || "",
+      resume: formation.shortDescription || formation.description || formation.resume || "",
+      image: formation.image || formation.thumbnail,
+      modalite: formation.mode || formation.modalite || "En ligne",
+      niveau: levelMap[formation.level] || levelMap[formation.niveau] || "Débutant",
+      secteur: formation.category?.name || formation.category || formation.secteur || "Formation",
+      objectifs: formation.objectives || formation.objectifs || [],
+      prerequis: formation.prerequisites || formation.prerequis || [],
+      livrables: formation.livrables || [],
+      competences: formation.tags || formation.competences || [],
+      format: modeMap[mode] || formation.format || "Vidéo",
+      duree: durationHours,
+      langue: formation.langue || "Français",
+      moduleLie: formation.moduleLie,
+      objectifMetier: formation.objectifMetier,
+      parcours: formation.parcours || [],
+      region: formation.region || formation.location,
+      ville: formation.ville,
+      expertId: formation.instructorId || formation.formateur_id || "",
+      expert: formation.expert,
+      certifiant: Boolean(formation.certifiant || formation.certification_delivrer_badge),
+      certificat: formation.certificat,
+      gratuit: formation.isPaid === false || formation.price === 0 || formation.gratuit === true,
+      prixPublic: formation.price ?? formation.prixPublic ?? formation.prix ?? 0,
+      prixMembre: formation.price_member ?? formation.prixMembre ?? formation.prixMembre ?? undefined,
+      modules: formation.modules || [],
+      chapitres: formation.chapitres || [],
+      nbInscrits: formation.totalStudents || formation.nbInscrits,
+      notesMoyenne: formation.rating || formation.notesMoyenne,
+      tauxCompletion: formation.tauxCompletion,
+      statut: formation.status === "published" || formation.statut === "publié"
+        ? "publié"
+        : formation.status === "archived" || formation.statut === "archivé"
+        ? "archivé"
+        : "brouillon",
+      dateCreation: formation.created_at || formation.dateCreation || now,
+      dateModification: formation.updated_at || formation.dateModification || now,
+      datePublication: formation.datePublication || formation.updated_at || undefined,
+      badges: formation.badges || [],
+    };
+  };
+
+  const apiFormationsNormalized = useMemo(
+    () => apiFormations.map(mapApiFormation),
+    [apiFormations]
+  );
+
+  const baseFormations = apiFormationsNormalized.length > 0 ? apiFormationsNormalized : formationsMock;
+
+  const objectifOptions = useMemo(() => {
+    const values = Array.from(new Set(baseFormations.map((formation) => formation.objectifMetier).filter(Boolean)));
+    if (values.length === 0) {
+      return objectifsMetier;
+    }
+    return values.map((value) => ({ value: value as string, label: value as string }));
+  }, [baseFormations]);
+
+  const regionOptions = useMemo(() => {
+    const values = Array.from(new Set(baseFormations.map((formation) => formation.region).filter(Boolean)));
+    if (values.length === 0) {
+      return regions.map((reg) => reg.nom);
+    }
+    return values as string[];
+  }, [baseFormations]);
+
+  const secteurOptions = useMemo(() => {
+    const values = Array.from(new Set(baseFormations.map((formation) => formation.secteur).filter(Boolean)));
+    return (values.length ? values : DEFAULT_SECTEURS) as string[];
+  }, [baseFormations]);
+
+  const niveauOptions = useMemo(() => {
+    const values = Array.from(new Set(baseFormations.map((formation) => formation.niveau).filter(Boolean)));
+    return (values.length ? values : DEFAULT_NIVEAUX) as (typeof DEFAULT_NIVEAUX)[number][];
+  }, [baseFormations]);
+
+  const formatOptions = useMemo(() => {
+    const values = Array.from(new Set(baseFormations.map((formation) => formation.format).filter(Boolean)));
+    return (values.length ? values : DEFAULT_FORMATS) as (typeof DEFAULT_FORMATS)[number][];
+  }, [baseFormations]);
 
   // Sauvegarder la recherche dans l'historique quand elle est finalisée (debounce)
   useEffect(() => {
@@ -90,7 +208,7 @@ export function CatalogueContent() {
 
   // Filtrage et tri des formations (avec useMemo pour éviter re-calculs)
   const formationsFiltrees = useMemo(() => {
-    let filtered = formationsMock.filter((formation) => {
+    let filtered = baseFormations.filter((formation) => {
       if (expertFilter && formation.expertId !== expertFilter) {
         return false;
       }
@@ -138,13 +256,13 @@ export function CatalogueContent() {
         default:
           // Tri par position dans le mock (premiers ajoutés = plus récents)
           // En pratique, les premiers dans le tableau sont considérés comme plus récents
-          return formationsMock.indexOf(b) - formationsMock.indexOf(a);
+          return baseFormations.indexOf(b) - baseFormations.indexOf(a);
       }
     });
 
     setResultCount(filtered.length);
     return filtered;
-  }, [debouncedMotCle, objectif, region, secteur, niveau, format, gratuit, certifiant, expertFilter, regionFilter, sortBy]);
+  }, [baseFormations, debouncedMotCle, objectif, region, secteur, niveau, format, gratuit, certifiant, expertFilter, regionFilter, sortBy]);
 
   // Phase 3: Pagination - Extraire les formations à afficher
   const totalPages = Math.ceil(formationsFiltrees.length / ITEMS_PER_PAGE);
@@ -186,10 +304,10 @@ export function CatalogueContent() {
 
   // Statistiques rapides
   const stats = {
-    total: formationsMock.length,
-    gratuit: formationsMock.filter(f => f.gratuit).length,
-    certifiant: formationsMock.filter(f => f.certifiant).length,
-    regions: new Set(formationsMock.map(f => f.region)).size
+    total: baseFormations.length,
+    gratuit: baseFormations.filter(f => f.gratuit).length,
+    certifiant: baseFormations.filter(f => f.certifiant).length,
+    regions: new Set(baseFormations.map(f => f.region).filter(Boolean)).size
   };
 
   return (
@@ -229,7 +347,7 @@ export function CatalogueContent() {
       />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
-        <div className="container mx-auto px-8 lg:px-16 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Search Bar and Stats */}
           <div className="mb-8 animate-fade-in-up">
             {/* Search Bar with Autocomplete */}
@@ -237,7 +355,7 @@ export function CatalogueContent() {
               <SearchAutocomplete
                 value={motCle}
                 onChange={setMotCle}
-                suggestions={[...new Set(formationsMock.map(f => f.titre).slice(0, 8))]}
+                suggestions={[...new Set(baseFormations.map(f => f.titre).slice(0, 8))]}
                 recentSearches={searchHistory}
                 onSelectSuggestion={(suggestion) => addSearch(suggestion)}
                 onClearHistory={clearHistory}
@@ -268,6 +386,11 @@ export function CatalogueContent() {
             <aside className="hidden md:block md:w-80 flex-shrink-0 animate-slide-right">
               <div className="sticky top-24">
                 <CatalogueFilters
+                  objectifOptions={objectifOptions}
+                  regionOptions={regionOptions}
+                  secteurOptions={secteurOptions}
+                  niveauOptions={niveauOptions}
+                  formatOptions={formatOptions}
                   objectif={objectif}
                   setObjectif={setObjectif}
                   region={region}
@@ -292,17 +415,17 @@ export function CatalogueContent() {
             <main className="flex-1 min-w-0">
               {/* Toolbar */}
               <div className="bg-white rounded-2xl p-4 mb-6 border-2 border-slate-100 shadow-lg transition-all duration-300 animate-fade-in-up animation-delay-200">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                   <p className="text-slate-600 font-medium" aria-live="polite" aria-atomic="true" role="status">
                     <span className="text-cpu-orange font-bold text-lg">{resultCount}</span> formation{resultCount > 1 ? "s" : ""} trouvée{resultCount > 1 ? "s" : ""}
                   </p>
 
-                  <div className="flex items-center gap-3">
+                  <div className="w-full lg:w-auto flex flex-wrap items-center gap-3 justify-start lg:justify-end">
                     {/* Sort */}
                     <div className="flex items-center gap-2">
                       <ArrowUpDown className="w-4 h-4 text-slate-500" />
                       <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-                        <SelectTrigger className="w-40">
+                        <SelectTrigger className="w-full sm:w-40">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -351,7 +474,7 @@ export function CatalogueContent() {
                     )}
                     {objectif && objectif !== "all" && (
                       <Badge variant="secondary" className="flex items-center gap-2">
-                        {objectifsMetier.find(o => o.value === objectif)?.label}
+                        {objectifOptions.find(o => o.value === objectif)?.label || objectif}
                         <button onClick={() => setObjectif("all")} className="cursor-pointer hover:text-red-600">
                           <X className="h-3 w-3" />
                         </button>
@@ -574,6 +697,11 @@ export function CatalogueContent() {
             aria-labelledby="drawer-title"
           >
             <CatalogueFilters
+              objectifOptions={objectifOptions}
+              regionOptions={regionOptions}
+              secteurOptions={secteurOptions}
+              niveauOptions={niveauOptions}
+              formatOptions={formatOptions}
               objectif={objectif}
               setObjectif={setObjectif}
               region={region}

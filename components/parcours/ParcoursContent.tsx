@@ -90,7 +90,7 @@ export function ParcoursContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
       {/* Hero Section */}
-      <section className="container mx-auto px-8 lg:px-16 py-12">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge className="mb-4 bg-cpu-orange text-white">
             <Target className="w-4 h-4 mr-2" />
@@ -165,7 +165,7 @@ export function ParcoursContent() {
             id={parcours.id}
             className={`py-20 ${isEven ? 'bg-white' : 'bg-slate-50'}`}
           >
-            <div className="container mx-auto px-8 lg:px-16">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center`}>
                 {/* Content */}
                 <div className="flex-1">
@@ -246,7 +246,7 @@ export function ParcoursContent() {
 
       {/* CTA Final */}
       <section className="py-20 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
-        <div className="container mx-auto px-8 lg:px-16 text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Pas sûr du parcours à choisir ?
           </h2>

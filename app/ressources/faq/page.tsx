@@ -197,7 +197,7 @@ export default function FAQPage() {
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/10">
-        <section className="container mx-auto px-8 lg:px-16 py-12">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Stats rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
             <div className="bg-white rounded-2xl p-4 md:p-6 text-center border-2 border-slate-100 shadow-md transition-all duration-500  animate-fade-in group">

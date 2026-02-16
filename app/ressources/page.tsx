@@ -157,7 +157,7 @@ export default function RessourcesPage() {
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
-        <section className="container mx-auto px-8 lg:px-16 py-20">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">

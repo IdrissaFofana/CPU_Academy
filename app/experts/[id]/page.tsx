@@ -187,7 +187,7 @@ export default function ExpertDetailPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
 
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 -mt-32 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
           {/* Header Card */}
           <Card className="p-6 md:p-8 mb-8 shadow-2xl">
             <div className="flex flex-col md:flex-row gap-6">

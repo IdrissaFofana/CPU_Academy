@@ -132,7 +132,7 @@ export default function MesCertificationsPage() {
       />
 
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-8">
-        <div className="container mx-auto px-8 lg:px-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Stats */}
           <div className="grid md:grid-cols-4 gap-6">
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
@@ -190,7 +190,7 @@ export default function MesCertificationsPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-8 lg:px-16 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Certifications */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-8">

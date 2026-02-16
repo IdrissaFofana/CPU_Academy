@@ -166,7 +166,7 @@ export default function BlogPage() {
         ]}
       />
 
-      <div className="container mx-auto px-8 lg:px-16 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Recherche et filtres */}
         <div className="mb-12">
           <div className="flex flex-col md:flex-row gap-4 mb-8">

@@ -187,7 +187,7 @@ export default function WebinairesPage() {
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/20">
         {/* Stats Section */}
-        <section className="container mx-auto px-8 lg:px-16 py-16">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {stats.map((stat, idx) => {
               const Icon = stat.icon;
@@ -207,7 +207,7 @@ export default function WebinairesPage() {
         </section>
 
         {/* Prochains webinaires */}
-        <section className="container mx-auto px-8 lg:px-16 py-16">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12 animate-slide-up">
             <Badge className="mb-4 bg-orange-100 text-orange-700 border-0">
               <Calendar className="w-3 h-3 mr-1" />
@@ -301,7 +301,7 @@ export default function WebinairesPage() {
         </section>
 
         {/* Replays disponibles */}
-        <section className="container mx-auto px-8 lg:px-16 py-16">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12 animate-slide-up">
             <Badge className="mb-4 bg-purple-100 text-purple-700 border-0">
               <Video className="w-3 h-3 mr-1" />
@@ -465,7 +465,7 @@ export default function WebinairesPage() {
         </section>
 
         {/* Newsletter CTA */}
-        <section className="container mx-auto px-8 lg:px-16 py-16">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-4xl mx-auto bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-12 text-center text-white">
             <Bell className="w-12 h-12 mx-auto mb-4 text-orange-500" />
             <h2 className="text-2xl md:text-3xl font-bold mb-4">

@@ -216,7 +216,7 @@ export default function MesFormationsPage() {
 
       {/* Header */}
       <div className="bg-white border-b py-8">
-        <div className="container mx-auto px-8 lg:px-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Stats */}
           <div className="grid md:grid-cols-4 gap-6">
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-6">
@@ -270,7 +270,7 @@ export default function MesFormationsPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-8 lg:px-16 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Filtres et recherche */}
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
           {/* Recherche */}

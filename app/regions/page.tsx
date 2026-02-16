@@ -223,7 +223,7 @@ export default function RegionsPage() {
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
         {/* Régions Grid */}
-        <section className="container mx-auto px-8 lg:px-16 py-20">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20">
           {/* Header Section améliorée */}
           <div className="text-center mb-16 animate-fade-in">
             <div className="inline-block mb-4">
@@ -329,7 +329,7 @@ export default function RegionsPage() {
         </section>
 
         {/* Prochaines sessions en présentiel */}
-        <section className="container mx-auto px-8 lg:px-16 py-20 bg-gradient-to-br from-orange-50/50 via-white to-blue-50/30">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-gradient-to-br from-orange-50/50 via-white to-blue-50/30">
           <div className="text-center mb-12 animate-fade-in">
             <div className="inline-block mb-4">
               <span className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">

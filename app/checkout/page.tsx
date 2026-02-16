@@ -103,7 +103,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-12">
-        <div className="container mx-auto px-8 lg:px-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-sm">
               <ShoppingCart className="w-8 h-8" />
@@ -118,7 +118,7 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-8 lg:px-16 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Stepper */}
         <div className="mb-12">
           <div className="flex items-center justify-center">
@@ -131,7 +131,7 @@ export default function CheckoutPage() {
                 <div key={step.id} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
                         isCompleted
                           ? "bg-green-500 text-white"
                           : isActive
@@ -139,10 +139,10 @@ export default function CheckoutPage() {
                           : "bg-slate-200 text-slate-400"
                       }`}
                     >
-                      {isCompleted ? <Check className="w-8 h-8" /> : <Icon className="w-8 h-8" />}
+                      {isCompleted ? <Check className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" /> : <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />}
                     </div>
                     <span
-                      className={`mt-3 text-sm font-semibold ${
+                      className={`mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-center ${
                         isActive ? "text-cpu-orange" : isCompleted ? "text-green-600" : "text-slate-400"
                       }`}
                     >
@@ -151,7 +151,7 @@ export default function CheckoutPage() {
                   </div>
                   {index < steps.length - 1 && (
                     <div
-                      className={`w-32 h-1 mx-4 transition-all duration-300 ${
+                      className={`hidden sm:block w-16 md:w-24 lg:w-32 h-1 mx-2 md:mx-4 transition-all duration-300 ${
                         currentStep > step.id ? "bg-green-500" : "bg-slate-200"
                       }`}
                     ></div>
@@ -185,7 +185,7 @@ export default function CheckoutPage() {
                                   <Badge className="bg-slate-100 text-slate-700 border-0 mb-2">
                                     {item.categorie}
                                   </Badge>
-                                  <h3 className="text-lg font-bold text-slate-900">{item.titre}</h3>
+                                  <h3 className="text-lg font-bold text-slate-900 line-clamp-2">{item.titre}</h3>
                                   <p className="text-sm text-slate-600 mt-1">Durée: {item.duree}</p>
                                   {item.certifiant && (
                                     <Badge className="bg-cpu-orange text-white border-0 mt-2">
@@ -230,7 +230,7 @@ export default function CheckoutPage() {
                       <Tag className="w-5 h-5 text-cpu-orange" />
                       Code promo
                     </h3>
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <Input
                         placeholder="Entrez votre code promo"
                         value={promoCode}
@@ -241,7 +241,7 @@ export default function CheckoutPage() {
                       <Button
                         onClick={applyPromo}
                         disabled={promoApplied || !promoCode}
-                        className={promoApplied ? "bg-green-500" : "bg-cpu-orange hover:bg-orange-600"}
+                        className={promoApplied ? "bg-green-500 sm:w-auto w-full" : "bg-cpu-orange hover:bg-orange-600 sm:w-auto w-full"}
                       >
                         {promoApplied ? <Check className="w-4 h-4" /> : "Appliquer"}
                       </Button>

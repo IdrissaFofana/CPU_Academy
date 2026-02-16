@@ -9,7 +9,7 @@ import { ChaptersSidebar } from "@/components/learn/ChaptersSidebar";
 import { VideoPlayer } from "@/components/learn/VideoPlayer";
 import { ContentTabs } from "@/components/learn/ContentTabs";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, ChevronLeft, ChevronRight, X, Play, BookOpen, Award, Clock } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, X, Play, BookOpen, Award, Clock, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 export default function LearnPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -24,6 +24,20 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
   const [currentLeconId, setCurrentLeconId] = useState<string>("");
   const [completedLecons, setCompletedLecons] = useState<string[]>([]);
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [sidebarVisible, setSidebarVisible] = useState<boolean>(true);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // Détecter si on est en mode mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Charger la progression depuis localStorage
   useEffect(() => {
@@ -39,6 +53,12 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
     // Si pas de leçon courante, prendre la première leçon du premier chapitre
     if (!saved && formation.chapitres && formation.chapitres.length > 0 && formation.chapitres[0].lecons.length > 0) {
       setCurrentLeconId(formation.chapitres[0].lecons[0].id);
+    }
+
+    // Charger la préférence de sidebar
+    const sidebarPref = localStorage.getItem('sidebar-visible');
+    if (sidebarPref !== null) {
+      setSidebarVisible(sidebarPref === 'true');
     }
   }, [formation.id, formation.chapitres?.length]);
 
@@ -57,6 +77,23 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
       );
     }
   }, [currentLeconId, completedLecons, notes, formation.id]);
+
+  // Toggle sidebar
+  const toggleSidebar = () => {
+    const newState = !sidebarVisible;
+    setSidebarVisible(newState);
+    localStorage.setItem('sidebar-visible', String(newState));
+  };
+
+  // Sélectionner une leçon et masquer la sidebar sur mobile
+  const handleLeconSelect = (leconId: string) => {
+    setCurrentLeconId(leconId);
+    // Masquer la sidebar uniquement sur mobile après sélection
+    if (isMobile) {
+      setSidebarVisible(false);
+      localStorage.setItem('sidebar-visible', 'false');
+    }
+  };
 
   // Trouver la leçon actuelle
   let currentLecon: Lecon | undefined;
@@ -149,31 +186,53 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
 
   return (
     <div className="h-screen flex flex-col bg-slate-50">
-      {/* Header moderne */}
-      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm">
+      {/* Header moderne avec glassmorphism */}
+      <header className="bg-white/80 backdrop-blur-lg border-b border-slate-200/50 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm sticky top-0 z-30">
         <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Bouton toggle sidebar */}
+          <button
+            onClick={toggleSidebar}
+            className="group relative text-slate-600 hover:text-cpu-orange transition-all duration-200 flex-shrink-0 p-2 hover:bg-orange-50 rounded-lg"
+            title={sidebarVisible ? "Masquer le menu" : "Afficher le menu"}
+          >
+            {sidebarVisible ? (
+              <PanelLeftClose className="w-5 h-5" />
+            ) : (
+              <PanelLeftOpen className="w-5 h-5" />
+            )}
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-cpu-orange font-medium whitespace-nowrap">
+              {sidebarVisible ? "Masquer" : "Afficher"}
+            </span>
+          </button>
+          
           <Link
             href={`/formations/${formation.slug}`}
-            className="text-slate-600 hover:text-cpu-orange transition-colors flex-shrink-0"
+            className="group relative text-slate-600 hover:text-red-500 transition-all duration-200 flex-shrink-0 p-2 hover:bg-red-50 rounded-lg"
             title="Quitter le cours"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-red-500 font-medium">
+              Quitter
+            </span>
           </Link>
           
           <div className="flex-1 min-w-0">
-            <h1 className="font-semibold text-slate-900 truncate text-sm sm:text-base">
+            <h1 className="font-bold text-slate-900 truncate text-sm sm:text-base">
               {formation.titre}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 truncate">{currentLecon.titre}</p>
+            <p className="text-xs sm:text-sm text-slate-500 truncate flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-cpu-orange animate-pulse"></span>
+              {currentLecon.titre}
+            </p>
           </div>
         </div>
 
         {/* Progress et navigation */}
         <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           {/* Progress circulaire */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             <div className="text-right">
-              <p className="text-xs text-slate-500">Progression</p>
+              <p className="text-[10px] uppercase tracking-wide text-slate-400 font-semibold">Progression</p>
               <p className="text-sm font-bold text-cpu-orange">{progressPercentage}%</p>
             </div>
             <div className="relative w-12 h-12">
@@ -183,20 +242,20 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
                   cy="24"
                   r="20"
                   stroke="currentColor"
-                  strokeWidth="4"
+                  strokeWidth="3"
                   fill="none"
-                  className="text-slate-200"
+                  className="text-slate-100"
                 />
                 <circle
                   cx="24"
                   cy="24"
                   r="20"
-                  stroke="currentColor"
-                  strokeWidth="4"
+                  stroke="#fb923c"
+                  strokeWidth="3"
                   fill="none"
                   strokeDasharray={`${2 * Math.PI * 20}`}
                   strokeDashoffset={`${2 * Math.PI * 20 * (1 - progressPercentage / 100)}`}
-                  className="text-cpu-orange transition-all duration-300"
+                  className="transition-all duration-500 ease-out"
                   strokeLinecap="round"
                 />
               </svg>
@@ -207,14 +266,15 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
           </div>
 
           {/* Boutons de navigation */}
-          <div className="flex gap-1">
+          <div className="flex gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={handlePrevious}
               disabled={currentChapitreIndex === 0 && 
                 formation.chapitres?.[0]?.lecons.findIndex((l) => l.id === currentLeconId) === 0}
-              className="h-9 w-9 p-0"
+              className="h-9 w-9 p-0 hover:bg-slate-100 disabled:opacity-30 transition-all duration-200 hover:scale-110 active:scale-95"
+              title="Leçon précédente"
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
@@ -222,7 +282,8 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
               variant="ghost"
               size="sm"
               onClick={handleNext}
-              className="h-9 w-9 p-0"
+              className="h-9 w-9 p-0 hover:bg-cpu-orange hover:text-white transition-all duration-200 hover:scale-110 active:scale-95"
+              title="Leçon suivante"
             >
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -237,7 +298,8 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
           chapitres={formation.chapitres || []}
           currentLeconId={currentLeconId}
           completedLecons={completedLecons}
-          onLeconSelect={setCurrentLeconId}
+          onLeconSelect={handleLeconSelect}
+          isVisible={sidebarVisible}
         />
 
         {/* Content Area */}
@@ -266,7 +328,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
               </div>
             )}
             {currentLecon.type === "quiz" && (
-              <div className="aspect-video flex items-center justify-center bg-gradient-to-br from-cpu-orange to-orange-600 text-white">
+              <div className="aspect-video flex items-center justify-center bg-cpu-orange text-white">
                 <div className="text-center p-8">
                   <svg
                     className="w-16 h-16 mx-auto mb-4"
@@ -305,75 +367,46 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
           />
 
           {/* Action Buttons */}
-          <div className="bg-white border-t border-slate-200 px-6 py-4 flex justify-between items-center">
+          <div className="bg-white border-t border-slate-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 shadow-lg">
             <Button
               variant="outline"
               onClick={handlePrevious}
               disabled={currentChapitreIndex === 0 && 
                 formation.chapitres?.[0]?.lecons.findIndex((l) => l.id === currentLeconId) === 0}
+              className="group border-2 hover:border-slate-400 hover:bg-slate-50 transition-all duration-200 disabled:opacity-40"
             >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Précédent
+              <ChevronLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-semibold">Précédent</span>
             </Button>
 
             <Button
-              variant={completedLecons.includes(currentLeconId) ? "outline" : "default"}
               onClick={handleMarkComplete}
               disabled={completedLecons.includes(currentLeconId)}
-              className={completedLecons.includes(currentLeconId) ? "" : "bg-green-600 hover:bg-green-700 text-white"}
+              className={`group font-semibold transition-all duration-300 ${
+                completedLecons.includes(currentLeconId)
+                  ? "bg-green-500 text-white cursor-default shadow-lg shadow-green-200"
+                  : "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-300 hover:shadow-xl hover:shadow-green-400 hover:scale-105 active:scale-95"
+              }`}
             >
               {completedLecons.includes(currentLeconId) ? (
                 <>
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Terminé
+                  <CheckCircle2 className="w-5 h-5 mr-2" />
+                  <span>Terminé</span>
                 </>
               ) : (
-                <>Marquer comme terminé</>
+                <>
+                  <CheckCircle2 className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                  <span>Marquer comme terminé</span>
+                </>
               )}
             </Button>
 
             <Button
-              className="bg-cpu-orange hover:bg-cpu-orange/90 text-white"
+              className="group bg-cpu-orange hover:bg-orange-600 text-white font-semibold shadow-lg shadow-orange-300 hover:shadow-xl hover:shadow-orange-400 transition-all duration-300 hover:scale-105 active:scale-95"
               onClick={handleNext}
             >
-              Suivant
-              <svg
-                className="w-4 h-4 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <span>Suivant</span>
+              <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>

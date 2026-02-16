@@ -57,11 +57,11 @@ export default function FormationDetailPage({
           {/* Left: Content */}
           <div className="lg:col-span-2">
             {/* Tabs */}
-            <div className="border-b border-slate-200 mb-6">
-              <nav className="-mb-px flex space-x-8">
+            <div className="border-b border-slate-200 mb-6 overflow-x-auto">
+              <nav className="-mb-px flex space-x-4 md:space-x-8 min-w-max">
                 <button
                   onClick={() => setActiveTab("apercu")}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`py-4 px-2 whitespace-nowrap border-b-2 font-medium text-sm transition-colors ${
                     activeTab === "apercu"
                       ? "border-cpu-orange text-cpu-orange"
                       : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
@@ -71,7 +71,7 @@ export default function FormationDetailPage({
                 </button>
                 <button
                   onClick={() => setActiveTab("programme")}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`py-4 px-2 whitespace-nowrap border-b-2 font-medium text-sm transition-colors ${
                     activeTab === "programme"
                       ? "border-cpu-orange text-cpu-orange"
                       : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
@@ -81,7 +81,7 @@ export default function FormationDetailPage({
                 </button>
                 <button
                   onClick={() => setActiveTab("sessions")}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`py-4 px-2 whitespace-nowrap border-b-2 font-medium text-sm transition-colors ${
                     activeTab === "sessions"
                       ? "border-cpu-orange text-cpu-orange"
                       : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
@@ -91,7 +91,7 @@ export default function FormationDetailPage({
                 </button>
                 <button
                   onClick={() => setActiveTab("instructeur")}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`py-4 px-2 whitespace-nowrap border-b-2 font-medium text-sm transition-colors ${
                     activeTab === "instructeur"
                       ? "border-cpu-orange text-cpu-orange"
                       : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
@@ -101,7 +101,7 @@ export default function FormationDetailPage({
                 </button>
                 <button
                   onClick={() => setActiveTab("avis")}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`py-4 px-2 whitespace-nowrap border-b-2 font-medium text-sm transition-colors ${
                     activeTab === "avis"
                       ? "border-cpu-orange text-cpu-orange"
                       : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"

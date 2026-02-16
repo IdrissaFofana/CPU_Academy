@@ -156,7 +156,7 @@ export default function GuidesPage() {
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/10">
-        <section className="container mx-auto px-8 lg:px-16 py-12">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Recherche */}
           <div className="mb-8 relative z-10">
             <div className="relative max-w-2xl mx-auto">

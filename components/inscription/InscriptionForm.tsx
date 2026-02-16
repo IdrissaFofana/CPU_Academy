@@ -78,7 +78,7 @@ export function InscriptionForm() {
   if (!selectedFormation) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/10 py-12">
-        <div className="container mx-auto px-8 lg:px-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="max-w-2xl mx-auto p-12 text-center">
             <AlertCircle className="w-16 h-16 mx-auto mb-4 text-orange-500" />
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Aucune formation sélectionnée</h2>
@@ -100,7 +100,7 @@ export function InscriptionForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/10 py-12">
-      <div className="container mx-auto px-8 lg:px-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Progress Steps */}
           <div className="mb-12">

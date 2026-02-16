@@ -148,7 +148,7 @@ export default function DashboardFormateurPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-12">
-        <div className="container mx-auto px-8 lg:px-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-2">Dashboard Formateur</h1>
@@ -164,7 +164,7 @@ export default function DashboardFormateurPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-8 lg:px-16 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <Card className="p-6 border-2 border-slate-100 transition-all duration-300">

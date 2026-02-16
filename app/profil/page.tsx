@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import Link from "next/link";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/card";
@@ -41,24 +41,31 @@ import {
 
 type TabType = "overview" | "courses" | "certificates" | "activity" | "settings";
 
+const initialUserProfile = {
+  name: "Jean Kouassi",
+  title: "Entrepreneur & Apprenant Passionné",
+  bio: "Entrepreneur ivoirien passionné par le digital et l'innovation. En formation continue pour développer mes compétences en marketing digital, gestion de projet et leadership. Mon objectif : créer des solutions innovantes pour l'Afrique.",
+  location: "Abidjan, Côte d'Ivoire",
+  memberSince: "Janvier 2024",
+  email: "jean.kouassi@example.com",
+  phone: "+225 07 XX XX XX XX",
+  website: "www.jeankouassi.com",
+  linkedin: "linkedin.com/in/jeankouassi",
+  twitter: "@jeankouassi",
+  avatar: "/images/avatar.jpg",
+  coverImage: "/images/profile-cover.jpg",
+};
+
 export default function ProfilPage() {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [userProfile, setUserProfile] = useState(initialUserProfile);
 
-  // Données utilisateur mock
-  const userProfile = {
-    name: "Jean Kouassi",
-    title: "Entrepreneur & Apprenant Passionné",
-    bio: "Entrepreneur ivoirien passionné par le digital et l'innovation. En formation continue pour développer mes compétences en marketing digital, gestion de projet et leadership. Mon objectif : créer des solutions innovantes pour l'Afrique.",
-    location: "Abidjan, Côte d'Ivoire",
-    memberSince: "Janvier 2024",
-    email: "jean.kouassi@example.com",
-    phone: "+225 07 XX XX XX XX",
-    website: "www.jeankouassi.com",
-    linkedin: "linkedin.com/in/jeankouassi",
-    twitter: "@jeankouassi",
-    avatar: "/images/avatar.jpg",
-    coverImage: "/images/profile-cover.jpg",
-  };
+  const handleProfileChange =
+    (field: keyof typeof initialUserProfile) =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      setUserProfile((prev) => ({ ...prev, [field]: value }));
+    };
 
   const stats = {
     coursesCompleted: 12,
@@ -798,6 +805,7 @@ export default function ProfilPage() {
                         <input
                           type="text"
                           value={userProfile.name}
+                          onChange={handleProfileChange("name")}
                           className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cpu-orange"
                         />
                       </div>
@@ -806,6 +814,7 @@ export default function ProfilPage() {
                         <input
                           type="text"
                           value={userProfile.title}
+                          onChange={handleProfileChange("title")}
                           className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cpu-orange"
                         />
                       </div>
@@ -815,6 +824,7 @@ export default function ProfilPage() {
                       <input
                         type="email"
                         value={userProfile.email}
+                        onChange={handleProfileChange("email")}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cpu-orange"
                       />
                     </div>
@@ -823,6 +833,7 @@ export default function ProfilPage() {
                       <input
                         type="text"
                         value={userProfile.location}
+                        onChange={handleProfileChange("location")}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cpu-orange"
                       />
                     </div>
@@ -841,6 +852,7 @@ export default function ProfilPage() {
                         type="text"
                         placeholder="URL LinkedIn"
                         value={userProfile.linkedin}
+                        onChange={handleProfileChange("linkedin")}
                         className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cpu-orange"
                       />
                     </div>
@@ -850,6 +862,7 @@ export default function ProfilPage() {
                         type="text"
                         placeholder="Nom d'utilisateur Twitter"
                         value={userProfile.twitter}
+                        onChange={handleProfileChange("twitter")}
                         className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cpu-orange"
                       />
                     </div>
@@ -859,6 +872,7 @@ export default function ProfilPage() {
                         type="text"
                         placeholder="Site web"
                         value={userProfile.website}
+                        onChange={handleProfileChange("website")}
                         className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cpu-orange"
                       />
                     </div>

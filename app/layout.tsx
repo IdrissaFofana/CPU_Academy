@@ -9,7 +9,6 @@ import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { CartProvider } from "@/contexts/CartContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { NotificationBanner } from "@/components/layout/NotificationBanner";
 
 // Configuration des polices Google Fonts
 const inter = Inter({ 
@@ -40,7 +39,6 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-white text-gray-900">
         <NotificationProvider>
           <CartProvider>
-            <NotificationBanner />
             <ScrollProgress />
             <AnnouncementBar />
             <Navbar />

@@ -848,7 +848,7 @@ export default function EntreprisesPage() {
         </section>
 
         {/* Services Section */}
-        <section id="services-entreprises" className="container mx-auto px-8 lg:px-16 py-16">
+        <section id="services-entreprises" className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12 animate-slide-up">
             <Badge className="mb-4 bg-orange-100 text-orange-700 border-0">
               <Briefcase className="w-3 h-3 mr-1" />
@@ -891,7 +891,7 @@ export default function EntreprisesPage() {
         </section>
 
         {/* Packs Métiers Section */}
-        <section id="former-vos-equipes" className="container mx-auto px-8 lg:px-16 py-16">
+        <section id="former-vos-equipes" className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12 animate-slide-up">
             <Badge className="mb-4 bg-orange-100 text-orange-700 border-0">
               <Briefcase className="w-3 h-3 mr-1" />
@@ -1147,7 +1147,7 @@ export default function EntreprisesPage() {
         </section>
 
         {/* Avantages Section */}
-        <section id="solutions-sur-mesure" className="container mx-auto px-8 lg:px-16 py-20 bg-gradient-to-br from-orange-50/30 via-white to-blue-50/20">
+        <section id="solutions-sur-mesure" className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-gradient-to-br from-orange-50/30 via-white to-blue-50/20">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
               Pourquoi choisir CPU Formation ?

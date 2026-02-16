@@ -5,14 +5,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal, X, Target, MapPin, Building2, BarChart3, Monitor, Check } from "lucide-react";
-import { objectifsMetier, regions } from "@/data/constants";
 import type { Niveau, Format } from "@/types";
 
-const niveaux: Niveau[] = ["Débutant", "Intermédiaire", "Avancé"];
-const formats: Format[] = ["Vidéo", "Live", "Présentiel", "Hybride"];
-const secteurs: string[] = ["Secteur Primaire", "Secteur Secondaire", "Secteur Tertiaire", "Secteur Quaternaire"];
+type Option = { value: string; label: string };
 
 interface FiltersProps {
+  objectifOptions: Option[];
+  regionOptions: string[];
+  secteurOptions: string[];
+  niveauOptions: Niveau[];
+  formatOptions: Format[];
   objectif: string;
   setObjectif: (value: string) => void;
   region: string;
@@ -34,6 +36,11 @@ interface FiltersProps {
 }
 
 export function CatalogueFilters({
+  objectifOptions,
+  regionOptions,
+  secteurOptions,
+  niveauOptions,
+  formatOptions,
   objectif,
   setObjectif,
   region,
@@ -91,7 +98,7 @@ export function CatalogueFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous</SelectItem>
-            {objectifsMetier.map((obj) => (
+            {objectifOptions.map((obj) => (
               <SelectItem key={obj.value} value={obj.value}>
                 {obj.label}
               </SelectItem>
@@ -112,9 +119,9 @@ export function CatalogueFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toutes</SelectItem>
-            {regions.map((reg) => (
-              <SelectItem key={reg.id} value={reg.nom}>
-                {reg.nom}
+            {regionOptions.map((reg) => (
+              <SelectItem key={reg} value={reg}>
+                {reg}
               </SelectItem>
             ))}
           </SelectContent>
@@ -133,7 +140,7 @@ export function CatalogueFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous</SelectItem>
-            {secteurs.map((sect) => (
+            {secteurOptions.map((sect) => (
               <SelectItem key={sect} value={sect}>
                 {sect}
               </SelectItem>
@@ -154,7 +161,7 @@ export function CatalogueFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous</SelectItem>
-            {niveaux.map((niv) => (
+            {niveauOptions.map((niv) => (
               <SelectItem key={niv} value={niv}>
                 {niv}
               </SelectItem>
@@ -175,7 +182,7 @@ export function CatalogueFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous</SelectItem>
-            {formats.map((fmt) => (
+            {formatOptions.map((fmt) => (
               <SelectItem key={fmt} value={fmt}>
                 {fmt}
               </SelectItem>

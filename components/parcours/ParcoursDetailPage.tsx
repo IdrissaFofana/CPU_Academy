@@ -71,7 +71,7 @@ export function ParcoursDetailPage({
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
       {/* Hero Section */}
       <section className={`${bgLight} border-b-4 ${borderColor}`}>
-        <div className="container mx-auto px-8 lg:px-16 py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-4xl mx-auto text-center">
             <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br ${gradient} text-white mb-6 animate-bounce`}>
               <Icon className="w-10 h-10" />
@@ -134,7 +134,7 @@ export function ParcoursDetailPage({
       </section>
 
       {/* Stats Section */}
-      <section className="container mx-auto px-8 lg:px-16 py-12">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
           <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md transition-shadow">
             <BookOpen className={`w-10 h-10 mx-auto mb-3 ${textColor}`} />
@@ -155,7 +155,7 @@ export function ParcoursDetailPage({
       </section>
 
       {/* Content Sections */}
-      <div className="container mx-auto px-8 lg:px-16 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {/* Objectifs */}
           <div className="bg-white rounded-2xl p-8 border-2 border-slate-100 shadow-lg animate-slide-up">
