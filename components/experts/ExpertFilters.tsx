@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -43,6 +44,9 @@ export function ExpertFilters({
   availableSpecialties,
   availableLocations
 }: ExpertFiltersProps) {
+  const [specialtySearch, setSpecialtySearch] = useState("");
+  const [locationSearch, setLocationSearch] = useState("");
+
   const activeFiltersCount = 
     (filters.search ? 1 : 0) +
     filters.specialties.length +
@@ -126,26 +130,49 @@ export function ExpertFilters({
       {/* Specialties */}
       <div className="mb-6">
         <Label className="text-sm font-semibold mb-3 block">Spécialités</Label>
-        <div className="space-y-2">
-          {availableSpecialties.map((specialty) => (
-            <label
-              key={specialty}
-              className="flex items-center gap-2 cursor-pointer group"
+        <div className="relative mb-2">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <Input
+            type="text"
+            placeholder="Rechercher une spécialité..."
+            value={specialtySearch}
+            onChange={(e) => setSpecialtySearch(e.target.value)}
+            className="pl-8 text-sm"
+          />
+          {specialtySearch && (
+            <button
+              onClick={() => setSpecialtySearch("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                filters.specialties.includes(specialty)
-                  ? "bg-cpu-orange border-cpu-orange"
-                  : "border-gray-300 group-hover:border-cpu-orange"
-              }`}>
-                {filters.specialties.includes(specialty) && (
-                  <CheckCircle2 className="w-4 h-4 text-white" />
-                )}
-              </div>
-              <span className="text-sm text-gray-700 group-hover:text-cpu-orange">
-                {specialty}
-              </span>
-            </label>
-          ))}
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <div className="max-h-44 overflow-y-auto space-y-0.5 border border-gray-200 rounded-lg p-2">
+          {availableSpecialties
+            .filter((s) => s.toLowerCase().includes(specialtySearch.toLowerCase()))
+            .map((specialty) => (
+              <label
+                key={specialty}
+                className="flex items-center gap-2 cursor-pointer group px-1 py-1.5 rounded hover:bg-orange-50"
+              >
+                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+                  filters.specialties.includes(specialty)
+                    ? "bg-cpu-orange border-cpu-orange"
+                    : "border-gray-300 group-hover:border-cpu-orange"
+                }`}>
+                  {filters.specialties.includes(specialty) && (
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                  )}
+                </div>
+                <span className="text-sm text-gray-700 group-hover:text-cpu-orange truncate">
+                  {specialty}
+                </span>
+              </label>
+            ))}
+          {availableSpecialties.filter((s) => s.toLowerCase().includes(specialtySearch.toLowerCase())).length === 0 && (
+            <p className="text-xs text-gray-400 text-center py-2">Aucune spécialité trouvée</p>
+          )}
         </div>
       </div>
 
@@ -155,26 +182,49 @@ export function ExpertFilters({
           <MapPin className="w-4 h-4" />
           Localisation
         </Label>
-        <div className="space-y-2">
-          {availableLocations.map((location) => (
-            <label
-              key={location}
-              className="flex items-center gap-2 cursor-pointer group"
+        <div className="relative mb-2">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <Input
+            type="text"
+            placeholder="Rechercher une ville..."
+            value={locationSearch}
+            onChange={(e) => setLocationSearch(e.target.value)}
+            className="pl-8 text-sm"
+          />
+          {locationSearch && (
+            <button
+              onClick={() => setLocationSearch("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                filters.locations.includes(location)
-                  ? "bg-cpu-orange border-cpu-orange"
-                  : "border-gray-300 group-hover:border-cpu-orange"
-              }`}>
-                {filters.locations.includes(location) && (
-                  <CheckCircle2 className="w-4 h-4 text-white" />
-                )}
-              </div>
-              <span className="text-sm text-gray-700 group-hover:text-cpu-orange">
-                {location}
-              </span>
-            </label>
-          ))}
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <div className="max-h-44 overflow-y-auto space-y-0.5 border border-gray-200 rounded-lg p-2">
+          {availableLocations
+            .filter((l) => l.toLowerCase().includes(locationSearch.toLowerCase()))
+            .map((location) => (
+              <label
+                key={location}
+                className="flex items-center gap-2 cursor-pointer group px-1 py-1.5 rounded hover:bg-orange-50"
+              >
+                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+                  filters.locations.includes(location)
+                    ? "bg-cpu-orange border-cpu-orange"
+                    : "border-gray-300 group-hover:border-cpu-orange"
+                }`}>
+                  {filters.locations.includes(location) && (
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                  )}
+                </div>
+                <span className="text-sm text-gray-700 group-hover:text-cpu-orange truncate">
+                  {location}
+                </span>
+              </label>
+            ))}
+          {availableLocations.filter((l) => l.toLowerCase().includes(locationSearch.toLowerCase())).length === 0 && (
+            <p className="text-xs text-gray-400 text-center py-2">Aucune localisation trouvée</p>
+          )}
         </div>
       </div>
 

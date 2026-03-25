@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useMemo } from "react";
 import { notFound } from "next/navigation";
-import { formationsMock, reviewsMock, sessionsPresentielMock } from "@/data/mock";
+import { reviewsMock, sessionsPresentielMock } from "@/data/mock";
 import { FormationDetailHero } from "@/components/formations/FormationDetailHero";
 import { FormationProgram } from "@/components/formations/FormationProgram";
 import { FormationInstructor } from "@/components/formations/FormationInstructor";
@@ -13,6 +13,8 @@ import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { SessionCard } from "@/components/sessions/SessionCard";
 import { PracticalInfo } from "@/components/sessions/PracticalInfo";
+import { useFormationContent, useFormations } from "@/hooks/useFormations";
+import { mapApiFormationToAppFormation } from "@/lib/adapters/formation-adapter";
 
 type Tab = "apercu" | "programme" | "sessions" | "instructeur" | "avis";
 
@@ -23,33 +25,58 @@ export default function FormationDetailPage({
 }) {
   const { slug } = use(params);
   const [activeTab, setActiveTab] = useState<Tab>("apercu");
+  const { formations, isLoading, hasFetched } = useFormations({ limit: 200 });
+
+  const formationsNormalized = useMemo(
+    () => formations.map((item) => mapApiFormationToAppFormation(item)),
+    [formations]
+  );
 
   // Trouver la formation par slug
-  const formation = formationsMock.find((f) => f.slug === slug);
+  const formation = formationsNormalized.find((f) => f.slug === slug);
+  const { chapitres } = useFormationContent(formation?.id || "", Boolean(formation?.id));
+  const formationWithContent = useMemo(
+    () =>
+      formation
+        ? {
+            ...formation,
+            chapitres: chapitres.length > 0 ? chapitres : formation.chapitres,
+          }
+        : null,
+    [formation, chapitres]
+  );
 
-  if (!formation) {
+  if ((isLoading || !hasFetched) && !formation) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500" />
+      </div>
+    );
+  }
+
+  if (hasFetched && !formation) {
     notFound();
   }
 
   // Reviews pour cette formation
   const formationReviews = reviewsMock.filter(
-    (r) => r.formationId === formation.id
+    (r) => r.formationId === formationWithContent?.id
   );
 
   // Sessions présentielles pour cette formation
   const formationSessions = sessionsPresentielMock.filter(
-    (s) => s.formationId === formation.id
+    (s) => s.formationId === formationWithContent?.id
   );
 
   // Formations similaires (même secteur ou même parcours)
-  const formationsSimilaires = formationsMock
-    .filter((f) => f.id !== formation.id && f.secteur === formation.secteur)
+  const formationsSimilaires = formationsNormalized
+    .filter((f) => f.id !== formationWithContent?.id && f.secteur === formationWithContent?.secteur)
     .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <FormationDetailHero formation={formation} />
+      <FormationDetailHero formation={formationWithContent!} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -122,7 +149,7 @@ export default function FormationDetailPage({
                       Description
                     </h2>
                     <p className="text-slate-600 leading-relaxed">
-                      {formation.description}
+                      {formationWithContent!.description}
                     </p>
                   </div>
 
@@ -132,7 +159,7 @@ export default function FormationDetailPage({
                       Ce que vous allez apprendre
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {formation.objectifs.map((obj, index) => (
+                      {formationWithContent!.objectifs.map((obj, index) => (
                         <div key={index} className="flex items-start gap-3">
                           <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
                             <svg
@@ -161,7 +188,7 @@ export default function FormationDetailPage({
                       Prérequis
                     </h3>
                     <ul className="space-y-2">
-                      {formation.prerequis.map((prereq, index) => (
+                      {formationWithContent!.prerequis.map((prereq, index) => (
                         <li
                           key={index}
                           className="flex items-start gap-3 text-slate-700"
@@ -179,7 +206,7 @@ export default function FormationDetailPage({
                       Ressources incluses
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {formation.livrables.map((livrable, index) => (
+                      {formationWithContent!.livrables.map((livrable, index) => (
                         <div
                           key={index}
                           className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg"
@@ -208,7 +235,7 @@ export default function FormationDetailPage({
               )}
 
               {activeTab === "programme" && (
-                <FormationProgram chapitres={formation.chapitres || []} />
+                <FormationProgram chapitres={formationWithContent!.chapitres || []} />
               )}
 
               {activeTab === "sessions" && (
@@ -249,8 +276,8 @@ export default function FormationDetailPage({
                 </div>
               )}
 
-              {activeTab === "instructeur" && formation.expert && (
-                <FormationInstructor expert={formation.expert} />
+              {activeTab === "instructeur" && formationWithContent!.expert && (
+                <FormationInstructor expert={formationWithContent!.expert} />
               )}
 
               {activeTab === "avis" && (
@@ -260,7 +287,7 @@ export default function FormationDetailPage({
                       <ReviewsStats reviews={formationReviews} />
                       <ReviewsList reviews={formationReviews} />
                       <div className="pt-8 border-t border-slate-200">
-                        <ReviewForm formationId={formation.id} />
+                        <ReviewForm formationId={formationWithContent!.id} />
                       </div>
                     </>
                   ) : (
@@ -274,7 +301,7 @@ export default function FormationDetailPage({
                           Soyez le premier à laisser un avis sur cette formation !
                         </p>
                       </div>
-                      <ReviewForm formationId={formation.id} />
+                      <ReviewForm formationId={formationWithContent!.id} />
                     </>
                   )}
                 </div>
@@ -284,7 +311,7 @@ export default function FormationDetailPage({
 
           {/* Right: Sidebar */}
           <div className="lg:col-span-1">
-            <FormationSidebar formation={formation} />
+            <FormationSidebar formation={formationWithContent!} />
           </div>
         </div>
 

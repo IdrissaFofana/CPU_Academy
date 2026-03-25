@@ -7,6 +7,7 @@ import { ImpactSection } from "@/components/home/ImpactSection";
 import { CalendarSection } from "@/components/home/CalendarSection";
 import { CertificationsSection } from "@/components/home/CertificationsSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
+import { HomeFaqSection } from "@/components/home/HomeFaqSection";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://cpu-formation.ci'),
@@ -53,7 +54,7 @@ export default function HomePage() {
     <>
       <Hero />
       <StatsSection />
-      <section id="formations">
+      <section id="parcours">
         <ParcoursSection />
       </section>
       <AboutSection />
@@ -66,6 +67,9 @@ export default function HomePage() {
       </section>
       <section id="temoignages">
         <TestimonialsSection />
+      </section>
+      <section id="faq">
+        <HomeFaqSection />
       </section>
     </>
   );

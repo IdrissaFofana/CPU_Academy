@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { X, Bookmark, Zap, Star, Trophy, BookOpen, Check, Clock, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { getSecteurFallbackImage } from '@/lib/utils';
 
 interface EnhancedFormationCardProps {
   formation: any;
@@ -16,6 +17,8 @@ export function EnhancedFormationCard({
   isFavorite = false, 
   onFavoriteToggle 
 }: EnhancedFormationCardProps) {
+  const fallbackImage = getSecteurFallbackImage(formation.secteur);
+  const [imageSrc, setImageSrc] = useState<string>(formation.image || fallbackImage);
   // Utiliser des valeurs déterministes basées sur l'ID pour éviter l'hydration mismatch
   const formationIdHash = formation.id ? formation.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) : 0;
   const isNew = formationIdHash % 10 === 1; // ~10% des formations
@@ -60,12 +63,13 @@ export function EnhancedFormationCard({
 
       {/* Image - Hover animation */}
       <div className="relative h-48 overflow-hidden bg-gray-200">
-        {formation.image ? (
+        {imageSrc ? (
           <Image
-            src={formation.image}
+            src={imageSrc}
             alt={formation.titre}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={() => setImageSrc(fallbackImage)}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-cpu-orange/20 to-cpu-green/20 flex items-center justify-center">
@@ -137,14 +141,13 @@ export function EnhancedFormationCard({
               {formation.gratuit ? "Gratuit" : `${formation.prixPublic || 0}€`}
             </span>
           </div>
-          <Link href={`/formations/${formation.slug}`}>
-            <Button 
+          <Button 
+              asChild
               className="cursor-pointer rounded-full px-4 bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold" 
               size="sm"
             >
-              Voir →
+              <Link href={`/formations/${formation.slug}`}>Voir →</Link>
             </Button>
-          </Link>
         </div>
 
         {/* Certification Badge */}

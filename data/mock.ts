@@ -998,7 +998,7 @@ export const formationsMock: Formation[] = [
     id: "formation-4",
     titre: "Introduction à la qualité ISO",
     slug: "introduction-qualite-iso",
-    image: "/images/formation-tech.png",
+    image: "/images/default-formation.jpg",
     modalite: "Hybride",
     niveau: "Débutant",
     secteur: "Secteur Secondaire",

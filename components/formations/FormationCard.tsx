@@ -10,6 +10,7 @@ import { FormationModal } from "./FormationModal";
 import type { Formation } from "@/types";
 import { Clock, MapPin, Users, Star, BookOpen, ShoppingCart, Check } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { getSecteurFallbackImage } from "@/lib/utils";
 
 interface FormationCardProps {
   formation: Formation;
@@ -18,6 +19,8 @@ interface FormationCardProps {
 
 export function FormationCard({ formation, variant = "default" }: FormationCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const fallbackImage = getSecteurFallbackImage(formation.secteur);
+  const [imageSrc, setImageSrc] = useState<string>(formation.image || fallbackImage);
   const { addItem, isInCart } = useCart();
   const inCart = isInCart(formation.id.toString());
 
@@ -72,14 +75,15 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
     <Card className="h-full transition-all duration-300  overflow-hidden animate-slide-up">
       {/* Image de la formation */}
       <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-        {formation.image ? (
+        {imageSrc ? (
           <Image 
-            src={formation.image} 
+            src={imageSrc} 
             alt={formation.titre}
             fill
             className="object-cover"
             loading="lazy"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            onError={() => setImageSrc(fallbackImage)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cpu-orange/10 to-cpu-green/10">
@@ -191,13 +195,14 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
           )}
           
           {/* Bouton Voir le détail */}
-          <Link href={`/formations/${formation.slug}`} className="w-full">
-            <Button 
-              className="cursor-pointer w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-md shadow-sm transition-all duration-200" 
-            >
+          <Button 
+            asChild
+            className="cursor-pointer w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-md shadow-sm transition-all duration-200" 
+          >
+            <Link href={`/formations/${formation.slug}`} className="w-full">
               Voir le détail
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </CardContent>
 

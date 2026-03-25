@@ -635,7 +635,7 @@ export default function CertificationsPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Certifications Professionnelles",
             subtitle: "Validez vos compétences avec nos certifications reconnues",
             badge: {
@@ -703,7 +703,7 @@ export default function CertificationsPage() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Excellence et Qualité",
             subtitle: "Des programmes conformes aux standards internationaux",
             badge: {

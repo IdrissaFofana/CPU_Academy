@@ -3,7 +3,7 @@
  */
 
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://back.cpupme.com',
   TIMEOUT: parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000'),
   TOKEN_KEY: process.env.NEXT_PUBLIC_TOKEN_KEY || 'cpu_access_token',
   REFRESH_TOKEN_KEY: process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY || 'cpu_refresh_token',
@@ -30,8 +30,14 @@ export const API_ENDPOINTS = {
   
   // Formations
   FORMATIONS: {
-    BASE: '/api/formations',
-    BY_ID: (id: string) => `/api/formations/${id}`,
+    BASE: '/api/formation/formations',
+    PUBLIC: '/api/formation/formations/public',
+    BY_ID: (id: string) => `/api/formation/formations/${id}`,
+  },
+
+  CHAPITRES: {
+    BASE: '/api/formation/chapitres',
+    LECONS: '/api/formation/chapitres/lecons',
   },
   
   // Users
@@ -42,8 +48,18 @@ export const API_ENDPOINTS = {
   
   // Categories
   CATEGORIES: {
-    BASE: '/api/categories',
-    BY_ID: (id: string) => `/api/categories/${id}`,
+    BASE: '/api/formation/categories',
+    PUBLIC: '/api/formation/categories/public',
+    BY_ID: (id: string) => `/api/formation/categories/${id}`,
+  },
+
+  // FAQs
+  FAQS: {
+    BASE: '/api/formation/faqs',
+    PUBLIC: '/api/formation/faqs/public',
+    BY_ID: (id: string) => `/api/formation/faqs/${id}`,
+    VIEW: (id: string) => `/api/formation/faqs/${id}/view`,
+    USEFUL: (id: string) => `/api/formation/faqs/${id}/utile`,
   },
   
   // Enrollments

@@ -6,6 +6,42 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Retourne l'image de fallback correspondant au secteur de la formation.
+ * Secteur Primaire  → formation-agriculture.png
+ * Secteur Secondaire → formation-tech.png
+ * Secteur Tertiaire / autre → default-formation.jpg
+ */
+export function getSecteurFallbackImage(secteur?: string): string {
+  const s = (secteur || "").toLowerCase();
+  if (
+    s.includes("primaire") ||
+    s.includes("agriculture") ||
+    s.includes("élevage") ||
+    s.includes("elevage") ||
+    s.includes("pêche") ||
+    s.includes("peche") ||
+    s.includes("forestier") ||
+    s.includes("minier")
+  ) {
+    return "/images/formation-agriculture.png";
+  }
+  if (
+    s.includes("secondaire") ||
+    s.includes("industrie") ||
+    s.includes("tech") ||
+    s.includes("numérique") ||
+    s.includes("numerique") ||
+    s.includes("btp") ||
+    s.includes("construction") ||
+    s.includes("manufacture") ||
+    s.includes("transformation")
+  ) {
+    return "/images/formation-tech.png";
+  }
+  return "/images/default-formation.jpg";
+}
+
+/**
  * Décode les entités HTML dans une chaîne de caractères
  * Gère les cas de double encodage comme &amp;#x27; → '
  */

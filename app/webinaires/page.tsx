@@ -1,515 +1,342 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SearchBar } from "@/components/ui/search-bar";
 import { PageBanner } from "@/components/layout/PageBanner";
+import { useFormations } from "@/hooks/useFormations";
 import {
-  Video,
-  Calendar,
-  BookOpen,
-  Clock,
-  Users,
-  TrendingUp,
-  Sparkles,
-  Play,
-  CheckCircle2,
-  Grid3x3,
-  List,
-  LayoutGrid
-} from "lucide-react";
-import Link from "next/link";
-import { webinairesMock } from "@/data/mock";
+  formatWebinaireDate,
+  isWebinaireFormation,
+  mapApiFormationToWebinaire,
+  type WebinaireStatus,
+} from "@/lib/adapters/webinaire-adapter";
+import { Calendar, Clock, Grid3x3, List, LayoutGrid, Play, Sparkles, Users, Video } from "lucide-react";
 
 type ViewMode = "grid" | "list" | "compact";
+const ITEMS_PER_PAGE = 9;
+
+const statuses: Array<{ value: "all" | WebinaireStatus; label: string }> = [
+  { value: "all", label: "Tous" },
+  { value: "a-venir", label: "A venir" },
+  { value: "live", label: "En direct" },
+  { value: "termine", label: "Replays" },
+];
+
+function statusBadge(statut: WebinaireStatus) {
+  if (statut === "live") {
+    return (
+      <Badge className="bg-red-500 text-white border-0 animate-pulse">
+        <Sparkles className="w-3 h-3 mr-1" /> EN DIRECT
+      </Badge>
+    );
+  }
+
+  if (statut === "a-venir") {
+    return (
+      <Badge className="bg-blue-500 text-white border-0">
+        <Calendar className="w-3 h-3 mr-1" /> A VENIR
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge className="bg-green-600 text-white border-0">
+      <Play className="w-3 h-3 mr-1" /> REPLAY
+    </Badge>
+  );
+}
 
 export default function WebinairesPage() {
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<"all" | WebinaireStatus>("all");
   const [selectedTheme, setSelectedTheme] = useState<string>("all");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const statuses = ["all", "a-venir", "live", "termine"];
-  const themes = [
-    "all",
-    ...new Set(webinairesMock.flatMap((w) => w.themes)),
-  ];
+  const { formations, isLoading, error } = useFormations({ limit: 400 });
 
-  const filteredWebinaires = webinairesMock.filter((w) => {
-    if (selectedStatus !== "all" && w.statut !== selectedStatus) return false;
-    if (selectedTheme !== "all" && !w.themes.includes(selectedTheme)) return false;
-    if (searchTerm !== "" && !w.titre.toLowerCase().includes(searchTerm.toLowerCase()) && 
-        !w.description.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-    return true;
-  });
+  const webinaires = useMemo(
+    () => formations.filter(isWebinaireFormation).map(mapApiFormationToWebinaire),
+    [formations]
+  );
 
-  const getStatusBadge = (statut: string) => {
-    switch (statut) {
-      case "live":
+  const themes = useMemo(
+    () => ["all", ...new Set(webinaires.flatMap((w) => w.themes))],
+    [webinaires]
+  );
+
+  const filteredWebinaires = useMemo(
+    () =>
+      webinaires.filter((w) => {
+        if (selectedStatus !== "all" && w.statut !== selectedStatus) return false;
+        if (selectedTheme !== "all" && !w.themes.includes(selectedTheme)) return false;
+
+        if (!searchTerm) return true;
+
+        const s = searchTerm.toLowerCase();
         return (
-          <Badge className="bg-red-500 text-white border-0 animate-pulse">
-            <Sparkles className="w-3 h-3 mr-1" />
-            EN DIRECT
-          </Badge>
+          w.titre.toLowerCase().includes(s) ||
+          w.description.toLowerCase().includes(s) ||
+          w.formateur.nomComplet.toLowerCase().includes(s) ||
+          w.themes.some((t) => t.toLowerCase().includes(s))
         );
-      case "a-venir":
-        return (
-          <Badge className="bg-blue-500 text-white border-0">
-            <Calendar className="w-3 h-3 mr-1" />
-            À VENIR
-          </Badge>
-        );
-      case "termine":
-        return (
-          <Badge className="bg-green-600 text-white border-0">
-            <CheckCircle2 className="w-3 h-3 mr-1" />
-            REPLAY DISPONIBLE
-          </Badge>
-        );
-      default:
-        return null;
+      }),
+    [webinaires, selectedStatus, selectedTheme, searchTerm]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filteredWebinaires.length / ITEMS_PER_PAGE));
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedWebinaires = filteredWebinaires.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedStatus, selectedTheme, searchTerm]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
     }
-  };
-
-  const formatDate = (date: Date | string) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return new Intl.DateTimeFormat("fr-FR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(dateObj);
-  };
+  }, [currentPage, totalPages]);
 
   return (
     <>
       <PageBanner
-        breadcrumb={[
-          { label: "Accueil", href: "/" },
-          { label: "Webinaires" }
-        ]}
+        breadcrumb={[{ label: "Accueil", href: "/" }, { label: "Webinaires" }]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Webinaires Live",
-            subtitle: "Participez à nos sessions live avec des experts et posez vos questions en direct",
-            badge: {
-              icon: "+",
-              number: "60",
-              text: "Webinaires par mois",
-              subtext: "Thématiques variées"
-            },
-            trustBadges: [
-              {
-                icon: "users",
-                color: "orange",
-                title: "5,000+",
-                subtitle: "Participants actifs"
-              },
-              {
-                icon: "users",
-                color: "purple",
-                title: "Sessions quotidiennes",
-                subtitle: "Horaires flexibles"
-              },
-              {
-                icon: "check",
-                color: "green",
-                title: "Certificat offert",
-                subtitle: "Attestation de présence"
-              }
-            ],
+            subtitle: "Les webinaires proviennent directement du catalogue formations API",
             buttons: [
-              { label: "S'inscrire maintenant", href: "#webinaires", icon: <Calendar className="h-5 w-5" /> },
-              { label: "Voir formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
-            ]
+              { label: "Voir les sessions", href: "#webinaires", icon: <Calendar className="h-5 w-5" /> },
+              { label: "Catalogue complet", href: "/catalogue", variant: "outline", icon: <Video className="h-5 w-5" /> },
+            ],
           },
-          {
-            image: "/images/formation-agriculture.png",
-            title: "Sessions Interactives",
-            subtitle: "Échangez en direct avec nos formateurs experts",
-            badge: {
-              number: "100%",
-              text: "Interaction garantie",
-              subtext: "Q&A en direct"
-            },
-            trustBadges: [
-              {
-                icon: "users",
-                color: "blue",
-                title: "Experts reconnus",
-                subtitle: "Leaders du secteur"
-              },
-              {
-                icon: "users",
-                color: "orange",
-                title: "Petits groupes",
-                subtitle: "Max 100 participants"
-              },
-              {
-                icon: "check",
-                color: "green",
-                title: "Documentation fournie",
-                subtitle: "Support PDF inclus"
-              }
-            ],
-            buttons: [
-              { label: "Voir le calendrier", href: "#webinaires", icon: <Calendar className="h-5 w-5" /> }
-            ]
-          },
-          {
-            image: "/images/formation-tech.png",
-            title: "Replays Disponibles",
-            subtitle: "Accédez aux enregistrements de nos sessions passées",
-            badge: {
-              icon: "📺 ",
-              number: "200+",
-              text: "Replays disponibles",
-              subtext: "Bibliothèque complète"
-            },
-            trustBadges: [
-              {
-                icon: "users",
-                color: "purple",
-                title: "Accès illimité",
-                subtitle: "24/7 à la demande"
-              },
-              {
-                icon: "check",
-                color: "green",
-                title: "Qualité HD",
-                subtitle: "Vidéo optimisée"
-              },
-              {
-                icon: "building",
-                color: "blue",
-                title: "Ressources incluses",
-                subtitle: "Slides et documents"
-              }
-            ],
-            buttons: [
-              { label: "Voir les replays", href: "/ressources/webinaires", icon: <BookOpen className="h-5 w-5" /> }
-            ]
-          }
         ]}
       />
 
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-50" id="webinaires">
         <div className="container mx-auto px-6 lg:px-16 max-w-7xl py-8 lg:py-12">
+          <div className="mb-6 grid gap-4 lg:grid-cols-3">
+            <SearchBar
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="Rechercher un webinaire..."
+              className="lg:col-span-2"
+            />
+            <div className="rounded-xl border bg-white px-4 py-2 text-sm text-slate-600">
+              <span className="font-semibold text-slate-900">{filteredWebinaires.length}</span> resultat(s)
+            </div>
+          </div>
 
-        {/* Main layout with sidebar */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Sidebar Filtres */}
-          <aside className="w-full lg:w-64 flex-shrink-0">
-            <Card className="p-6 border-2 border-slate-200 shadow-lg sticky top-24 bg-white">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-cpu-orange rounded-full"></div>
-                  Filtres
-                </h2>
-                {(selectedStatus !== "all" || selectedTheme !== "all") && (
-                  <button
-                    onClick={() => {
-                      setSelectedStatus("all");
-                      setSelectedTheme("all");
-                    }}
-                    className="text-xs text-cpu-orange hover:underline font-medium"
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            <aside className="w-full lg:w-72 flex-shrink-0 space-y-5">
+              <Card className="p-5 border-2 border-slate-200 bg-white">
+                <h2 className="font-bold text-slate-900 mb-4">Statut</h2>
+                <div className="space-y-2">
+                  {statuses.map((status) => {
+                    const count = webinaires.filter((w) => status.value === "all" || w.statut === status.value).length;
+                    return (
+                      <Button
+                        key={status.value}
+                        onClick={() => setSelectedStatus(status.value)}
+                        variant="ghost"
+                        className={`w-full justify-between ${
+                          selectedStatus === status.value ? "bg-cpu-orange text-white hover:bg-cpu-orange" : ""
+                        }`}
+                      >
+                        <span>{status.label}</span>
+                        <Badge className={selectedStatus === status.value ? "bg-white/20 text-white" : "bg-slate-100 text-slate-700"}>
+                          {count}
+                        </Badge>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </Card>
+
+              <Card className="p-5 border-2 border-slate-200 bg-white">
+                <h2 className="font-bold text-slate-900 mb-4">Theme</h2>
+                <div className="space-y-2 max-h-72 overflow-auto pr-1">
+                  {themes.map((theme) => (
+                    <Button
+                      key={theme}
+                      onClick={() => setSelectedTheme(theme)}
+                      variant="ghost"
+                      className={`w-full justify-start ${selectedTheme === theme ? "bg-cpu-orange text-white hover:bg-cpu-orange" : ""}`}
+                    >
+                      <span className="truncate">{theme === "all" ? "Tous les themes" : theme}</span>
+                    </Button>
+                  ))}
+                </div>
+              </Card>
+            </aside>
+
+            <div className="flex-1 min-w-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-sm text-slate-600">Affichage</p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
                   >
-                    Réinitialiser
-                  </button>
-                )}
+                    <Grid3x3 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "compact" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("compact")}
+                    className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
-              
-              {/* Filtres actifs */}
-              {(selectedStatus !== "all" || selectedTheme !== "all") && (
-                <div className="mb-6 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                  <p className="text-xs font-semibold text-orange-900 mb-2">Filtres actifs:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedStatus !== "all" && (
-                      <Badge className="bg-cpu-orange text-white text-xs">
-                        {selectedStatus === "a-venir" ? "À venir" : selectedStatus === "live" ? "En direct" : "Replays"}
-                      </Badge>
-                    )}
-                    {selectedTheme !== "all" && (
-                      <Badge className="bg-slate-700 text-white text-xs">
-                        {selectedTheme}
-                      </Badge>
-                    )}
+
+              {isLoading && webinaires.length === 0 && (
+                <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
+                  {Array.from({ length: 4 }).map((_, idx) => (
+                    <Card key={idx} className="h-56 animate-pulse bg-slate-100 border-0" />
+                  ))}
+                </div>
+              )}
+
+              {error && (
+                <Card className="p-6 border-red-200 bg-red-50 text-red-800">
+                  Erreur chargement API webinaires. Veuillez reessayer.
+                </Card>
+              )}
+
+              {!isLoading && !error && (
+                <div
+                  className={
+                    viewMode === "grid"
+                      ? "grid sm:grid-cols-2 gap-4 md:gap-6"
+                      : viewMode === "compact"
+                      ? "grid md:grid-cols-3 gap-4"
+                      : "space-y-4"
+                  }
+                >
+                  {paginatedWebinaires.map((webinaire) => {
+                    const isListMode = viewMode === "list";
+                    const isCompactMode = viewMode === "compact";
+
+                    return (
+                      <Card
+                        key={webinaire.id}
+                        className={`border-2 transition-all duration-300 ${
+                          webinaire.statut === "live" ? "border-red-500 shadow-red-100" : "border-slate-200 hover:border-cpu-orange"
+                        } ${isListMode ? "flex flex-row p-0 overflow-hidden" : "p-4"}`}
+                      >
+                        <div className={`relative rounded-lg overflow-hidden ${isListMode ? "h-full w-56 flex-shrink-0" : isCompactMode ? "h-28 mb-3" : "h-40 mb-4"}`}>
+                          <img src={webinaire.thumbnail} alt={webinaire.titre} className="w-full h-full object-cover" />
+                          <div className="absolute top-3 right-3">{statusBadge(webinaire.statut)}</div>
+                        </div>
+
+                        <div className={isListMode ? "p-4 flex-1" : ""}>
+                          <Badge className="bg-slate-100 text-slate-700 border-0 mb-2 text-xs">{webinaire.themes[0]}</Badge>
+                          <h3 className={`${isCompactMode ? "text-base" : "text-xl"} font-bold text-slate-900 mb-1 line-clamp-2`}>
+                            {webinaire.titre}
+                          </h3>
+                          {!isCompactMode && <p className="text-sm text-slate-600 line-clamp-2 mb-3">{webinaire.description}</p>}
+
+                          <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-4">
+                            <div className="flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5 text-cpu-orange" />
+                              <span className="truncate">{formatWebinaireDate(webinaire.date, false)}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-cpu-orange" />
+                              <span>{webinaire.dureeMinutes} min</span>
+                            </div>
+                            {!isCompactMode && (
+                              <>
+                                <div className="flex items-center gap-1.5">
+                                  <Users className="w-3.5 h-3.5 text-cpu-orange" />
+                                  <span>{webinaire.inscrits} inscrits</span>
+                                </div>
+                                <div className="font-semibold text-green-600">{webinaire.gratuit ? "Gratuit" : `${webinaire.prix} FCFA`}</div>
+                              </>
+                            )}
+                          </div>
+
+                          <Button asChild size="sm" className={`w-full ${webinaire.statut === "live" ? "bg-red-500 hover:bg-red-600" : "bg-cpu-orange hover:bg-cpu-orange/90"} text-white`}>
+                            <Link href={`/webinaires/${webinaire.id}`}>
+                              {webinaire.statut === "live" ? "Rejoindre" : webinaire.statut === "a-venir" ? "S'inscrire" : "Voir replay"}
+                            </Link>
+                          </Button>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+
+              {!isLoading && !error && filteredWebinaires.length > 0 && (
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-sm text-slate-600">
+                    Page <span className="font-semibold text-slate-900">{currentPage}</span> sur <span className="font-semibold text-slate-900">{totalPages}</span>
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Precedent
+                    </Button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2))
+                      .map((pageNum) => (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          className={currentPage === pageNum ? "bg-cpu-orange text-white hover:bg-cpu-orange" : ""}
+                          onClick={() => setCurrentPage(pageNum)}
+                        >
+                          {pageNum}
+                        </Button>
+                      ))}
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Suivant
+                    </Button>
                   </div>
                 </div>
               )}
-              
-              {/* Filtrer par statut */}
-              <div className="mb-6 pb-6 border-b-2 border-slate-100">
-                <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
-                  <Video className="w-4 h-4 text-cpu-orange" />
-                  Statut
-                </h3>
-                <div className="space-y-2">
-                  {statuses.map((status) => {
-                    const count = webinairesMock.filter(w => status === "all" || w.statut === status).length;
-                    const Icon = status === "all" ? Video : status === "a-venir" ? Calendar : status === "live" ? Sparkles : Play;
-                    const colorClass = status === "live" ? "text-red-600" : status === "a-venir" ? "text-blue-600" : status === "termine" ? "text-green-600" : "text-slate-600";
-                    
-                    return (
-                      <Button
-                        key={status}
-                        onClick={() => setSelectedStatus(status)}
-                        variant="ghost"
-                        className={`w-full justify-between text-sm transition-all group ${
-                          selectedStatus === status
-                            ? "bg-cpu-orange text-white hover:bg-cpu-orange shadow-md scale-105"
-                            : "text-slate-700 hover:bg-slate-100 hover:scale-[1.02]"
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <Icon className={`w-4 h-4 ${selectedStatus === status ? "text-white" : colorClass}`} />
-                          {status === "all"
-                            ? "Tous"
-                            : status === "a-venir"
-                            ? "À venir"
-                            : status === "live"
-                            ? "En direct"
-                            : "Replays"}
-                        </span>
-                        <Badge 
-                          className={`text-xs ${
-                            selectedStatus === status
-                              ? "bg-white/20 text-white border-0"
-                              : "bg-slate-200 text-slate-700 border-0"
-                          }`}
-                        >
-                          {count}
-                        </Badge>
-                      </Button>
-                    );
-                  })}
+
+              {!isLoading && !error && filteredWebinaires.length === 0 && (
+                <div className="text-center py-16">
+                  <Video className="w-14 h-14 text-slate-300 mx-auto mb-3" />
+                  <p className="text-slate-500">Aucun webinaire ne correspond aux filtres.</p>
                 </div>
-              </div>
-
-              {/* Filtrer par thème */}
-              <div>
-                <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-cpu-orange" />
-                  Thème
-                </h3>
-                <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                  {themes.map((theme) => {
-                    const count = webinairesMock.filter(w => theme === "all" || w.themes.includes(theme)).length;
-                    
-                    return (
-                      <Button
-                        key={theme}
-                        onClick={() => setSelectedTheme(theme)}
-                        variant="ghost"
-                        className={`w-full justify-between text-sm transition-all group ${
-                          selectedTheme === theme
-                            ? "bg-cpu-orange text-white hover:bg-cpu-orange shadow-md scale-105"
-                            : "text-slate-700 hover:bg-slate-100 hover:scale-[1.02]"
-                        }`}
-                      >
-                        <span className="truncate flex-1 text-left">{theme === "all" ? "Tous les thèmes" : theme}</span>
-                        <Badge 
-                          className={`text-xs ml-2 ${
-                            selectedTheme === theme
-                              ? "bg-white/20 text-white border-0"
-                              : "bg-slate-200 text-slate-700 border-0"
-                          }`}
-                        >
-                          {count}
-                        </Badge>
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Info helper */}
-              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs text-blue-800 leading-relaxed">
-                  <span className="font-semibold">Astuce:</span> Combinez plusieurs filtres pour affiner votre recherche
-                </p>
-              </div>
-            </Card>
-          </aside>
-
-          {/* Contenu principal */}
-          <div className="flex-1 min-w-0">
-            {/* Nombre de résultats + View Toggle */}
-            <div className="mb-6 flex items-center justify-between">
-              <p className="text-sm text-slate-600">
-                <span className="font-semibold text-slate-900">{filteredWebinaires.length}</span> webinaire{filteredWebinaires.length > 1 ? "s" : ""} trouvé{filteredWebinaires.length > 1 ? "s" : ""}
-              </p>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant={viewMode === "grid" ? "default" : "outline"} 
-                  size="sm" 
-                  onClick={() => setViewMode("grid")}
-                  className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
-                >
-                  <Grid3x3 className="w-4 h-4" />
-                </Button>
-                <Button 
-                  variant={viewMode === "list" ? "default" : "outline"} 
-                  size="sm" 
-                  onClick={() => setViewMode("list")}
-                  className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-                <Button 
-                  variant={viewMode === "compact" ? "default" : "outline"} 
-                  size="sm" 
-                  onClick={() => setViewMode("compact")}
-                  className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Liste des webinaires */}
-            <div className={(viewMode === "grid"
-                ? "grid sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6"
-                : viewMode === "compact"
-                ? "grid md:grid-cols-3 gap-4"
-                : "space-y-4") + " mb-8"}>
-          {filteredWebinaires.map((webinaire) => {
-            const isListMode = viewMode === "list";
-            const isCompactMode = viewMode === "compact";
-            const isLive = webinaire.statut === "live";
-            const borderColor = isLive ? "border-red-500 shadow-lg shadow-red-100" : "border-slate-100 hover:border-cpu-orange";
-            const cardClassName = "border-2 transition-all duration-300 " + borderColor + " " + (isListMode ? "flex flex-row p-0 overflow-hidden" : isCompactMode ? "p-3" : "p-4 md:p-5");
-            const imageHeight = isListMode ? "h-full w-48" : isCompactMode ? "h-24" : "h-32 md:h-40";
-            const padding = isCompactMode ? "p-3" : isListMode ? "p-4 flex-1" : "p-0";
-            const titleSize = isCompactMode ? "text-sm" : "text-lg md:text-xl";
-            const textSizeSmall = isCompactMode ? "text-xs" : "text-xs md:text-sm";
-            const iconSize = isCompactMode ? "w-3 h-3" : "w-3 h-3 md:w-4 md:h-4";
-            const buttonText = isLive ? "Rejoindre" : webinaire.statut === "a-venir" ? "S'inscrire" : isCompactMode ? "Voir" : "Replay";
-            const ButtonIcon = isLive ? Video : webinaire.statut === "a-venir" ? Calendar : Play;
-            const buttonBg = isLive ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" : "bg-cpu-orange hover:bg-cpu-orange/90 text-white";
-            const formateurInitial = webinaire.formateur.nom.charAt(0);
-            const formateurNomComplet = webinaire.formateur.prenom + " " + webinaire.formateur.nom;
-            const dateFormatted = formatDate(webinaire.date).split(" à ")[0];
-            
-            return (
-            <Card key={webinaire.id} className={cardClassName}>
-              {/* Image & Badge */}
-              <div className={"relative rounded-lg overflow-hidden " + imageHeight + " " + (isListMode ? "flex-shrink-0" : "mb-4")}>
-                <img src={webinaire.thumbnail} alt={webinaire.titre} className="w-full h-full object-cover" />
-                <div className="absolute top-4 right-4">
-                  {getStatusBadge(webinaire.statut)}
-                </div>
-                {isLive && (
-                  <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center">
-                    <div className="bg-red-500 text-white px-6 py-3 rounded-full font-bold text-lg shadow-lg animate-pulse">
-                      EN DIRECT MAINTENANT
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Infos */}
-              <div className={(isListMode ? "flex-1 p-4" : padding) + " space-y-3"}>
-                <div>
-                  <Badge className="bg-slate-100 text-slate-700 border-0 mb-2 text-xs">
-                    {webinaire.themes[0]}
-                  </Badge>
-                  <h3 className={titleSize + " font-bold text-slate-900 mb-1 line-clamp-2"}>
-                    {webinaire.titre}
-                  </h3>
-                  {!isCompactMode && (
-                    <p className={textSizeSmall + " text-slate-600 line-clamp-2"}>
-                      {webinaire.description}
-                    </p>
-                  )}
-                </div>
-
-                {/* Formateur */}
-                {!isCompactMode && (
-                  <div className="flex items-center gap-2 py-2 border-y border-slate-100">
-                    <div className="w-8 h-8 rounded-full bg-cpu-orange flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                      {formateurInitial}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">
-                        {formateurNomComplet}
-                      </p>
-                      <p className="text-xs text-slate-600 truncate">
-                        Expert en {webinaire.formateur.domaines[0]}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Détails */}
-                <div className={"grid gap-2 " + textSizeSmall + " " + (isCompactMode ? "grid-cols-1" : "grid-cols-2")}>
-                  <div className={"flex items-center gap-1 text-slate-600 " + (isCompactMode ? "gap-1" : "md:gap-2")}>
-                    <Calendar className={iconSize + " text-cpu-orange flex-shrink-0"} />
-                    <span className="truncate">{dateFormatted}</span>
-                  </div>
-                  <div className={"flex items-center gap-1 text-slate-600 " + (isCompactMode ? "gap-1" : "md:gap-2")}>
-                    <Clock className={iconSize + " text-cpu-orange flex-shrink-0"} />
-                    <span className="truncate">{webinaire.duree} min</span>
-                  </div>
-                  {!isCompactMode && (
-                    <>
-                      <div className="flex items-center gap-1 md:gap-2 text-slate-600">
-                        <Users className={iconSize + " text-cpu-orange flex-shrink-0"} />
-                        <span className="truncate">{webinaire.inscrits} inscrits</span>
-                      </div>
-                      {webinaire.gratuit && (
-                        <div className="flex items-center gap-1 md:gap-2 text-green-600 font-semibold">
-                          <TrendingUp className={iconSize + " flex-shrink-0"} />
-                          <span>Gratuit</span>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="pt-3">
-                  <Link href={"/webinaires/" + webinaire.id} className="block">
-                    <Button size="sm" className={"w-full " + textSizeSmall + " " + buttonBg}>
-                      <ButtonIcon className={iconSize + " mr-1"} />
-                      <span>{buttonText}</span>
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </Card>
-            );
-          })}
-            </div>
-
-            {filteredWebinaires.length === 0 && (
-              <div className="text-center py-12 md:py-16">
-                <Video className="w-12 h-12 md:w-16 md:h-16 text-slate-300 mx-auto mb-3 md:mb-4" />
-                <p className="text-slate-500 text-sm md:text-base">
-                  Aucun webinaire ne correspond à vos critères de filtrage.
-                </p>
-              </div>
-            )}
-
-            {/* CTA Final */}
-            <div className="mt-8 md:mt-12 lg:mt-16 bg-cpu-orange rounded-xl md:rounded-2xl p-8 md:p-12 text-center text-white">
-              <h3 className="text-2xl md:text-3xl font-bold mb-3">Vous ne trouvez pas ce que vous cherchez ?</h3>
-              <p className="text-base md:text-lg text-orange-50 mb-6">Découvrez nos formations complètes avec accompagnement personnalisé.</p>
-              <Link href="/catalogue">
-                <Button className="bg-white text-cpu-orange hover:bg-orange-50 font-bold">
-                  Explorer nos formations
-                </Button>
-              </Link>
+              )}
             </div>
           </div>
-        </div>
         </div>
       </div>
     </>
   );
 }
-

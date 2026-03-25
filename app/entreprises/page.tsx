@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -565,7 +565,7 @@ export default function EntreprisesPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Investissez dans vos équipes, récoltez la performance",
             subtitle: "200+ entreprises nous font confiance pour développer les compétences de leurs collaborateurs",
             badge: {
@@ -604,7 +604,7 @@ export default function EntreprisesPage() {
             title: "Solutions Sur Mesure pour Entreprises",
             subtitle: "Prise en charge FDFP jusqu'à 70% - Formations adaptées à vos besoins",
             badge: {
-              icon: "🎯 ",
+              icon: "?? ",
               number: "70%",
               text: "Prise en charge FDFP",
               subtext: "Sur vos formations"
@@ -634,7 +634,7 @@ export default function EntreprisesPage() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "ROI Mesurable & Certifications",
             subtitle: "Formations certifiantes avec suivi des performances de vos équipes",
             badge: {
@@ -1608,7 +1608,7 @@ export default function EntreprisesPage() {
                   </Button>
 
                   <p className="text-xs text-center text-slate-500">
-                    ⚡ Réponse sous 24h ouvrées • 📞 Ou appelez-nous : +225 27 20 21 22 23
+                    ? Réponse sous 24h ouvrées • ?? Ou appelez-nous : +225 27 20 21 22 23
                   </p>
                 </form>
               </div>

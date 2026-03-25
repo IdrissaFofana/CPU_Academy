@@ -65,6 +65,11 @@ export function PageBanner({
 
   const currentData = slides[currentSlide];
 
+  // Safety check: return null if no slides or currentData is undefined
+  if (!currentData) {
+    return null;
+  }
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900 text-white min-h-[50vh]">
       {/* Logo en background */}

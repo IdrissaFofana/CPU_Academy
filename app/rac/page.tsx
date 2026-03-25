@@ -303,7 +303,7 @@ export default function RACPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Reconnaissance des Acquis de Compétences",
             subtitle: "Obtenez une certification officielle basée sur votre expérience professionnelle",
             badge: {
@@ -365,7 +365,7 @@ export default function RACPage() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Certification Sans Formation Complète",
             subtitle: "Gagnez du temps en validant directement vos acquis professionnels",
             badge: {

@@ -1,9 +1,9 @@
 "use client";
 
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { SlidersHorizontal, X, Target, MapPin, Building2, BarChart3, Monitor, Check } from "lucide-react";
 import type { Niveau, Format } from "@/types";
 
@@ -60,6 +60,27 @@ export function CatalogueFilters({
   onClose,
   isMobile = false
 }: FiltersProps) {
+  const objectifSelectOptions = [
+    { value: "all", label: "Tous" },
+    ...objectifOptions.map((obj) => ({ value: obj.value, label: obj.label })),
+  ];
+  const regionSelectOptions = [
+    { value: "all", label: "Toutes" },
+    ...regionOptions.map((reg) => ({ value: reg, label: reg })),
+  ];
+  const secteurSelectOptions = [
+    { value: "all", label: "Tous" },
+    ...secteurOptions.map((sect) => ({ value: sect, label: sect })),
+  ];
+  const niveauSelectOptions = [
+    { value: "all", label: "Tous" },
+    ...niveauOptions.map((niv) => ({ value: niv, label: niv })),
+  ];
+  const formatSelectOptions = [
+    { value: "all", label: "Tous" },
+    ...formatOptions.map((fmt) => ({ value: fmt, label: fmt })),
+  ];
+
   return (
     <div className="bg-white rounded-2xl p-6 border-2 border-slate-100 shadow-lg h-full overflow-y-auto">
       {/* Filter Header */}
@@ -92,19 +113,15 @@ export function CatalogueFilters({
           <Target className="w-4 h-4 text-cpu-orange" />
           Objectif métier
         </Label>
-        <Select value={objectif} onValueChange={setObjectif}>
-          <SelectTrigger id={isMobile ? "objectif-mobile" : "objectif"} className="h-11">
-            <SelectValue placeholder="Tous les objectifs" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous</SelectItem>
-            {objectifOptions.map((obj) => (
-              <SelectItem key={obj.value} value={obj.value}>
-                {obj.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          triggerId={isMobile ? "objectif-mobile" : "objectif"}
+          value={objectif}
+          onValueChange={setObjectif}
+          options={objectifSelectOptions}
+          placeholder="Tous les objectifs"
+          searchPlaceholder="Rechercher un objectif..."
+          emptyText="Aucun objectif trouvé"
+        />
       </div>
 
       {/* Région */}
@@ -113,19 +130,15 @@ export function CatalogueFilters({
           <MapPin className="w-4 h-4 text-cpu-orange" />
           Région
         </Label>
-        <Select value={region} onValueChange={setRegion}>
-          <SelectTrigger id={isMobile ? "region-mobile" : "region"} className="h-11">
-            <SelectValue placeholder="Toutes les régions" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Toutes</SelectItem>
-            {regionOptions.map((reg) => (
-              <SelectItem key={reg} value={reg}>
-                {reg}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          triggerId={isMobile ? "region-mobile" : "region"}
+          value={region}
+          onValueChange={setRegion}
+          options={regionSelectOptions}
+          placeholder="Toutes les régions"
+          searchPlaceholder="Rechercher une région..."
+          emptyText="Aucune région trouvée"
+        />
       </div>
 
       {/* Secteur */}
@@ -134,19 +147,15 @@ export function CatalogueFilters({
           <Building2 className="w-4 h-4 text-cpu-orange" />
           Secteur
         </Label>
-        <Select value={secteur} onValueChange={setSecteur}>
-          <SelectTrigger id={isMobile ? "secteur-mobile" : "secteur"} className="h-11">
-            <SelectValue placeholder="Tous les secteurs" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous</SelectItem>
-            {secteurOptions.map((sect) => (
-              <SelectItem key={sect} value={sect}>
-                {sect}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          triggerId={isMobile ? "secteur-mobile" : "secteur"}
+          value={secteur}
+          onValueChange={setSecteur}
+          options={secteurSelectOptions}
+          placeholder="Tous les secteurs"
+          searchPlaceholder="Rechercher un secteur..."
+          emptyText="Aucun secteur trouvé"
+        />
       </div>
 
       {/* Niveau */}
@@ -155,19 +164,15 @@ export function CatalogueFilters({
           <BarChart3 className="w-4 h-4 text-cpu-orange" />
           Niveau
         </Label>
-        <Select value={niveau} onValueChange={setNiveau}>
-          <SelectTrigger id={isMobile ? "niveau-mobile" : "niveau"} className="h-11">
-            <SelectValue placeholder="Tous les niveaux" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous</SelectItem>
-            {niveauOptions.map((niv) => (
-              <SelectItem key={niv} value={niv}>
-                {niv}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          triggerId={isMobile ? "niveau-mobile" : "niveau"}
+          value={niveau}
+          onValueChange={setNiveau}
+          options={niveauSelectOptions}
+          placeholder="Tous les niveaux"
+          searchPlaceholder="Rechercher un niveau..."
+          emptyText="Aucun niveau trouvé"
+        />
       </div>
 
       {/* Format */}
@@ -176,19 +181,15 @@ export function CatalogueFilters({
           <Monitor className="w-4 h-4 text-cpu-orange" />
           Format
         </Label>
-        <Select value={format} onValueChange={setFormat}>
-          <SelectTrigger id={isMobile ? "format-mobile" : "format"} className="h-11">
-            <SelectValue placeholder="Tous les formats" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous</SelectItem>
-            {formatOptions.map((fmt) => (
-              <SelectItem key={fmt} value={fmt}>
-                {fmt}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          triggerId={isMobile ? "format-mobile" : "format"}
+          value={format}
+          onValueChange={setFormat}
+          options={formatSelectOptions}
+          placeholder="Tous les formats"
+          searchPlaceholder="Rechercher un format..."
+          emptyText="Aucun format trouvé"
+        />
       </div>
 
       {/* Options booléennes */}

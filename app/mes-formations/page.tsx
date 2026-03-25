@@ -196,7 +196,7 @@ export default function MesFormationsPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Mes Formations",
             subtitle: "Suivez votre progression et reprenez là où vous vous êtes arrêté",
             buttons: [

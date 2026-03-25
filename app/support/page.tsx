@@ -17,7 +17,7 @@ export default function SupportPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Support & Assistance",
             subtitle: "Contactez-nous pour toute question ou assistance",
             buttons: [

@@ -8,6 +8,8 @@ interface Partenaire {
   nom: string;
   logo: string;
   lien?: string;
+  description?: string | null;
+  categorie?: string | null;
   type?: string;
 }
 
@@ -22,6 +24,7 @@ interface Membre {
   odre?: number;
   reseauxSociaux?: {
     linkedin?: string;
+    twitter?: string;
     email?: string;
   };
 }
@@ -43,8 +46,8 @@ export function usePartenairesForSiteWeb(params: UsePartenairesParams = {}) {
       setIsLoading(true);
       setError(null);
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cpupme.com';
-        const endpoint = `${apiUrl}/api/partenaire/for-site-web${params.type ? `?type=${params.type}` : ''}`;
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://back.cpupme.com';
+        const endpoint = `${apiUrl}/api/formation/partenaire`;
         
         const response = await fetch(endpoint);
         if (!response.ok) {
@@ -52,8 +55,8 @@ export function usePartenairesForSiteWeb(params: UsePartenairesParams = {}) {
         }
         
         const result = await response.json();
-        // L'API retourne { success: true, data: { success: true, data: [...] } }
-        const partenairesData = result.data?.data || result.data || [];
+        // L'API retourne { success: true, data: [...] }.
+        const partenairesData = Array.isArray(result.data) ? result.data : result.data?.data || [];
         setData(partenairesData);
         
         if (process.env.NODE_ENV === 'development') {
@@ -97,8 +100,8 @@ export function useEquipeForSiteWeb() {
       setIsLoading(true);
       setError(null);
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.cpupme.com';
-        const endpoint = `${apiUrl}/api/siteequipe/for-site-web`;
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://back.cpupme.com';
+        const endpoint = `${apiUrl}/api/formation/siteequipe`;
         
         const response = await fetch(endpoint);
         if (!response.ok) {
@@ -106,8 +109,8 @@ export function useEquipeForSiteWeb() {
         }
         
         const result = await response.json();
-        // L'API retourne { success: true, data: { success: true, data: [...] } }
-        const equipeData = result.data?.data || result.data || [];
+        // L'API retourne { success: true, data: [...] }
+        const equipeData = Array.isArray(result.data) ? result.data : result.data?.data || [];
         setData(equipeData);
         
         if (process.env.NODE_ENV === 'development') {

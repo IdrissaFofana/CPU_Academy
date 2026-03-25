@@ -11,13 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { PageBanner } from "@/components/layout/PageBanner";
-import { formationsMock } from "@/data/mock";
 import { objectifsMetier, regions } from "@/data/constants";
 import { Search, Filter, X, Grid3x3, List, LayoutGrid, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal, Clock, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useFormations } from "@/hooks/useFormations";
+import type { Formation } from "@/types";
+import { mapApiFormationToAppFormation } from "@/lib/adapters/formation-adapter";
 
 type ViewMode = "grid" | "list" | "compact";
 type SortOption = "recent" | "popular" | "title" | "price";
@@ -27,7 +28,7 @@ const DEFAULT_SECTEURS = ["Secteur Primaire", "Secteur Secondaire", "Secteur Ter
 const DEFAULT_NIVEAUX = ["Débutant", "Intermédiaire", "Avancé"] as const;
 const DEFAULT_FORMATS = ["Vidéo", "Live", "Présentiel", "Hybride"] as const;
 
-type CatalogueFormation = (typeof formationsMock)[number];
+type CatalogueFormation = Formation;
 
 export function CatalogueContent() {
   const searchParams = useSearchParams();
@@ -51,89 +52,23 @@ export function CatalogueContent() {
   const [expertFilter, setExpertFilter] = useState<string | null>(null);
   const [regionFilter, setRegionFilter] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [resultCount, setResultCount] = useState(0); // Pour aria-live
+  // resultCount is derived from formationsFiltrees.length below
   const [currentPage, setCurrentPage] = useState(1); // Phase 3: Pagination
-  const { formations: apiFormations } = useFormations({ limit: 200 });
-
-  const mapApiFormation = (formation: any): CatalogueFormation => {
-    const levelMap: Record<string, CatalogueFormation["niveau"]> = {
-      beginner: "Débutant",
-      intermediate: "Intermédiaire",
-      advanced: "Avancé",
-      debutant: "Débutant",
-      intermediaire: "Intermédiaire",
-      avance: "Avancé",
-      "Débutant": "Débutant",
-      "Intermédiaire": "Intermédiaire",
-      "Avancé": "Avancé",
-    };
-
-    const modeMap: Record<string, CatalogueFormation["format"]> = {
-      presentiel: "Présentiel",
-      hybride: "Hybride",
-      live: "Live",
-      webinaire: "Live",
-      video: "Vidéo",
-      document: "Vidéo",
-    };
-
-    const now = new Date().toISOString();
-    const rawDuration = formation.duration ?? formation.duree ?? 0;
-    const durationHours = Math.max(1, Number(rawDuration) || 1);
-    const mode = (formation.mode || formation.format || "").toString().toLowerCase();
-
-    return {
-      id: formation.id?.toString() || formation._id?.toString() || "",
-      titre: formation.title || formation.titre || "Formation",
-      slug: formation.slug || formation.titre?.toString().toLowerCase().replace(/\s+/g, "-") || "",
-      description: formation.description || formation.resume || "",
-      resume: formation.shortDescription || formation.description || formation.resume || "",
-      image: formation.image || formation.thumbnail,
-      modalite: formation.mode || formation.modalite || "En ligne",
-      niveau: levelMap[formation.level] || levelMap[formation.niveau] || "Débutant",
-      secteur: formation.category?.name || formation.category || formation.secteur || "Formation",
-      objectifs: formation.objectives || formation.objectifs || [],
-      prerequis: formation.prerequisites || formation.prerequis || [],
-      livrables: formation.livrables || [],
-      competences: formation.tags || formation.competences || [],
-      format: modeMap[mode] || formation.format || "Vidéo",
-      duree: durationHours,
-      langue: formation.langue || "Français",
-      moduleLie: formation.moduleLie,
-      objectifMetier: formation.objectifMetier,
-      parcours: formation.parcours || [],
-      region: formation.region || formation.location,
-      ville: formation.ville,
-      expertId: formation.instructorId || formation.formateur_id || "",
-      expert: formation.expert,
-      certifiant: Boolean(formation.certifiant || formation.certification_delivrer_badge),
-      certificat: formation.certificat,
-      gratuit: formation.isPaid === false || formation.price === 0 || formation.gratuit === true,
-      prixPublic: formation.price ?? formation.prixPublic ?? formation.prix ?? 0,
-      prixMembre: formation.price_member ?? formation.prixMembre ?? formation.prixMembre ?? undefined,
-      modules: formation.modules || [],
-      chapitres: formation.chapitres || [],
-      nbInscrits: formation.totalStudents || formation.nbInscrits,
-      notesMoyenne: formation.rating || formation.notesMoyenne,
-      tauxCompletion: formation.tauxCompletion,
-      statut: formation.status === "published" || formation.statut === "publié"
-        ? "publié"
-        : formation.status === "archived" || formation.statut === "archivé"
-        ? "archivé"
-        : "brouillon",
-      dateCreation: formation.created_at || formation.dateCreation || now,
-      dateModification: formation.updated_at || formation.dateModification || now,
-      datePublication: formation.datePublication || formation.updated_at || undefined,
-      badges: formation.badges || [],
-    };
-  };
+  
+  // Appel API avec paramètres de filtrage (search, category, level)
+  const { formations: apiFormations, isLoading: apiLoading, error: apiError } = useFormations({ 
+    limit: 200,
+    search: debouncedMotCle || undefined,
+    categoryId: secteur !== "all" ? secteur : undefined,
+    level: niveau !== "all" ? niveau : undefined,
+  });
 
   const apiFormationsNormalized = useMemo(
-    () => apiFormations.map(mapApiFormation),
+    () => apiFormations.map((item) => mapApiFormationToAppFormation(item) as CatalogueFormation),
     [apiFormations]
   );
 
-  const baseFormations = apiFormationsNormalized.length > 0 ? apiFormationsNormalized : formationsMock;
+  const baseFormations = apiFormationsNormalized;
 
   const objectifOptions = useMemo(() => {
     const values = Array.from(new Set(baseFormations.map((formation) => formation.objectifMetier).filter(Boolean)));
@@ -260,9 +195,10 @@ export function CatalogueContent() {
       }
     });
 
-    setResultCount(filtered.length);
     return filtered;
   }, [baseFormations, debouncedMotCle, objectif, region, secteur, niveau, format, gratuit, certifiant, expertFilter, regionFilter, sortBy]);
+
+  const resultCount = formationsFiltrees.length;
 
   // Phase 3: Pagination - Extraire les formations à afficher
   const totalPages = Math.ceil(formationsFiltrees.length / ITEMS_PER_PAGE);
@@ -319,7 +255,7 @@ export function CatalogueContent() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Catalogue de formations",
             subtitle: `Découvrez nos ${stats.total} formations adaptées aux besoins des entreprises ivoiriennes`,
             buttons: [
@@ -336,7 +272,7 @@ export function CatalogueContent() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Solutions Pour Entreprises",
             subtitle: "Des programmes adaptés aux besoins de votre organisation",
             buttons: [
@@ -416,9 +352,11 @@ export function CatalogueContent() {
               {/* Toolbar */}
               <div className="bg-white rounded-2xl p-4 mb-6 border-2 border-slate-100 shadow-lg transition-all duration-300 animate-fade-in-up animation-delay-200">
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                  <p className="text-slate-600 font-medium" aria-live="polite" aria-atomic="true" role="status">
-                    <span className="text-cpu-orange font-bold text-lg">{resultCount}</span> formation{resultCount > 1 ? "s" : ""} trouvée{resultCount > 1 ? "s" : ""}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <p className="text-slate-600 font-medium" aria-live="polite" aria-atomic="true" role="status">
+                      <span className="text-cpu-orange font-bold text-lg">{resultCount}</span> formation{resultCount > 1 ? "s" : ""} trouvée{resultCount > 1 ? "s" : ""}
+                    </p>
+                  </div>
 
                   <div className="w-full lg:w-auto flex flex-wrap items-center gap-3 justify-start lg:justify-end">
                     {/* Sort */}

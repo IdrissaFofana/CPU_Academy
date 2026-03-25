@@ -8,6 +8,7 @@ import { ExpertCard } from "@/components/experts/ExpertCard";
 import { ExpertFilters } from "@/components/experts/ExpertFilters";
 import { useExpertFilters } from "@/hooks/useExpertFilters";
 import { useExpertFavorites } from "@/hooks/useExpertFavorites";
+import { useFormations } from "@/hooks/useFormations";
 import { 
   Users, 
   GraduationCap, 
@@ -22,135 +23,92 @@ import {
   LayoutGrid,
   BookOpen,
   UserPlus,
-  MapPin,
-  Filter,
-  SlidersHorizontal
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-const experts = [
-  {
-    id: 1,
-    nom: "Dr. Kouassi Amani",
-    specialite: "Entrepreneuriat & Management",
-    photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
-    experience: "15 ans",
-    formations: 45,
-    studentsCount: 1250,
-    rating: 4.9,
-    reviewsCount: 287,
-    certifications: ["MBA", "Consultant CEPICI", "PMP"],
-    domaines: ["Business Plan", "Stratégie", "Finance"],
-    localisation: "Plateau, Abidjan",
-    disponible: true,
-    bio: "Expert en entrepreneuriat avec plus de 15 ans d'expérience dans l'accompagnement des startups et PME africaines.",
-    tarif: "50 000 FCFA/h",
-    langues: ["Français", "Anglais"],
-    isTop: true,
-    isNew: false
-  },
-  {
-    id: 2,
-    nom: "Marie-Claire Koné",
-    specialite: "Marketing Digital & E-commerce",
-    photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-    experience: "10 ans",
-    formations: 38,
-    studentsCount: 980,
-    rating: 4.8,
-    reviewsCount: 245,
-    certifications: ["Google Analytics", "Meta Blueprint", "HubSpot"],
-    domaines: ["SEO", "Réseaux Sociaux", "Marketplace"],
-    localisation: "Cocody, Abidjan",
-    disponible: true,
-    bio: "Spécialiste du marketing digital et de la transformation numérique des entreprises en Afrique de l'Ouest.",
-    tarif: "45 000 FCFA/h",
-    langues: ["Français", "Anglais"],
-    isTop: true,
-    isNew: false
-  },
-  {
-    id: 3,
-    nom: "Jean-Baptiste Yao",
-    specialite: "Marchés Publics & AO",
-    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-    experience: "12 ans",
-    formations: 32,
-    studentsCount: 650,
-    rating: 4.9,
-    reviewsCount: 198,
-    certifications: ["Expert AO", "Juriste", "CIPS"],
-    domaines: ["Appels d'offres", "Conformité", "Rédaction"],
-    localisation: "Marcory, Abidjan",
-    disponible: false,
-    bio: "Consultant senior en marchés publics et procédures d'appels d'offres internationaux.",
-    tarif: "60 000 FCFA/h",
-    langues: ["Français"],
-    isTop: false,
-    isNew: false
-  },
-  {
-    id: 4,
-    nom: "Fatou Traoré",
-    specialite: "Finance & Bancabilité",
-    photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop",
-    experience: "18 ans",
-    formations: 41,
-    studentsCount: 1450,
-    rating: 5.0,
-    reviewsCount: 312,
-    certifications: ["CFA", "Expert Comptable", "ACCA"],
-    domaines: ["Comptabilité", "Audit", "Levée de fonds"],
-    localisation: "Deux Plateaux, Abidjan",
-    disponible: true,
-    bio: "Experte financière reconnue, spécialisée dans l'accompagnement des entreprises vers la bancabilité.",
-    tarif: "70 000 FCFA/h",
-    langues: ["Français", "Anglais"],
-    isTop: true,
-    isNew: false
-  },
-  {
-    id: 5,
-    nom: "Ibrahim Diallo",
-    specialite: "Production & Qualité",
-    photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-    experience: "14 ans",
-    formations: 28,
-    studentsCount: 540,
-    rating: 4.7,
-    reviewsCount: 176,
-    certifications: ["ISO 9001", "HACCP", "Lean Six Sigma"],
-    domaines: ["Qualité", "Process", "Certification"],
-    localisation: "Yopougon, Abidjan",
-    disponible: true,
-    bio: "Ingénieur qualité certifié avec une expertise approfondie en gestion de la production et des processus.",
-    tarif: "40 000 FCFA/h",
-    langues: ["Français"],
-    isTop: false,
-    isNew: false
-  },
-  {
-    id: 6,
-    nom: "Aya N'Guessan",
-    specialite: "Ressources Humaines",
-    photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
-    experience: "11 ans",
-    formations: 35,
-    studentsCount: 820,
-    rating: 4.8,
-    reviewsCount: 234,
-    certifications: ["GPEC", "Coach Certifiée", "SHRM"],
-    domaines: ["Recrutement", "Formation", "Management"],
-    localisation: "Angré, Abidjan",
-    disponible: true,
-    bio: "Coach RH certifiée, experte en développement des talents et transformation managériale.",
-    tarif: "50 000 FCFA/h",
-    langues: ["Français", "Anglais"],
-    isTop: false,
-    isNew: true
-  }
-];
+function hashText(value: string): number {
+  return value
+    .split("")
+    .reduce((acc, char) => (acc + char.charCodeAt(0)) % 1000, 0);
+}
+
+function mapFormationsToExperts(formations: any[]) {
+  const grouped = new Map<string, any>();
+
+  formations.forEach((formation) => {
+    const formateur = formation?.formateur;
+    if (!formateur) return;
+
+    const key =
+      formateur.id?.toString() ||
+      formateur.email ||
+      `${formateur.firstname || ""}-${formateur.lastname || ""}`;
+
+    if (!key) return;
+
+    const speciality =
+      formateur.titre ||
+      formation?.category?.name ||
+      formation?.category ||
+      "Formateur expert";
+
+    const domain =
+      formation?.category?.name ||
+      formation?.category ||
+      formation?.module?.name ||
+      speciality;
+
+    if (!grouped.has(key)) {
+      const hash = hashText(key);
+      const years = 5 + (hash % 16);
+      const baseRating = 4 + (hash % 10) / 10;
+
+      grouped.set(key, {
+        apiId: key,
+        email: formateur.email || "",
+        nom: `${formateur.firstname || ""} ${formateur.lastname || ""}`.trim() || "Expert CPU",
+        specialite: speciality,
+        photo: formateur.photo || "/images/expert-avatar.svg",
+        experience: `${years} ans`,
+        formations: 0,
+        studentsCount: 0,
+        rating: Number(Math.min(5, baseRating).toFixed(1)),
+        reviewsCount: 0,
+        certifications: [
+          ...(formation?.certification_delivrer_badge ? [formation?.certification_nom_badge || "Certifie"] : []),
+          ...(formateur.titre ? [formateur.titre] : []),
+        ].filter(Boolean),
+        domaines: [],
+        localisation: formation?.location || "Abidjan",
+        disponible: Boolean(formation?.isActive ?? true),
+        bio: formateur.bio || "Formateur CPU Academy",
+        tarif:
+          Number(formation?.price ?? 0) > 0
+            ? `${Math.round(Number(formation.price)).toLocaleString("fr-FR")} FCFA`
+            : "Tarif sur demande",
+        langues: ["Francais"],
+        isTop: false,
+        isNew: false,
+      });
+    }
+
+    const current = grouped.get(key);
+    current.formations += 1;
+    current.studentsCount += Number(formation?.totalStudents || 0);
+    current.reviewsCount = Math.max(current.reviewsCount, current.formations * 12);
+    current.domaines = Array.from(new Set([...current.domaines, domain]));
+    if (current.certifications.length === 0) {
+      current.certifications = ["Formateur certifie"];
+    }
+    current.isTop = current.formations >= 3 || current.studentsCount >= 100;
+  });
+
+  return Array.from(grouped.values()).map((expert, index) => ({
+    id: index + 1,
+    ...expert,
+  }));
+}
 
 const avantagesFormateur = [
   {
@@ -184,9 +142,13 @@ const criteres = [
   "Engagement envers la qualité pédagogique"
 ];
 
+const EXPERTS_PER_PAGE = 9;
+
 export default function ExpertsPage() {
   // State for view mode
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact">("grid");
+  const { formations, isLoading, error } = useFormations({ limit: 400 });
+  const experts = useMemo(() => mapFormationsToExperts(formations), [formations]);
   
   // Use filters hook
   const {
@@ -201,6 +163,15 @@ export default function ExpertsPage() {
 
   // Use favorites hook
   const { toggleFavorite, isFavorite } = useExpertFavorites();
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(filteredExperts.length / EXPERTS_PER_PAGE));
+  const startIndex = (currentPage - 1) * EXPERTS_PER_PAGE;
+  const paginatedExperts = filteredExperts.slice(startIndex, startIndex + EXPERTS_PER_PAGE);
+
+  useEffect(() => { setCurrentPage(1); }, [filters]);
+  useEffect(() => { if (currentPage > totalPages) setCurrentPage(totalPages); }, [currentPage, totalPages]);
 
   // Calculate dynamic stats based on filtered experts
   const avgRating = filteredExperts.length > 0
@@ -227,7 +198,7 @@ export default function ExpertsPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Nos Formateurs Experts",
             subtitle: "Découvrez nos formateurs experts dans leur domaine",
             badge: {
@@ -295,7 +266,7 @@ export default function ExpertsPage() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Rejoignez Notre Équipe",
             subtitle: "Devenez formateur et partagez votre savoir-faire",
             badge: {
@@ -393,7 +364,18 @@ export default function ExpertsPage() {
               </div>
 
               {/* Experts Grid/List */}
-              {filteredExperts.length === 0 ? (
+              {isLoading && experts.length === 0 ? (
+                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <Card key={idx} className="h-80 animate-pulse bg-slate-100 border-0" />
+                  ))}
+                </div>
+              ) : error ? (
+                <Card className="p-8 text-center border-red-200 bg-red-50">
+                  <h3 className="text-lg font-semibold text-red-800 mb-2">Erreur API formateurs</h3>
+                  <p className="text-red-700">Impossible de charger les formateurs depuis l'API pour le moment.</p>
+                </Card>
+              ) : filteredExperts.length === 0 ? (
                 <Card className="p-12 text-center">
                   <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -414,7 +396,7 @@ export default function ExpertsPage() {
                     ? "md:grid-cols-3 xl:grid-cols-4" 
                     : "grid-cols-1"
                 }`}>
-                  {filteredExperts.map((expert) => (
+                  {paginatedExperts.map((expert) => (
                     <ExpertCard
                       key={expert.id}
                       expert={expert}
@@ -423,6 +405,51 @@ export default function ExpertsPage() {
                       isFavorite={isFavorite(expert.id)}
                     />
                   ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {!isLoading && !error && filteredExperts.length > 0 && totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8 flex-wrap">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Précédent
+                  </Button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(p => Math.abs(p - currentPage) <= 2 || p === 1 || p === totalPages)
+                    .reduce<(number | string)[]>((acc, page, idx, arr) => {
+                      if (idx > 0 && (arr[idx - 1] as number) !== page - 1) acc.push("...");
+                      acc.push(page);
+                      return acc;
+                    }, [])
+                    .map((item, idx) =>
+                      typeof item === "string" ? (
+                        <span key={`ellipsis-${idx}`} className="px-2 text-slate-400">…</span>
+                      ) : (
+                        <Button
+                          key={item}
+                          variant={currentPage === item ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(item as number)}
+                          className={currentPage === item ? "bg-cpu-orange text-white border-cpu-orange" : ""}
+                        >
+                          {item}
+                        </Button>
+                      )
+                    )
+                  }
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Suivant
+                  </Button>
                 </div>
               )}
             </div>

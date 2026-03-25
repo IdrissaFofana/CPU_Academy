@@ -297,7 +297,7 @@ export default function DashboardPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Mon Espace Apprentissage",
             subtitle: "Suivez votre progression et continuez votre parcours de formation",
             buttons: [
@@ -327,7 +327,7 @@ export default function DashboardPage() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Atteignez Vos Objectifs",
             subtitle: "Découvrez de nouvelles compétences pour progresser",
             buttons: [

@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
       },
+      {
+        protocol: 'https',
+        hostname: 'back.cpupme.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.cpupme.com',
+      },
     ],
   },
 };

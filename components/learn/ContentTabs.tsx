@@ -74,8 +74,18 @@ export function ContentTabs({ lecon, notes, onNotesChange }: ContentTabsProps) {
             <h3 className="text-lg font-semibold text-slate-900">
               {lecon.titre}
             </h3>
-            {lecon.contenu && (
+            {lecon.contenu && !/^https?:\/\//.test(lecon.contenu) && (
               <p className="text-slate-700 leading-relaxed">{lecon.contenu}</p>
+            )}
+            {/^https?:\/\//.test(lecon.contenu || "") && (
+              <a
+                href={lecon.contenu}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 text-cpu-orange font-medium hover:underline"
+              >
+                Ouvrir le contenu
+              </a>
             )}
           </div>
         )}
@@ -178,7 +188,12 @@ export function ContentTabs({ lecon, notes, onNotesChange }: ContentTabsProps) {
                     </div>
 
                     {/* Download Button */}
-                    <button className="flex items-center gap-2 px-4 py-2 bg-cpu-orange text-white rounded-lg hover:bg-cpu-orange/90 transition-colors">
+                    <a
+                      href={ressource.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-cpu-orange text-white rounded-lg hover:bg-cpu-orange/90 transition-colors"
+                    >
                       <svg
                         className="w-4 h-4"
                         fill="none"
@@ -193,7 +208,7 @@ export function ContentTabs({ lecon, notes, onNotesChange }: ContentTabsProps) {
                         />
                       </svg>
                       Télécharger
-                    </button>
+                    </a>
                   </div>
                 ))}
               </div>

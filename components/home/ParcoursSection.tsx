@@ -3,12 +3,19 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { EnhancedFormationCard } from "@/components/catalogue/EnhancedFormationCard";
-import { formationsMock } from "@/data/mock";
+import { useMemo } from "react";
+import { useFormations } from "@/hooks/useFormations";
+import { mapApiFormationToAppFormation } from "@/lib/adapters/formation-adapter";
 import { ArrowRight } from "lucide-react";
 
 export function ParcoursSection() {
-  // Prendre les 3 premières formations
-  const formations = formationsMock.slice(0, 3);
+  const { formations, isLoading, error } = useFormations({ limit: 200 });
+  const trendingFormations = useMemo(() => {
+    return formations
+      .map((formation) => mapApiFormationToAppFormation(formation))
+      .sort((left, right) => (right.nbInscrits || 0) - (left.nbInscrits || 0))
+      .slice(0, 3);
+  }, [formations]);
 
   return (
     <section id="formations" className="py-12 md:py-20 bg-gray-50">
@@ -32,13 +39,29 @@ export function ParcoursSection() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {formations.map((formation, index) => (
-            <div key={formation.id} className={`animation-delay-${(index + 1) * 100}`}>
-              <EnhancedFormationCard formation={formation} />
-            </div>
-          ))}
-        </div>
+        {error && !isLoading && (
+          <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            Impossible de charger les formations en tendance pour le moment.
+          </div>
+        )}
+
+        {isLoading && trendingFormations.length === 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="h-[420px] rounded-xl bg-slate-200 animate-pulse" />
+            ))}
+          </div>
+        )}
+
+        {trendingFormations.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {trendingFormations.map((formation, index) => (
+              <div key={formation.id} className={`animation-delay-${(index + 1) * 100}`}>
+                <EnhancedFormationCard formation={formation} />
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="text-center lg:hidden">
           <Button variant="outline" asChild className="cursor-pointer border-2 hover:border-cpu-orange hover:text-cpu-orange">

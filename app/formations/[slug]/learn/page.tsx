@@ -1,22 +1,47 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useMemo } from "react";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
-import { formationsMock } from "@/data/mock";
 import { Lecon } from "@/types";
 import { ChaptersSidebar } from "@/components/learn/ChaptersSidebar";
 import { VideoPlayer } from "@/components/learn/VideoPlayer";
 import { ContentTabs } from "@/components/learn/ContentTabs";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, ChevronLeft, ChevronRight, X, Play, BookOpen, Award, Clock, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { useFormationContent, useFormations } from "@/hooks/useFormations";
+import { mapApiFormationToAppFormation } from "@/lib/adapters/formation-adapter";
 
 export default function LearnPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const router = useRouter();
-  const formation = formationsMock.find((f) => f.slug === slug);
+  const { formations, isLoading, hasFetched } = useFormations({ limit: 200 });
+  const formationsNormalized = useMemo(
+    () => formations.map((item) => mapApiFormationToAppFormation(item)),
+    [formations]
+  );
+  const formation = formationsNormalized.find((f) => f.slug === slug);
+  const { chapitres } = useFormationContent(formation?.id || "", Boolean(formation?.id));
+  const formationWithContent = useMemo(
+    () =>
+      formation
+        ? {
+            ...formation,
+            chapitres: chapitres.length > 0 ? chapitres : formation.chapitres,
+          }
+        : null,
+    [formation, chapitres]
+  );
 
-  if (!formation) {
+  if ((isLoading || !hasFetched) && !formation) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500" />
+      </div>
+    );
+  }
+
+  if (hasFetched && !formation) {
     notFound();
   }
 
@@ -41,7 +66,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
 
   // Charger la progression depuis localStorage
   useEffect(() => {
-    const storageKey = `formation-progress-${formation.id}`;
+    const storageKey = `formation-progress-${formationWithContent!.id}`;
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       const progress = JSON.parse(saved);
@@ -51,8 +76,8 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
     }
 
     // Si pas de leçon courante, prendre la première leçon du premier chapitre
-    if (!saved && formation.chapitres && formation.chapitres.length > 0 && formation.chapitres[0].lecons.length > 0) {
-      setCurrentLeconId(formation.chapitres[0].lecons[0].id);
+    if (!saved && formationWithContent!.chapitres && formationWithContent!.chapitres.length > 0 && formationWithContent!.chapitres[0].lecons.length > 0) {
+      setCurrentLeconId(formationWithContent!.chapitres[0].lecons[0].id);
     }
 
     // Charger la préférence de sidebar
@@ -60,12 +85,12 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
     if (sidebarPref !== null) {
       setSidebarVisible(sidebarPref === 'true');
     }
-  }, [formation.id, formation.chapitres?.length]);
+  }, [formationWithContent?.id, formationWithContent?.chapitres?.length]);
 
   // Sauvegarder la progression
   useEffect(() => {
     if (currentLeconId) {
-      const storageKey = `formation-progress-${formation.id}`;
+      const storageKey = `formation-progress-${formationWithContent!.id}`;
       localStorage.setItem(
         storageKey,
         JSON.stringify({
@@ -76,7 +101,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
         })
       );
     }
-  }, [currentLeconId, completedLecons, notes, formation.id]);
+  }, [currentLeconId, completedLecons, notes, formationWithContent?.id]);
 
   // Toggle sidebar
   const toggleSidebar = () => {
@@ -98,8 +123,8 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
   // Trouver la leçon actuelle
   let currentLecon: Lecon | undefined;
   let currentChapitreIndex = 0;
-  for (let i = 0; i < (formation.chapitres?.length || 0); i++) {
-    const lecon = formation.chapitres?.[i]?.lecons.find((l) => l.id === currentLeconId);
+  for (let i = 0; i < (formationWithContent?.chapitres?.length || 0); i++) {
+    const lecon = formationWithContent?.chapitres?.[i]?.lecons.find((l) => l.id === currentLeconId);
     if (lecon) {
       currentLecon = lecon;
       currentChapitreIndex = i;
@@ -108,7 +133,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
   }
 
   // Progression globale
-  const totalLecons = (formation.chapitres?.reduce(
+  const totalLecons = (formationWithContent?.chapitres?.reduce(
     (acc, chap) => acc + chap.lecons.length,
     0
   ) ?? 0);
@@ -125,9 +150,9 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
 
   // Navigation vers leçon suivante
   const handleNext = () => {
-    if (!currentLecon || !formation.chapitres) return;
+    if (!currentLecon || !formationWithContent?.chapitres) return;
 
-    const currentChapitre = formation.chapitres[currentChapitreIndex];
+    const currentChapitre = formationWithContent.chapitres[currentChapitreIndex];
     const currentLeconIndex = currentChapitre.lecons.findIndex(
       (l) => l.id === currentLeconId
     );
@@ -140,23 +165,23 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
       setCurrentLeconId(currentChapitre.lecons[currentLeconIndex + 1].id);
     }
     // Premier leçon du chapitre suivant
-    else if (currentChapitreIndex < (formation.chapitres?.length || 0) - 1) {
-      const nextChapitre = formation.chapitres?.[currentChapitreIndex + 1];
+    else if (currentChapitreIndex < (formationWithContent.chapitres?.length || 0) - 1) {
+      const nextChapitre = formationWithContent.chapitres?.[currentChapitreIndex + 1];
       if (nextChapitre.lecons.length > 0) {
         setCurrentLeconId(nextChapitre.lecons[0].id);
       }
     } else {
       // Fin de la formation
       alert("🎉 Félicitations ! Vous avez terminé la formation !");
-      router.push(`/formations/${formation.slug}`);
+      router.push(`/formations/${formationWithContent.slug}`);
     }
   };
 
   // Navigation vers leçon précédente
   const handlePrevious = () => {
-    if (!currentLecon || !formation.chapitres) return;
+    if (!currentLecon || !formationWithContent?.chapitres) return;
 
-    const currentChapitre = formation.chapitres[currentChapitreIndex];
+    const currentChapitre = formationWithContent.chapitres[currentChapitreIndex];
     const currentLeconIndex = currentChapitre.lecons.findIndex(
       (l) => l.id === currentLeconId
     );
@@ -167,7 +192,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
     }
     // Dernière leçon du chapitre précédent
     else if (currentChapitreIndex > 0) {
-      const prevChapitre = formation.chapitres?.[currentChapitreIndex - 1];
+      const prevChapitre = formationWithContent.chapitres?.[currentChapitreIndex - 1];
       if (prevChapitre.lecons.length > 0) {
         setCurrentLeconId(prevChapitre.lecons[prevChapitre.lecons.length - 1].id);
       }
@@ -206,7 +231,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
           </button>
           
           <Link
-            href={`/formations/${formation.slug}`}
+            href={`/formations/${formationWithContent!.slug}`}
             className="group relative text-slate-600 hover:text-red-500 transition-all duration-200 flex-shrink-0 p-2 hover:bg-red-50 rounded-lg"
             title="Quitter le cours"
           >
@@ -218,7 +243,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
           
           <div className="flex-1 min-w-0">
             <h1 className="font-bold text-slate-900 truncate text-sm sm:text-base">
-              {formation.titre}
+              {formationWithContent!.titre}
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 truncate flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-cpu-orange animate-pulse"></span>
@@ -272,7 +297,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
               size="sm"
               onClick={handlePrevious}
               disabled={currentChapitreIndex === 0 && 
-                formation.chapitres?.[0]?.lecons.findIndex((l) => l.id === currentLeconId) === 0}
+                formationWithContent!.chapitres?.[0]?.lecons.findIndex((l) => l.id === currentLeconId) === 0}
               className="h-9 w-9 p-0 hover:bg-slate-100 disabled:opacity-30 transition-all duration-200 hover:scale-110 active:scale-95"
               title="Leçon précédente"
             >
@@ -295,7 +320,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar - Chapitres */}
         <ChaptersSidebar
-          chapitres={formation.chapitres || []}
+          chapitres={formationWithContent!.chapitres || []}
           currentLeconId={currentLeconId}
           completedLecons={completedLecons}
           onLeconSelect={handleLeconSelect}
@@ -346,12 +371,32 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
                   <p className="text-2xl font-bold mb-2">Quiz de validation</p>
                   <p className="text-white/80 mb-6">Testez vos connaissances !</p>
                   <Link
-                    href={`/formations/${formation.slug}/quiz/${currentLecon.quiz?.id}`}
+                    href={`/formations/${formationWithContent!.slug}/quiz/${currentLecon.quiz?.id}`}
                   >
                     <Button className="bg-white text-cpu-orange hover:bg-slate-100">
                       Commencer le quiz
                     </Button>
                   </Link>
+                </div>
+              </div>
+            )}
+            {currentLecon.type === "ressources" && (
+              <div className="aspect-video flex items-center justify-center bg-slate-900 text-white">
+                <div className="text-center p-8 max-w-2xl">
+                  <BookOpen className="w-16 h-16 mx-auto mb-4 text-orange-300" />
+                  <p className="text-2xl font-bold mb-2">Document de cours</p>
+                  <p className="text-white/80 mb-6">{currentLecon.titre}</p>
+                  {currentLecon.ressources?.[0]?.url && (
+                    <a
+                      href={currentLecon.ressources[0].url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Button className="bg-white text-cpu-orange hover:bg-slate-100">
+                        Ouvrir le document
+                      </Button>
+                    </a>
+                  )}
                 </div>
               </div>
             )}
@@ -372,7 +417,7 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
               variant="outline"
               onClick={handlePrevious}
               disabled={currentChapitreIndex === 0 && 
-                formation.chapitres?.[0]?.lecons.findIndex((l) => l.id === currentLeconId) === 0}
+                formationWithContent!.chapitres?.[0]?.lecons.findIndex((l) => l.id === currentLeconId) === 0}
               className="group border-2 hover:border-slate-400 hover:bg-slate-50 transition-all duration-200 disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />

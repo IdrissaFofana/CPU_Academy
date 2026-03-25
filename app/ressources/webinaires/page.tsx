@@ -1,488 +1,314 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SearchBar } from "@/components/ui/search-bar";
-import { 
-  Video, 
-  Calendar, 
-  Clock, 
-  Users, 
-  Play,
-  Eye,
-  CheckCircle2,
-  ArrowRight,
-  Presentation,
-  TrendingUp,
-  Bell,
-  Grid3x3,
-  List,
-  LayoutGrid
-} from "lucide-react";
-import Link from "next/link";
+import { useFormations } from "@/hooks/useFormations";
+import {
+  formatWebinaireDate,
+  isWebinaireFormation,
+  mapApiFormationToWebinaire,
+} from "@/lib/adapters/webinaire-adapter";
+import { Calendar, Eye, Grid3x3, LayoutGrid, List, Play, TrendingUp, Users, Video } from "lucide-react";
 
 type ViewMode = "grid" | "list" | "compact";
+const REPLAYS_PER_PAGE = 9;
 
-const stats = [
-  { icon: Video, value: "30+", label: "Webinaires disponibles" },
-  { icon: Users, value: "5,000+", label: "Participants" },
-  { icon: Eye, value: "15,000+", label: "Vues replays" },
-  { icon: TrendingUp, value: "2x/mois", label: "Nouveaux webinaires" }
-];
-
-const prochains = [
-  {
-    id: 1,
-    titre: "Comment réussir sa levée de fonds en Côte d'Ivoire",
-    animateur: "Fatou Traoré",
-    role: "Expert Finance",
-    date: "25 Janvier 2026",
-    heure: "15h00 - 16h30",
-    duree: "90 min",
-    participants: 45,
-    places: 100,
-    niveau: "Intermédiaire",
-    themes: ["Financement", "Investissement", "Business Plan"],
-    color: "blue"
-  },
-  {
-    id: 2,
-    titre: "Les clés pour remporter des marchés publics",
-    animateur: "Jean-Baptiste Yao",
-    role: "Expert Marchés Publics",
-    date: "02 Février 2026",
-    heure: "14h00 - 15h30",
-    duree: "90 min",
-    participants: 62,
-    places: 100,
-    niveau: "Débutant",
-    themes: ["Marchés Publics", "Appels d'offres", "Administration"],
-    color: "green"
-  },
-  {
-    id: 3,
-    titre: "Stratégies marketing digital pour PME",
-    animateur: "Marie-Claire Koné",
-    role: "Expert Marketing Digital",
-    date: "08 Février 2026",
-    heure: "16h00 - 17h30",
-    duree: "90 min",
-    participants: 38,
-    places: 100,
-    niveau: "Tous niveaux",
-    themes: ["Marketing", "Digital", "Réseaux Sociaux"],
-    color: "purple"
-  }
-];
-
-const replays = [
-  {
-    id: 1,
-    titre: "Optimiser sa trésorerie en période de croissance",
-    animateur: "Ibrahim Diallo",
-    date: "15 Décembre 2025",
-    duree: "85 min",
-    vues: 2340,
-    rating: 4.8,
-    themes: ["Finance", "Gestion", "Trésorerie"],
-    thumbnail: "/webinaires/thumb-1.jpg",
-    color: "orange"
-  },
-  {
-    id: 2,
-    titre: "Les nouvelles obligations fiscales 2026",
-    animateur: "Dr. Kouassi Amani",
-    date: "20 Décembre 2025",
-    duree: "75 min",
-    vues: 1890,
-    rating: 4.9,
-    themes: ["Fiscalité", "Comptabilité", "Conformité"],
-    thumbnail: "/webinaires/thumb-2.jpg",
-    color: "blue"
-  },
-  {
-    id: 3,
-    titre: "Certification ISO 9001 : par où commencer ?",
-    animateur: "Aya N'Guessan",
-    date: "10 Janvier 2026",
-    duree: "95 min",
-    vues: 1560,
-    rating: 4.7,
-    themes: ["Qualité", "ISO", "Processus"],
-    thumbnail: "/webinaires/thumb-3.jpg",
-    color: "green"
-  },
-  {
-    id: 4,
-    titre: "E-commerce : lancer sa boutique en ligne",
-    animateur: "Marie-Claire Koné",
-    date: "12 Janvier 2026",
-    duree: "100 min",
-    vues: 2150,
-    rating: 4.9,
-    themes: ["E-commerce", "Digital", "Marketplace"],
-    thumbnail: "/webinaires/thumb-4.jpg",
-    color: "purple"
-  },
-  {
-    id: 5,
-    titre: "Recrutement : attirer les meilleurs talents",
-    animateur: "Aya N'Guessan",
-    date: "18 Janvier 2026",
-    duree: "70 min",
-    vues: 980,
-    rating: 4.6,
-    themes: ["RH", "Recrutement", "Management"],
-    thumbnail: "/webinaires/thumb-5.jpg",
-    color: "indigo"
-  },
-  {
-    id: 6,
-    titre: "Export : s'implanter sur les marchés africains",
-    animateur: "Dr. Kouassi Amani",
-    date: "20 Janvier 2026",
-    duree: "90 min",
-    vues: 1420,
-    rating: 4.8,
-    themes: ["Export", "International", "Stratégie"],
-    thumbnail: "/webinaires/thumb-6.jpg",
-    color: "cyan"
-  }
-];
-
-export default function WebinairesPage() {
+export default function RessourcesWebinairesPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentReplayPage, setCurrentReplayPage] = useState(1);
 
-  const filteredReplays = replays.filter(replay =>
-    searchTerm === "" ||
-    replay.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    replay.animateur.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    replay.themes.some(theme => theme.toLowerCase().includes(searchTerm.toLowerCase()))
+  const { formations, isLoading, error } = useFormations({ limit: 500 });
+
+  const webinaires = useMemo(
+    () => formations.filter(isWebinaireFormation).map(mapApiFormationToWebinaire),
+    [formations]
   );
-  
+
+  const prochains = useMemo(() => webinaires.filter((w) => w.statut !== "termine"), [webinaires]);
+  const replays = useMemo(() => webinaires.filter((w) => w.statut === "termine"), [webinaires]);
+
+  const filteredReplays = useMemo(
+    () =>
+      replays.filter((replay) => {
+        if (!searchTerm) return true;
+        const q = searchTerm.toLowerCase();
+        return (
+          replay.titre.toLowerCase().includes(q) ||
+          replay.formateur.nomComplet.toLowerCase().includes(q) ||
+          replay.themes.some((t) => t.toLowerCase().includes(q))
+        );
+      }),
+    [replays, searchTerm]
+  );
+
+  const totalReplayPages = Math.max(1, Math.ceil(filteredReplays.length / REPLAYS_PER_PAGE));
+  const replayStartIndex = (currentReplayPage - 1) * REPLAYS_PER_PAGE;
+  const paginatedReplays = filteredReplays.slice(
+    replayStartIndex,
+    replayStartIndex + REPLAYS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentReplayPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (currentReplayPage > totalReplayPages) {
+      setCurrentReplayPage(totalReplayPages);
+    }
+  }, [currentReplayPage, totalReplayPages]);
+
   return (
     <>
-      <PageBanner 
-        breadcrumb={[
-          { label: "Accueil", href: "/" },
-          { label: "Ressources" },
-          { label: "Webinaires" }
-        ]}
+      <PageBanner
+        breadcrumb={[{ label: "Accueil", href: "/" }, { label: "Ressources" }, { label: "Webinaires" }]}
         slides={[
           {
-            image: "/images/formation-tech.png",
-            title: "Webinaires & Replays",
-            subtitle: "Participez à nos sessions en direct ou visionnez les replays",
+            image: "/images/default-formation.jpg",
+            title: "Webinaires et replays",
+            subtitle: "Contenu synchronise en direct depuis l'API formations",
           },
-          {
-            image: "/images/formation-agriculture.png",
-            title: "Sessions À la Demande",
-            subtitle: "Accédez à notre bibliothèque complète de webinaires enregistrés",
-          }
         ]}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/20">
-        {/* Stats Section */}
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            {stats.map((stat, idx) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={idx}
-                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-md transition-all  animate-fade-in"
-                  style={{ animationDelay: `${idx * 100}ms` }}
-                >
-                  <Icon className="w-10 h-10 mx-auto mb-3 text-orange-600" />
-                  <div className="text-3xl font-bold mb-1 text-slate-900">{stat.value}</div>
-                  <div className="text-sm text-slate-600">{stat.label}</div>
-                </div>
-              );
-            })}
+            <div className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-sm">
+              <Video className="w-10 h-10 mx-auto mb-3 text-orange-600" />
+              <div className="text-3xl font-bold text-slate-900">{webinaires.length}</div>
+              <div className="text-sm text-slate-600">Webinaires API</div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-sm">
+              <Calendar className="w-10 h-10 mx-auto mb-3 text-blue-600" />
+              <div className="text-3xl font-bold text-slate-900">{prochains.length}</div>
+              <div className="text-sm text-slate-600">A venir / live</div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-sm">
+              <Play className="w-10 h-10 mx-auto mb-3 text-green-600" />
+              <div className="text-3xl font-bold text-slate-900">{replays.length}</div>
+              <div className="text-sm text-slate-600">Replays</div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-sm">
+              <Users className="w-10 h-10 mx-auto mb-3 text-purple-600" />
+              <div className="text-3xl font-bold text-slate-900">{webinaires.reduce((a, w) => a + w.inscrits, 0)}</div>
+              <div className="text-sm text-slate-600">Participants</div>
+            </div>
           </div>
         </section>
 
-        {/* Prochains webinaires */}
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12 animate-slide-up">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="text-center mb-10">
             <Badge className="mb-4 bg-orange-100 text-orange-700 border-0">
-              <Calendar className="w-3 h-3 mr-1" />
-              À venir
+              <Calendar className="w-3 h-3 mr-1" /> Agenda
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Prochains webinaires
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Inscrivez-vous gratuitement et participez en direct
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Prochains webinaires</h2>
           </div>
 
-          <div className="space-y-6 max-w-5xl mx-auto">
-            {prochains.map((webinaire, idx) => (
-              <Card
-                key={webinaire.id}
-                className="group transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up overflow-hidden"
-                style={{ animationDelay: `${idx * 100}ms` }}
-              >
-                <div className="flex flex-col lg:flex-row">
-                  {/* Colonne gauche - Info principale */}
-                  <div className="flex-grow p-6">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className={`w-2 h-2 rounded-full bg-${webinaire.color}-500 mt-2`}></div>
-                      <div className="flex-grow">
-                        <Badge variant="outline" className="mb-3 bg-blue-50 text-blue-700 border-blue-200">
-                          <Bell className="w-3 h-3 mr-1" />
-                          Inscription ouverte
-                        </Badge>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors">
-                          {webinaire.titre}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
-                          <Presentation className="w-4 h-4 text-orange-600" />
-                          <span className="font-semibold">{webinaire.animateur}</span>
-                          <span className="text-slate-400">•</span>
-                          <span>{webinaire.role}</span>
+          {isLoading && webinaires.length === 0 && (
+            <div className="space-y-4 max-w-5xl mx-auto">
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <Card key={idx} className="h-40 animate-pulse bg-slate-100 border-0" />
+              ))}
+            </div>
+          )}
+
+          {error && <Card className="max-w-5xl mx-auto p-6 bg-red-50 border-red-200 text-red-800">Impossible de charger les webinaires.</Card>}
+
+          {!isLoading && !error && (
+            <div className="space-y-6 max-w-5xl mx-auto">
+              {prochains.map((webinaire) => (
+                <Card key={webinaire.id} className="group transition-all duration-300 border-2 hover:border-orange-200 overflow-hidden">
+                  <div className="flex flex-col lg:flex-row">
+                    <div className="flex-grow p-6">
+                      <Badge variant="outline" className="mb-3 bg-blue-50 text-blue-700 border-blue-200">
+                        {webinaire.statut === "live" ? "En direct" : "Inscription ouverte"}
+                      </Badge>
+                      <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors">{webinaire.titre}</h3>
+                      <div className="flex flex-wrap items-center gap-4 text-sm mb-4 text-slate-600">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-blue-600" />
+                          <span>{formatWebinaireDate(webinaire.date)}</span>
                         </div>
-                        
-                        <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-blue-600" />
-                            <span className="font-semibold">{webinaire.date}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-green-600" />
-                            <span>{webinaire.heure}</span>
-                          </div>
-                          <Badge variant="outline" className="bg-slate-50">
-                            {webinaire.niveau}
+                        <Badge variant="outline" className="bg-slate-50">{webinaire.dureeMinutes} min</Badge>
+                        <Badge variant="outline" className="bg-slate-50">{webinaire.gratuit ? "Gratuit" : `${webinaire.prix} FCFA`}</Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {webinaire.themes.slice(0, 5).map((theme) => (
+                          <Badge key={theme} variant="outline" className="text-xs bg-orange-50 text-orange-700">
+                            {theme}
                           </Badge>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2">
-                          {webinaire.themes.map((theme, i) => (
-                            <Badge key={i} variant="outline" className="text-xs bg-orange-50 text-orange-700">
-                              {theme}
-                            </Badge>
-                          ))}
-                        </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
-
-                  {/* Colonne droite - CTA */}
-                  <div className="lg:w-64 bg-gradient-to-br from-orange-50 to-blue-50 p-6 flex flex-col justify-center items-center border-l border-slate-100">
-                    <div className="text-center mb-4">
-                      <div className="text-2xl font-bold text-slate-900 mb-1">
-                        {webinaire.participants}/{webinaire.places}
+                    <div className="lg:w-64 bg-gradient-to-br from-orange-50 to-blue-50 p-6 flex flex-col justify-center items-center border-l border-slate-100">
+                      <div className="text-center mb-4">
+                        <div className="text-2xl font-bold text-slate-900">{webinaire.inscrits}</div>
+                        <div className="text-xs text-slate-600">participants</div>
                       </div>
-                      <div className="text-xs text-slate-600">participants inscrits</div>
-                      <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
-                        <div 
-                          className={`bg-${webinaire.color}-500 h-2 rounded-full`}
-                          style={{ width: `${(webinaire.participants / webinaire.places) * 100}%` }}
-                        ></div>
-                      </div>
+                      <Button asChild className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white">
+                        <Link href={`/webinaires/${webinaire.id}`}>Voir le detail</Link>
+                      </Button>
                     </div>
-                    <Button
-                      className="w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white"
-                    >
-                      <Calendar className="mr-2 h-4 w-4" />
-                      S'inscrire gratuitement
-                    </Button>
                   </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </section>
 
-        {/* Replays disponibles */}
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12 animate-slide-up">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="text-center mb-10">
             <Badge className="mb-4 bg-purple-100 text-purple-700 border-0">
-              <Video className="w-3 h-3 mr-1" />
-              Replays
+              <Video className="w-3 h-3 mr-1" /> Replays
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Webinaires en replay
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Accédez aux enregistrements de nos précédents webinaires
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Webinaires en replay</h2>
           </div>
 
-          {/* Recherche + View Mode Toggle */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8 max-w-7xl mx-auto">
             <div className="flex-1 max-w-md">
-              <SearchBar 
-                value={searchTerm}
-                onChange={setSearchTerm}
-                placeholder="Rechercher un replay..."
-                size="md"
-              />
+              <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Rechercher un replay..." size="md" />
             </div>
             <div className="flex items-center gap-4">
               <p className="text-sm text-slate-600">
-                <span className="font-semibold">{filteredReplays.length}</span> replay{filteredReplays.length > 1 ? "s" : ""} disponible{filteredReplays.length > 1 ? "s" : ""}
+                <span className="font-semibold">{filteredReplays.length}</span> replay(s)
               </p>
               <div className="flex items-center gap-2">
-              <Button 
-                variant={viewMode === "grid" ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => setViewMode("grid")}
-                className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
-              >
-                <Grid3x3 className="w-4 h-4" />
-              </Button>
-              <Button 
-                variant={viewMode === "list" ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => setViewMode("list")}
-                className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button 
-                variant={viewMode === "compact" ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => setViewMode("compact")}
-                className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
+                <Button variant={viewMode === "grid" ? "default" : "outline"} size="sm" onClick={() => setViewMode("grid")} className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}>
+                  <Grid3x3 className="w-4 h-4" />
+                </Button>
+                <Button variant={viewMode === "list" ? "default" : "outline"} size="sm" onClick={() => setViewMode("list")} className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}>
+                  <List className="w-4 h-4" />
+                </Button>
+                <Button variant={viewMode === "compact" ? "default" : "outline"} size="sm" onClick={() => setViewMode("compact")} className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}>
+                  <LayoutGrid className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
 
-          <div className={(viewMode === "grid" 
-              ? "grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-              : viewMode === "compact"
-              ? "grid md:grid-cols-4 gap-4"
-              : "space-y-4") + " max-w-7xl mx-auto"}>
-            {filteredReplays.map((replay, idx) => {
+          <div
+            className={
+              (viewMode === "grid"
+                ? "grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                : viewMode === "compact"
+                ? "grid md:grid-cols-4 gap-4"
+                : "space-y-4") + " max-w-7xl mx-auto"
+            }
+          >
+            {paginatedReplays.map((replay) => {
               const isListMode = viewMode === "list";
               const isCompactMode = viewMode === "compact";
-              const cardClassName = "group flex transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up overflow-hidden " + (isListMode ? "flex-row" : "flex-col");
-              const thumbnailClassName = isListMode ? "w-64 h-48 flex-shrink-0" : isCompactMode ? "h-32" : "h-48";
-              const contentPadding = isCompactMode ? "p-4" : "p-6";
-              const titleClassName = isCompactMode ? "text-sm font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-2" : "text-lg font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-2";
-              const textSize = isCompactMode ? "text-xs" : "text-sm";
-              const buttonSize = isCompactMode ? "text-xs" : "text-sm";
-              const playIconSize = isCompactMode ? "w-10 h-10" : "w-16 h-16";
-              const playIconInner = isCompactMode ? "w-5 h-5" : "w-8 h-8";
-              const animationDelay = idx * 100 + "ms";
-              
+
               return (
-              <Card
-                key={replay.id}
-                className={cardClassName}
-                style={{ animationDelay: animationDelay }}
-              >
-                {/* Thumbnail avec play button */}
-                <div className={"relative bg-gradient-to-br from-slate-900 to-slate-700 overflow-hidden " + thumbnailClassName}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className={playIconSize + " rounded-full bg-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform cursor-pointer"}>
-                      <Play className={playIconInner + " text-white ml-1"} />
+                <Card key={replay.id} className={`group flex border-2 hover:border-orange-200 overflow-hidden ${isListMode ? "flex-row" : "flex-col"}`}>
+                  <div className={`relative bg-slate-900 overflow-hidden ${isListMode ? "w-64 h-48" : isCompactMode ? "h-32" : "h-48"}`}>
+                    <img src={replay.thumbnail} alt={replay.titre} className="w-full h-full object-cover opacity-70" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Play className="w-7 h-7 text-white ml-1" />
+                      </div>
                     </div>
                   </div>
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-white/90 text-slate-900 border-0">
-                      {replay.duree}
-                    </Badge>
-                  </div>
-                </div>
 
-                <div className={contentPadding + " flex-grow flex flex-col"}>
-                  {/* Titre */}
-                  <h3 className={titleClassName}>
-                    {replay.titre}
-                  </h3>
+                  <div className={`${isCompactMode ? "p-4" : "p-6"} flex-grow flex flex-col`}>
+                    <h3 className={`${isCompactMode ? "text-sm" : "text-lg"} font-bold text-slate-900 mb-2 line-clamp-2`}>{replay.titre}</h3>
+                    {!isCompactMode && <p className="text-sm text-slate-600 mb-3">Par {replay.formateur.nomComplet}</p>}
 
-                  {/* Animateur */}
-                  {!isCompactMode && (
-                    <p className={textSize + " text-slate-600 mb-3"}>
-                      Par <span className="font-semibold">{replay.animateur}</span>
-                    </p>
-                  )}
-
-                  {/* Stats */}
-                  <div className={"flex items-center gap-4 text-xs text-slate-500 mb-4 " + (isCompactMode ? "text-xs" : "")}>
-                    <div className="flex items-center gap-1">
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>{replay.vues.toLocaleString()} </span>
-                    </div>
-                    {!isCompactMode && (
+                    <div className="flex items-center gap-4 text-xs text-slate-500 mb-4">
                       <div className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>{replay.date}</span>
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>{replay.inscrits.toLocaleString()}</span>
+                      </div>
+                      {!isCompactMode && (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>{formatWebinaireDate(replay.date, false)}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {!isCompactMode && (
+                      <div className="flex flex-wrap gap-1.5 mb-5 flex-grow">
+                        {replay.themes.slice(0, isListMode ? 5 : 3).map((theme) => (
+                          <Badge key={theme} variant="outline" className="text-xs bg-slate-50">
+                            {theme}
+                          </Badge>
+                        ))}
                       </div>
                     )}
+
+                    <Button asChild className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white">
+                      <Link href={`/webinaires/${replay.id}`}>
+                        <Play className="mr-2 h-4 w-4" />
+                        {isCompactMode ? "Voir" : "Regarder le replay"}
+                      </Link>
+                    </Button>
                   </div>
-
-                  {/* Themes */}
-                  {!isCompactMode && (
-                    <div className="flex flex-wrap gap-1.5 mb-6 flex-grow">
-                      {replay.themes.slice(0, isListMode ? 5 : 3).map((theme, i) => (
-                        <Badge key={i} variant="outline" className="text-xs bg-slate-50">
-                          {theme}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Bouton */}
-                  <Button
-                    className={"w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white " + buttonSize}
-                  >
-                    <Play className={"mr-2 h-4 w-4 " + (isCompactMode ? "h-3 w-3" : "")} />
-                    {isCompactMode ? "Voir" : "Regarder le replay"}
-                  </Button>
-                </div>
-              </Card>
+                </Card>
               );
             })}
           </div>
 
-          {/* CTA voir tous */}
-          <div className="text-center mt-12">
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="cursor-pointer border-2 border-orange-500 text-orange-600 hover:bg-orange-50"
-            >
-              <Link href="/ressources/webinaires">
-                <Video className="mr-2 h-5 w-5" />
-                Voir tous les replays
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
+          {!isLoading && !error && filteredReplays.length > 0 && (
+            <div className="max-w-7xl mx-auto mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-slate-600">
+                Page <span className="font-semibold text-slate-900">{currentReplayPage}</span> sur <span className="font-semibold text-slate-900">{totalReplayPages}</span>
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentReplayPage((p) => Math.max(1, p - 1))}
+                  disabled={currentReplayPage === 1}
+                >
+                  Precedent
+                </Button>
+
+                {Array.from({ length: totalReplayPages }, (_, i) => i + 1)
+                  .slice(Math.max(0, currentReplayPage - 3), Math.min(totalReplayPages, currentReplayPage + 2))
+                  .map((pageNum) => (
+                    <Button
+                      key={pageNum}
+                      variant={currentReplayPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      className={currentReplayPage === pageNum ? "bg-cpu-orange text-white hover:bg-cpu-orange" : ""}
+                      onClick={() => setCurrentReplayPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  ))}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentReplayPage((p) => Math.min(totalReplayPages, p + 1))}
+                  disabled={currentReplayPage === totalReplayPages}
+                >
+                  Suivant
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {!isLoading && !error && filteredReplays.length === 0 && (
+            <div className="text-center py-12 text-slate-500">Aucun replay ne correspond a votre recherche.</div>
+          )}
         </section>
 
-        {/* Newsletter CTA */}
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="max-w-4xl mx-auto bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-12 text-center text-white">
-            <Bell className="w-12 h-12 mx-auto mb-4 text-orange-500" />
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Ne manquez aucun webinaire
-            </h2>
-            <p className="text-lg text-slate-300 mb-8">
-              Inscrivez-vous à notre newsletter pour être alerté des prochaines sessions
-            </p>
-            <Button
-              asChild
-              size="lg"
-              className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white shadow-lg"
-            >
-              <Link href="/ressources/faq">
-                <Bell className="mr-2 h-5 w-5" />
-                M'abonner aux notifications
-              </Link>
+            <TrendingUp className="w-12 h-12 mx-auto mb-4 text-orange-500" />
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Continuer votre progression</h2>
+            <p className="text-lg text-slate-300 mb-8">Accedez a toutes les formations pour approfondir les thematiques vues en webinaire.</p>
+            <Button asChild size="lg" className="bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white">
+              <Link href="/catalogue">Explorer le catalogue</Link>
             </Button>
           </div>
         </section>
@@ -490,4 +316,3 @@ export default function WebinairesPage() {
     </>
   );
 }
-

@@ -19,11 +19,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ExpertCardProps {
   expert: {
     id: number;
+    apiId?: string;
+    email?: string;
     nom: string;
     specialite: string;
     photo: string;
@@ -54,7 +56,18 @@ export function ExpertCard({
   onToggleFavorite,
   isFavorite = false
 }: ExpertCardProps) {
+  const avatarFallback = "/images/expert-avatar.svg";
+  const [photoSrc, setPhotoSrc] = useState(expert.photo || avatarFallback);
   const [isHovered, setIsHovered] = useState(false);
+  const expertIdentifier = expert.apiId || expert.id.toString();
+  const formationsHref = `/catalogue?expert=${encodeURIComponent(expertIdentifier)}`;
+  const contactHref = expert.email
+    ? `mailto:${expert.email}?subject=${encodeURIComponent(`Prise de contact - ${expert.nom}`)}`
+    : `/support?expert=${encodeURIComponent(expert.nom)}`;
+
+  useEffect(() => {
+    setPhotoSrc(expert.photo || avatarFallback);
+  }, [expert.photo]);
 
   if (variant === "compact") {
     return (
@@ -63,10 +76,11 @@ export function ExpertCard({
           <div className="flex items-center gap-3 mb-3">
             <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
               <Image
-                src={expert.photo}
+                src={photoSrc}
                 alt={expert.nom}
                 fill
                 className="object-cover"
+                onError={() => setPhotoSrc(avatarFallback)}
               />
             </div>
             <div className="flex-1 min-w-0">
@@ -108,10 +122,11 @@ export function ExpertCard({
           {/* Photo */}
           <div className="relative md:w-64 h-48 md:h-auto flex-shrink-0">
             <Image
-              src={expert.photo}
+              src={photoSrc}
               alt={expert.nom}
               fill
               className="object-cover"
+              onError={() => setPhotoSrc(avatarFallback)}
             />
             {(expert.isTop || expert.isNew) && (
               <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -217,25 +232,19 @@ export function ExpertCard({
                   <MapPin className="w-4 h-4" />
                   <span>{expert.localisation}</span>
                 </div>
-                {expert.tarif && (
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4" />
-                    <span className="font-semibold text-cpu-orange">{expert.tarif}</span>
-                  </div>
-                )}
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" asChild>
-                  <Link href={`/catalogue?expert=${expert.id}`}>
+                  <Link href={formationsHref}>
                     <BookOpen className="w-4 h-4 mr-1" />
                     Formations
                   </Link>
                 </Button>
                 <Button size="sm" className="bg-cpu-orange hover:bg-cpu-orange/90" asChild>
-                  <Link href={`/experts/${expert.id}#contact`}>
+                  <a href={contactHref}>
                     <Mail className="w-4 h-4 mr-1" />
                     Contacter
-                  </Link>
+                  </a>
                 </Button>
               </div>
             </div>
@@ -255,10 +264,11 @@ export function ExpertCard({
       {/* Photo */}
       <div className="relative h-56">
         <Image
-          src={expert.photo}
+          src={photoSrc}
           alt={expert.nom}
           fill
           className={`object-cover transition-transform duration-500 ${isHovered ? 'scale-110' : 'scale-100'}`}
+          onError={() => setPhotoSrc(avatarFallback)}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         
@@ -361,26 +371,19 @@ export function ExpertCard({
           </div>
         </div>
 
-        {expert.tarif && (
-          <div className="mb-4 flex items-center justify-between bg-orange-50 rounded-lg px-3 py-2">
-            <span className="text-xs text-gray-600">Tarif indicatif</span>
-            <span className="font-bold text-cpu-orange">{expert.tarif}</span>
-          </div>
-        )}
-
         {/* Actions */}
         <div className="mt-auto pt-4 border-t border-gray-100 flex gap-2">
           <Button variant="outline" size="sm" className="flex-1" asChild>
-            <Link href={`/catalogue?expert=${expert.id}`}>
+            <Link href={formationsHref}>
               <BookOpen className="w-4 h-4 mr-1" />
               Formations
             </Link>
           </Button>
           <Button size="sm" className="flex-1 bg-cpu-orange hover:bg-cpu-orange/90" asChild>
-            <Link href={`/experts/${expert.id}#contact`}>
+            <a href={contactHref}>
               <Mail className="w-4 h-4 mr-1" />
               Contacter
-            </Link>
+            </a>
           </Button>
         </div>
       </div>

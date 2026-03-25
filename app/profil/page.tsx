@@ -233,7 +233,7 @@ export default function ProfilPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: userProfile.name,
             subtitle: userProfile.title,
           },

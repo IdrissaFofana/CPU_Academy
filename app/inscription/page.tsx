@@ -14,7 +14,7 @@ export default function InscriptionPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Inscription à la formation",
             subtitle: "Complétez votre inscription en quelques étapes",
             buttons: [

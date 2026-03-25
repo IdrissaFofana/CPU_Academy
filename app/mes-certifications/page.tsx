@@ -113,7 +113,7 @@ export default function MesCertificationsPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Mes Certifications",
             subtitle: "Vos réussites et certifications officielles CPU Formation",
             buttons: [

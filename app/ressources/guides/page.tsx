@@ -143,7 +143,7 @@ export default function GuidesPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Guides & Modèles",
             subtitle: "Téléchargez nos ressources gratuites pour développer votre entreprise",
           },

@@ -13,7 +13,26 @@ import {
  */
 export const formationService = {
   /**
-   * Récupérer toutes les formations
+   * Catalogue public des formations (avec filtres)
+   */
+  async getPublic(params?: {
+    q?: string;
+    category?: string;
+    niveau?: string;
+    mode?: string;
+    isPaid?: string;
+    priceMin?: string;
+    priceMax?: string;
+    sort?: string;
+  }): Promise<{ success: boolean; data: Formation[] }> {
+    return apiClient.get<{ success: boolean; data: Formation[] }>(
+      API_ENDPOINTS.FORMATIONS.PUBLIC,
+      { params }
+    );
+  },
+
+  /**
+   * Récupérer toutes les formations (admin)
    */
   async getAll(params?: {
     page?: number;
@@ -36,6 +55,26 @@ export const formationService = {
   async getById(id: string): Promise<ApiResponse<Formation>> {
     return apiClient.get<ApiResponse<Formation>>(
       API_ENDPOINTS.FORMATIONS.BY_ID(id)
+    );
+  },
+
+  /**
+   * Récupérer les chapitres d'une formation
+   */
+  async getChapitresByFormationId(formationId: string): Promise<any> {
+    return apiClient.get(
+      API_ENDPOINTS.CHAPITRES.BASE,
+      { params: { formation_id: formationId } }
+    );
+  },
+
+  /**
+   * Récupérer les leçons d'un chapitre
+   */
+  async getLeconsByChapitreId(chapitreId: string): Promise<any> {
+    return apiClient.get(
+      API_ENDPOINTS.CHAPITRES.LECONS,
+      { params: { chapitre_id: chapitreId } }
     );
   },
 

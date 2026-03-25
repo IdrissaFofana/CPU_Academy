@@ -194,7 +194,7 @@ export default function RegionsPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Formations par Région",
             subtitle: "Trouvez des formations près de chez vous en Côte d'Ivoire",
             buttons: [
@@ -211,7 +211,7 @@ export default function RegionsPage() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Formation de Qualité Partout",
             subtitle: "Les mêmes standards d'excellence dans toutes nos régions",
             buttons: [

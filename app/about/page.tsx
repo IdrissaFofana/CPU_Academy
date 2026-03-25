@@ -16,6 +16,9 @@ import { useSearchParams } from "next/navigation";
 import { usePartenairesForSiteWeb, useEquipeForSiteWeb } from "@/hooks/use-api";
 import { PageBanner } from "@/components/layout/PageBanner";
 
+const TEAM_AVATAR_FALLBACK = "/images/team-member-avatar.svg";
+const PARTNER_LOGO_FALLBACK = "/images/cpu-logo.png";
+
 function AProposContent() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") || "mission";
@@ -46,7 +49,7 @@ function AProposContent() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "À Propos de CPU-PME.CI",
             subtitle: "La Confédération Patronale Unique des PME de Côte d'Ivoire au service des entrepreneurs",
             badge: {
@@ -320,11 +323,11 @@ function AProposContent() {
                       >
                         <div className="relative bg-slate-50">
                           <img
-                            src={membre.photo}
+                            src={membre.photo || TEAM_AVATAR_FALLBACK}
                             alt={membre.nom}
                             className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-500"
                             onError={(e) => {
-                              e.currentTarget.src = "/logo.png";
+                              e.currentTarget.src = TEAM_AVATAR_FALLBACK;
                             }}
                           />
                         </div>
@@ -340,7 +343,7 @@ function AProposContent() {
                               {membre.bio}
                             </p>
                           )}
-                          {membre.reseauxSociaux && (membre.reseauxSociaux.linkedin || membre.reseauxSociaux.email) && (
+                          {membre.reseauxSociaux && (membre.reseauxSociaux.linkedin || membre.reseauxSociaux.twitter || membre.reseauxSociaux.email) && (
                             <div className="flex gap-2 pt-5 mt-5 border-t border-slate-100">
                               {membre.reseauxSociaux.linkedin && (
                                 <a
@@ -353,6 +356,19 @@ function AProposContent() {
                                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                                   </svg>
                                   <span>LinkedIn</span>
+                                </a>
+                              )}
+                              {membre.reseauxSociaux.twitter && (
+                                <a
+                                  href={membre.reseauxSociaux.twitter}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-sky-50 text-sky-500 hover:bg-sky-500 hover:text-white transition-all text-sm font-medium"
+                                >
+                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                  </svg>
+                                  <span>Twitter</span>
                                 </a>
                               )}
                               {membre.reseauxSociaux.email && (
@@ -412,18 +428,18 @@ function AProposContent() {
                           <a href={partenaire.lien} target="_blank" rel="noopener noreferrer"
                              className="w-full h-full flex items-center justify-center">
                             <img
-                              src={partenaire.logo}
+                              src={partenaire.logo || PARTNER_LOGO_FALLBACK}
                               alt={partenaire.nom}
                               className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
-                              onError={(e) => { e.currentTarget.src = "/logo.png"; }}
+                              onError={(e) => { e.currentTarget.src = PARTNER_LOGO_FALLBACK; }}
                             />
                           </a>
                         ) : (
                           <img
-                            src={partenaire.logo}
+                            src={partenaire.logo || PARTNER_LOGO_FALLBACK}
                             alt={partenaire.nom}
                             className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
-                            onError={(e) => { e.currentTarget.src = "/logo.png"; }}
+                            onError={(e) => { e.currentTarget.src = PARTNER_LOGO_FALLBACK; }}
                           />
                         )}
                       </Card>

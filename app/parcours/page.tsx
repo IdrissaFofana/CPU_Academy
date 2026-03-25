@@ -110,7 +110,7 @@ export default function ParcoursPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Parcours de Formation",
             subtitle: "Accélérez votre carrière avec nos parcours certifiants",
             badge: {
@@ -178,7 +178,7 @@ export default function ParcoursPage() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Certifications Professionnelles",
             subtitle: "Obtenez une reconnaissance officielle de vos compétences",
             badge: {

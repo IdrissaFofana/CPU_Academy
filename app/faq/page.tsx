@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useFaqs } from "@/hooks/useFaqs";
+import {
   Search,
   ChevronDown,
   HelpCircle,
@@ -16,311 +20,490 @@ import {
   Users,
   Mail,
   Phone,
-  MessageCircle
+  MessageCircle,
+  Lightbulb,
+  CheckCircle,
+  ArrowRight,
+  Download,
+  Video,
+  Award,
+  Clock,
 } from "lucide-react";
 
-const categories = [
-  { id: "all", label: "Toutes", icon: HelpCircle, color: "orange" },
-  { id: "formations", label: "Formations", icon: GraduationCap, color: "blue" },
-  { id: "inscriptions", label: "Inscriptions", icon: FileText, color: "green" },
-  { id: "paiements", label: "Paiements", icon: CreditCard, color: "purple" },
-  { id: "certifications", label: "Certifications", icon: BookOpen, color: "indigo" },
-  { id: "entreprises", label: "Entreprises", icon: Users, color: "cyan" }
-];
+function normalizeCategory(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
 
-const faqs = [
-  {
-    id: 1,
-    question: "Comment s'inscrire à une formation ?",
-    reponse: "Pour vous inscrire, rendez-vous sur la page de la formation qui vous intéresse, cliquez sur le bouton 'S'inscrire' et suivez les étapes. Vous devrez créer un compte si vous n'en avez pas déjà un, puis compléter le formulaire d'inscription avec vos informations personnelles et professionnelles.",
-    categorie: "inscriptions"
-  },
-  {
-    id: 2,
-    question: "Quels sont les modes de paiement acceptés ?",
-    reponse: "Nous acceptons plusieurs modes de paiement : cartes bancaires (Visa, Mastercard), Mobile Money (Orange Money, MTN Money, Moov Money), virements bancaires et paiements en espèces à nos centres. Pour les entreprises, nous proposons également la facturation avec paiement différé.",
-    categorie: "paiements"
-  },
-  {
-    id: 3,
-    question: "Les formations sont-elles certifiantes ?",
-    reponse: "Oui, toutes nos formations sont certifiantes. À l'issue de votre formation et après validation de vos acquis, vous recevrez une attestation ou un certificat reconnu. Certaines de nos formations préparent également à des certifications internationales (ISO, PMI, etc.).",
-    categorie: "certifications"
-  },
-  {
-    id: 4,
-    question: "Quelle est la durée moyenne d'une formation ?",
-    reponse: "La durée varie selon le type de formation. Les formations courtes durent de 1 à 3 jours (7-21 heures), les formations standard de 1 à 2 semaines (35-70 heures), et les parcours complets peuvent s'étendre sur plusieurs mois avec un rythme flexible adapté aux professionnels.",
-    categorie: "formations"
-  },
-  {
-    id: 5,
-    question: "Puis-je financer ma formation avec mon CPF ?",
-    reponse: "Les formations CPU Formation sont éligibles au financement par différents dispositifs selon votre situation : Plan de développement des compétences pour les salariés, Fonds d'Assurance Formation (FAF) pour les indépendants, et financement personnel avec possibilité d'échelonnement.",
-    categorie: "paiements"
-  },
-  {
-    id: 6,
-    question: "Proposez-vous des formations sur mesure pour les entreprises ?",
-    reponse: "Absolument ! Nous concevons des programmes de formation sur mesure adaptés aux besoins spécifiques de votre entreprise. Notre équipe pédagogique peut intervenir dans vos locaux ou accueillir vos collaborateurs dans nos centres. Contactez notre service entreprises pour un devis personnalisé.",
-    categorie: "entreprises"
-  },
-  {
-    id: 7,
-    question: "Les formations sont-elles disponibles en ligne ?",
-    reponse: "Oui, nous proposons trois formats : formations en présentiel dans nos 15 centres régionaux, formations en ligne via notre plateforme e-learning, et formations hybrides combinant sessions en ligne et présentiel. Toutes nos formations en ligne incluent l'accès aux supports, exercices pratiques et accompagnement par un formateur.",
-    categorie: "formations"
-  },
-  {
-    id: 8,
-    question: "Comment obtenir mon attestation de formation ?",
-    reponse: "Votre attestation est délivrée automatiquement à l'issue de votre formation, après validation de votre assiduité et réussite aux évaluations. Elle est disponible en téléchargement sur votre espace personnel sous 48h et vous recevez également une version papier par courrier.",
-    categorie: "certifications"
-  },
-  {
-    id: 9,
-    question: "Puis-je annuler ou reporter mon inscription ?",
-    reponse: "Oui, vous pouvez annuler ou reporter votre inscription jusqu'à 7 jours avant le début de la formation sans frais. Entre 7 jours et 48h, des frais de 30% s'appliquent. Moins de 48h avant le début, la formation est due en totalité sauf cas de force majeure justifié.",
-    categorie: "inscriptions"
-  },
-  {
-    id: 10,
-    question: "Y a-t-il des prérequis pour suivre les formations ?",
-    reponse: "Les prérequis varient selon les formations. Ils sont clairement indiqués sur chaque fiche formation. Les formations de niveau débutant sont accessibles sans prérequis particulier, tandis que les formations avancées peuvent nécessiter une expérience professionnelle ou des connaissances préalables spécifiques.",
-    categorie: "formations"
-  },
-  {
-    id: 11,
-    question: "Comment faire une demande de devis pour mon entreprise ?",
-    reponse: "Pour obtenir un devis, rendez-vous sur notre page Entreprises et remplissez le formulaire de demande de devis, ou contactez-nous directement au +225 27 XX XX XX XX. Notre équipe vous recontactera sous 24h pour discuter de vos besoins et vous proposer une solution adaptée.",
-    categorie: "entreprises"
-  },
-  {
-    id: 12,
-    question: "Les supports de cours sont-ils fournis ?",
-    reponse: "Oui, tous les supports pédagogiques sont inclus dans le prix de la formation : documentation complète, exercices pratiques, études de cas, et accès à notre plateforme en ligne avec ressources complémentaires. Vous conservez l'accès aux supports pendant 6 mois après la formation.",
-    categorie: "formations"
-  },
-  {
-    id: 13,
-    question: "Proposez-vous un suivi après la formation ?",
-    reponse: "Oui, nous assurons un suivi post-formation pendant 3 mois. Vous pouvez contacter votre formateur par email pour des questions, accéder à notre forum d'entraide, et bénéficier de webinaires de suivi mensuels. Un coaching individuel peut également être ajouté en option.",
-    categorie: "formations"
-  },
-  {
-    id: 14,
-    question: "Les certifications sont-elles reconnues internationalement ?",
-    reponse: "Nos certifications internes sont reconnues en Côte d'Ivoire et dans la sous-région. Pour les certifications internationales (ISO, PMI, PRINCE2, etc.), nous sommes centre d'examen agréé et nos formations vous préparent aux examens officiels qui délivrent des certifications reconnues mondialement.",
-    categorie: "certifications"
-  },
-  {
-    id: 15,
-    question: "Comment suivre ma candidature après inscription ?",
-    reponse: "Après votre inscription, vous recevez un email de confirmation avec un lien vers votre espace personnel. Vous pouvez y suivre l'état de votre dossier, télécharger vos documents, et recevoir toutes les informations relatives à votre formation (convocation, planning, supports).",
-    categorie: "inscriptions"
+function getCategoryMeta(category: string) {
+  const normalized = normalizeCategory(category);
+
+  if (normalized.includes("inscription")) {
+    return {
+      icon: FileText,
+      buttonClass: "bg-green-600 text-white shadow-lg",
+      idleClass: "bg-white text-slate-700 border-2 border-slate-200 hover:border-green-300",
+      badgeClass: "bg-green-50 text-green-700 border-green-200",
+      iconWrapClass: "bg-green-100",
+      iconClass: "text-green-600",
+    };
   }
-];
+
+  if (normalized.includes("paiement")) {
+    return {
+      icon: CreditCard,
+      buttonClass: "bg-purple-600 text-white shadow-lg",
+      idleClass: "bg-white text-slate-700 border-2 border-slate-200 hover:border-purple-300",
+      badgeClass: "bg-purple-50 text-purple-700 border-purple-200",
+      iconWrapClass: "bg-purple-100",
+      iconClass: "text-purple-600",
+    };
+  }
+
+  if (normalized.includes("certification")) {
+    return {
+      icon: BookOpen,
+      buttonClass: "bg-blue-600 text-white shadow-lg",
+      idleClass: "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-300",
+      badgeClass: "bg-blue-50 text-blue-700 border-blue-200",
+      iconWrapClass: "bg-blue-100",
+      iconClass: "text-blue-600",
+    };
+  }
+
+  if (normalized.includes("entreprise")) {
+    return {
+      icon: Users,
+      buttonClass: "bg-cyan-600 text-white shadow-lg",
+      idleClass: "bg-white text-slate-700 border-2 border-slate-200 hover:border-cyan-300",
+      badgeClass: "bg-cyan-50 text-cyan-700 border-cyan-200",
+      iconWrapClass: "bg-cyan-100",
+      iconClass: "text-cyan-600",
+    };
+  }
+
+  if (normalized.includes("formation")) {
+    return {
+      icon: GraduationCap,
+      buttonClass: "bg-orange-600 text-white shadow-lg",
+      idleClass: "bg-white text-slate-700 border-2 border-slate-200 hover:border-orange-300",
+      badgeClass: "bg-orange-50 text-orange-700 border-orange-200",
+      iconWrapClass: "bg-orange-100",
+      iconClass: "text-orange-600",
+    };
+  }
+
+  return {
+    icon: HelpCircle,
+    buttonClass: "bg-slate-900 text-white shadow-lg",
+    idleClass: "bg-white text-slate-700 border-2 border-slate-200 hover:border-slate-300",
+    badgeClass: "bg-slate-100 text-slate-700 border-slate-200",
+    iconWrapClass: "bg-slate-100",
+    iconClass: "text-slate-600",
+  };
+}
 
 export default function FAQPage() {
+  const { faqs, categories, isLoading, error, recordView } = useFaqs();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+  const [openFAQ, setOpenFAQ] = useState<string | null>(null);
 
-  // Filtrer les FAQs
-  const filteredFAQs = faqs.filter(faq => {
-    const matchCategory = selectedCategory === "all" || faq.categorie === selectedCategory;
-    const matchSearch = searchQuery === "" ||
-      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.reponse.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCategory && matchSearch;
-  });
+  const categoryItems = useMemo(() => {
+    return [
+      {
+        id: "all",
+        label: "Toutes",
+        icon: HelpCircle,
+        buttonClass: "bg-cpu-orange text-white shadow-lg",
+        idleClass: "bg-white text-slate-700 border-2 border-slate-200 hover:border-orange-300",
+      },
+      ...categories.map((category) => {
+        const meta = getCategoryMeta(category);
+        return {
+          id: normalizeCategory(category),
+          label: category,
+          icon: meta.icon,
+          buttonClass: meta.buttonClass,
+          idleClass: meta.idleClass,
+        };
+      }),
+    ];
+  }, [categories]);
 
-  const toggleFAQ = (id: number) => {
-    setOpenFAQ(openFAQ === id ? null : id);
+  const filteredFAQs = useMemo(() => {
+    return faqs.filter((faq) => {
+      const matchCategory =
+        selectedCategory === "all" || normalizeCategory(faq.categorie) === selectedCategory;
+      const matchSearch =
+        searchQuery.trim() === "" ||
+        faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        faq.reponse.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        faq.categorie.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return matchCategory && matchSearch;
+    });
+  }, [faqs, searchQuery, selectedCategory]);
+
+  const stats = useMemo(
+    () => [
+      { icon: HelpCircle, value: `${faqs.length}+`, label: "Questions publiées", wrapClass: "bg-orange-100", iconClass: "text-orange-600" },
+      { icon: MessageCircle, value: `${categories.length || 1}`, label: "Catégories actives", wrapClass: "bg-blue-100", iconClass: "text-blue-600" },
+      { icon: BookOpen, value: `${filteredFAQs.length}`, label: "FAQ filtrées", wrapClass: "bg-green-100", iconClass: "text-green-600" },
+      { icon: Users, value: "24/7", label: "Support disponible", wrapClass: "bg-purple-100", iconClass: "text-purple-600" },
+    ],
+    [categories.length, faqs.length, filteredFAQs.length]
+  );
+
+  const faqListRef = useRef<HTMLDivElement>(null);
+
+  const toggleFAQ = (id: string) => {
+    if (openFAQ !== id) {
+      void recordView(id);
+    }
+    setOpenFAQ((current) => (current === id ? null : id));
+  };
+
+  const openFeaturedFAQ = (id: string) => {
+    setSelectedCategory("all");
+    setSearchQuery("");
+    setOpenFAQ(id);
+    void recordView(id);
+    setTimeout(() => {
+      faqListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   return (
     <>
-      <PageBanner 
+      <PageBanner
         breadcrumb={[
           { label: "Accueil", href: "/" },
-          { label: "FAQ" }
+          { label: "FAQ" },
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Foire aux Questions",
-            subtitle: "Trouvez rapidement les réponses à vos questions",
+            subtitle: "Trouvez rapidement les réponses aux questions les plus fréquentes sur nos formations et services.",
             buttons: [
-              { label: "Contactez-nous", href: "/support", icon: <Send className="h-5 w-5" /> },
-              { label: "Voir les formations", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
-            ]
+              { label: "Contacter le support", href: "/support", icon: <Send className="h-5 w-5" /> },
+              { label: "Voir le catalogue", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> },
+            ],
           },
-          {
-            image: "/images/formation-agriculture.png",
-            title: "Besoin d'Aide ?",
-            subtitle: "Consultez nos réponses ou contactez notre équipe support",
-            buttons: [
-              { label: "Support direct", href: "/support", icon: <Send className="h-5 w-5" /> }
-            ]
-          }
         ]}
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/10">
+      <div className="min-h-screen bg-slate-50">
         <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Stats rapides */}
+          {error && (
+            <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+              Impossible de charger les FAQ depuis l'API.
+            </div>
+          )}
+
           <div className="grid md:grid-cols-4 gap-6 mb-12">
-            {[
-              { icon: HelpCircle, value: "15+", label: "Questions fréquentes", color: "orange" },
-              { icon: MessageCircle, value: "24/7", label: "Support disponible", color: "blue" },
-              { icon: Phone, value: "< 2h", label: "Temps de réponse", color: "green" },
-              { icon: Users, value: "1000+", label: "Questions résolues", color: "purple" }
-            ].map((stat, idx) => {
+            {stats.map((stat, idx) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={idx}
-                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-md transition-all duration-500  animate-fade-in group"
-                  style={{ animationDelay: `${idx * 100}ms` }}
+                  className="bg-white rounded-2xl p-6 text-center border-2 border-slate-100 shadow-sm"
                 >
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
-                    <Icon className={`w-8 h-8 text-${stat.color}-600`} />
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl ${stat.wrapClass} flex items-center justify-center`}>
+                    <Icon className={`w-8 h-8 ${stat.iconClass}`} />
                   </div>
-                  <div className={`text-3xl font-bold mb-1 text-slate-900 group-hover:text-${stat.color}-600 transition-colors`}>{stat.value}</div>
+                  <div className="text-3xl font-bold mb-1 text-slate-900">{stat.value}</div>
                   <div className="text-sm text-slate-600">{stat.label}</div>
                 </div>
               );
             })}
           </div>
 
-          {/* Barre de recherche */}
-          <div className="max-w-2xl mx-auto mb-12 animate-slide-up">
+          {/* Featured Questions - visible only when browsing all with no search */}
+          {!searchQuery && selectedCategory === "all" && faqs.length > 0 && (
+            <div className="max-w-4xl mx-auto mb-10">
+              <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-5 text-center">
+                Questions en vedette
+              </h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                {faqs.slice(0, 3).map((faq) => {
+                  const meta = getCategoryMeta(faq.categorie);
+                  const FeatIcon = meta.icon;
+                  return (
+                    <button
+                      key={faq.id}
+                      onClick={() => openFeaturedFAQ(faq.id)}
+                      className="text-left p-5 bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-300 hover:shadow-md transition-all duration-200 group"
+                    >
+                      <div className={`w-9 h-9 rounded-xl ${meta.iconWrapClass} flex items-center justify-center mb-3`}>
+                        <FeatIcon className={`w-5 h-5 ${meta.iconClass}`} />
+                      </div>
+                      <p className="font-semibold text-slate-800 text-sm mb-2 line-clamp-2 leading-snug">
+                        {faq.question}
+                      </p>
+                      <p className="text-xs text-slate-500 line-clamp-2 mb-3">{faq.reponse}</p>
+                      <span className="text-xs text-orange-600 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                        Voir la réponse <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="max-w-2xl mx-auto mb-12">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
-              <input
+              <Input
                 type="text"
                 placeholder="Rechercher une question..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-12 py-4 text-lg border-2 border-slate-200 rounded-2xl focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 focus:outline-none transition-all shadow-lg"
+                onChange={(event) => setSearchQuery(event.target.value)}
+                className="w-full pl-12 pr-12 py-6 text-lg border-2 border-slate-200 rounded-2xl focus:border-cpu-orange"
+                suppressHydrationWarning
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xl"
                 >
-                  ✕
+                  ×
                 </button>
               )}
             </div>
             <p className="text-center text-sm text-slate-500 mt-3">
-              Tapez des mots-clés comme "inscription", "paiement", "certification"...
+              Recherchez par mot-clé, thème ou catégorie.
             </p>
           </div>
 
-          {/* Catégories */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12 animate-fade-in">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            {categoryItems.map((category) => {
+              const Icon = category.icon;
+              const isActive = selectedCategory === category.id;
+
               return (
                 <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                    selectedCategory === cat.id
-                      ? `bg-gradient-to-r from-${cat.color}-500 to-${cat.color}-600 text-white shadow-lg scale-105`
-                      : "bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200 hover:border-slate-300 shadow-md"
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                    isActive ? category.buttonClass : category.idleClass
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  {cat.label}
+                  {category.label}
                 </button>
               );
             })}
           </div>
 
-          {/* Liste des FAQs */}
-          <div className="max-w-4xl mx-auto">
-            {filteredFAQs.length > 0 ? (
+          <div ref={faqListRef} className="max-w-4xl mx-auto">
+            {isLoading && faqs.length === 0 ? (
               <div className="space-y-4">
-                {filteredFAQs.map((faq, idx) => (
-                  <Card
-                    key={faq.id}
-                    className="overflow-hidden border-2 border-slate-100 hover:border-orange-200 transition-all duration-300 animate-slide-up"
-                    style={{ animationDelay: `${idx * 50}ms` }}
-                  >
-                    <button
-                      onClick={() => toggleFAQ(faq.id)}
-                      className="w-full p-6 flex items-start justify-between gap-4 text-left hover:bg-slate-50/50 transition-colors"
-                    >
-                      <div className="flex-grow">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center flex-shrink-0">
-                            <HelpCircle className="w-5 h-5 text-orange-600" />
-                          </div>
-                          <Badge variant="outline" className="text-xs bg-slate-50">
-                            {categories.find(c => c.id === faq.categorie)?.label}
-                          </Badge>
-                        </div>
-                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-orange-600 transition-colors">
-                          {faq.question}
-                        </h3>
-                      </div>
-                      <ChevronDown
-                        className={`w-6 h-6 text-slate-400 flex-shrink-0 transition-transform duration-300 ${
-                          openFAQ === faq.id ? "rotate-180 text-orange-600" : ""
-                        }`}
-                      />
-                    </button>
-                    
-                    <div
-                      className={`overflow-hidden transition-all duration-500 ${
-                        openFAQ === faq.id ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                      }`}
-                    >
-                      <div className="px-6 pb-6 pt-2">
-                        <div className="pl-11 pr-10">
-                          <div className="h-px bg-gradient-to-r from-orange-200 via-orange-300 to-orange-200 mb-4"></div>
-                          <p className="text-slate-700 leading-relaxed animate-fade-in">
-                            {faq.reponse}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
+                {[0, 1, 2, 3, 4].map((item) => (
+                  <div key={item} className="bg-white rounded-2xl border-2 border-slate-100 p-6 animate-pulse">
+                    <div className="h-5 w-3/4 bg-slate-200 rounded mb-4" />
+                    <div className="h-4 w-full bg-slate-100 rounded mb-2" />
+                    <div className="h-4 w-5/6 bg-slate-100 rounded" />
+                  </div>
                 ))}
               </div>
+            ) : filteredFAQs.length > 0 ? (
+              <div className="space-y-4">
+                {filteredFAQs.map((faq) => {
+                  const meta = getCategoryMeta(faq.categorie);
+                  const Icon = meta.icon;
+
+                  return (
+                    <Card
+                      key={faq.id}
+                      className="overflow-hidden border-2 border-slate-100 hover:border-orange-200 transition-all duration-200"
+                    >
+                      <button
+                        onClick={() => toggleFAQ(faq.id)}
+                        className="w-full p-6 flex items-start justify-between gap-4 text-left hover:bg-slate-50/70 transition-colors"
+                      >
+                        <div className="flex-grow">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <div className={`w-8 h-8 rounded-lg ${meta.iconWrapClass} flex items-center justify-center flex-shrink-0`}>
+                              <Icon className={`w-5 h-5 ${meta.iconClass}`} />
+                            </div>
+                            <Badge variant="outline" className={`text-xs ${meta.badgeClass}`}>
+                              {faq.categorie}
+                            </Badge>
+                          </div>
+                          <h3 className="text-lg font-bold text-slate-900">
+                            {faq.question}
+                          </h3>
+                        </div>
+                        <ChevronDown
+                          className={`w-6 h-6 text-slate-400 flex-shrink-0 transition-transform duration-300 ${
+                            openFAQ === faq.id ? "rotate-180 text-cpu-orange" : ""
+                          }`}
+                        />
+                      </button>
+
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ${
+                          openFAQ === faq.id ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <div className="px-6 pb-6 pt-2">
+                          <div className="pl-11 pr-10">
+                            <div className="h-px bg-slate-200 mb-4" />
+                            <p className="text-slate-700 leading-relaxed">{faq.reponse}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
             ) : (
-              <div className="text-center py-16 animate-fade-in">
+              <div className="text-center py-16">
                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
                   <Search className="w-10 h-10 text-slate-300" />
                 </div>
                 <p className="text-xl text-slate-500 font-semibold mb-2">Aucune question trouvée</p>
-                <p className="text-slate-400">Essayez de modifier vos critères de recherche</p>
+                <p className="text-slate-400">Essayez de modifier votre recherche ou votre filtre.</p>
               </div>
             )}
           </div>
 
-          {/* Section contact */}
+          {/* Tips Section */}
           <div className="max-w-4xl mx-auto mt-16">
-            <div className="bg-gradient-to-r from-orange-50 via-white to-blue-50 rounded-3xl p-8 md:p-12 border-2 border-slate-100 shadow-xl">
+            <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-3xl p-8 border-2 border-orange-100">
+              <h2 className="font-bold text-slate-900 mb-6 text-lg flex items-center gap-2">
+                <span className="w-8 h-8 rounded-xl bg-orange-500 flex items-center justify-center">
+                  <Lightbulb className="w-4 h-4 text-white" />
+                </span>
+                Le saviez-vous ?
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {([
+                  {
+                    icon: Award,
+                    text: "Les formations CPU sont éligibles au financement FDFP pour les salariés du secteur privé en Côte d'Ivoire.",
+                    colorClass: "bg-orange-100 text-orange-600",
+                  },
+                  {
+                    icon: CheckCircle,
+                    text: "Vous obtenez une certification reconnue dès la validation de votre premier parcours de formation.",
+                    colorClass: "bg-green-100 text-green-600",
+                  },
+                  {
+                    icon: Clock,
+                    text: "Nos formations en ligne sont accessibles 24h/24, 7j/7 depuis n'importe quel appareil connecté à internet.",
+                    colorClass: "bg-blue-100 text-blue-600",
+                  },
+                  {
+                    icon: Users,
+                    text: "Plus de 20 000 apprenants ont déjà transformé leur carrière ou leur activité grâce aux parcours CPU Academy.",
+                    colorClass: "bg-purple-100 text-purple-600",
+                  },
+                ] as Array<{ icon: React.ElementType; text: string; colorClass: string }>).map((tip, idx) => {
+                  const TipIcon = tip.icon;
+                  return (
+                    <div key={idx} className="flex items-start gap-3 bg-white rounded-2xl p-4 shadow-sm">
+                      <div
+                        className={`w-8 h-8 rounded-lg ${tip.colorClass} flex items-center justify-center flex-shrink-0 mt-0.5`}
+                      >
+                        <TipIcon className="w-4 h-4" />
+                      </div>
+                      <p className="text-sm text-slate-700 leading-relaxed">{tip.text}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Complementary Resources */}
+          <div className="max-w-4xl mx-auto mt-10">
+            <div className="text-center mb-7">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Ressources complémentaires</h2>
+              <p className="text-slate-500">Approfondissez vos connaissances avec nos autres contenus</p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {([
+                {
+                  href: "/catalogue",
+                  icon: BookOpen,
+                  title: "Catalogue",
+                  desc: "Toutes nos formations disponibles",
+                  from: "from-orange-500",
+                  to: "to-orange-600",
+                },
+                {
+                  href: "/ressources/guides",
+                  icon: Download,
+                  title: "Guides & Modèles",
+                  desc: "Documents et templates gratuits",
+                  from: "from-blue-500",
+                  to: "to-blue-600",
+                },
+                {
+                  href: "/ressources/webinaires",
+                  icon: Video,
+                  title: "Webinaires",
+                  desc: "Sessions live et replays HD",
+                  from: "from-purple-500",
+                  to: "to-purple-600",
+                },
+                {
+                  href: "/parcours",
+                  icon: GraduationCap,
+                  title: "Parcours",
+                  desc: "Programmes certifiants complets",
+                  from: "from-green-500",
+                  to: "to-green-600",
+                },
+              ] as Array<{ href: string; icon: React.ElementType; title: string; desc: string; from: string; to: string }>).map(
+                (item) => {
+                  const ItemIcon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="group flex flex-col p-5 bg-white rounded-2xl border-2 border-slate-100 hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
+                    >
+                      <div
+                        className={`w-11 h-11 rounded-xl bg-gradient-to-br ${item.from} ${item.to} flex items-center justify-center mb-3 shadow-md`}
+                      >
+                        <ItemIcon className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="font-bold text-slate-900 mb-1 text-sm">{item.title}</h3>
+                      <p className="text-xs text-slate-500 flex-1">{item.desc}</p>
+                      <span className="text-xs text-orange-600 font-medium mt-3 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                        Explorer <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </Link>
+                  );
+                }
+              )}
+            </div>
+          </div>
+
+          <div className="max-w-4xl mx-auto mt-16">
+            <div className="bg-white rounded-3xl p-8 md:p-12 border-2 border-slate-100 shadow-sm">
               <div className="text-center mb-8">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-cpu-orange flex items-center justify-center">
                   <MessageCircle className="w-8 h-8 text-white" />
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
                   Vous ne trouvez pas la réponse ?
                 </h2>
-                <p className="text-lg text-slate-600">
-                  Notre équipe est là pour vous aider
-                </p>
+                <p className="text-lg text-slate-600">Notre équipe est là pour vous aider.</p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <div className="grid md:grid-cols-3 gap-6 mb-10">
                 <a
                   href="mailto:contact@cpuformation.ci"
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-orange-300 transition-all duration-300 "
+                  className="group flex flex-col items-center p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 hover:border-orange-300 transition-all duration-200"
                 >
                   <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mb-3 group-hover:bg-orange-500 transition-colors">
                     <Mail className="w-6 h-6 text-orange-600 group-hover:text-white transition-colors" />
@@ -331,7 +514,7 @@ export default function FAQPage() {
 
                 <a
                   href="tel:+22527000000"
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-300 transition-all duration-300 "
+                  className="group flex flex-col items-center p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 hover:border-blue-300 transition-all duration-200"
                 >
                   <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:bg-blue-500 transition-colors">
                     <Phone className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
@@ -341,105 +524,21 @@ export default function FAQPage() {
                 </a>
 
                 <a
-                  href="#chat"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // Ici vous pouvez ouvrir un widget de chat
-                    alert("Chat en direct disponible bientôt !");
-                  }}
-                  className="group flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-green-300 transition-all duration-300  cursor-pointer"
+                  href="/support"
+                  className="group flex flex-col items-center p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 hover:border-green-300 transition-all duration-200"
                 >
                   <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:bg-green-500 transition-colors">
                     <MessageCircle className="w-6 h-6 text-green-600 group-hover:text-white transition-colors" />
                   </div>
-                  <h3 className="font-bold text-slate-900 mb-1">Chat en direct</h3>
-                  <p className="text-sm text-slate-600 text-center">Réponse immédiate</p>
+                  <h3 className="font-bold text-slate-900 mb-1">Support</h3>
+                  <p className="text-sm text-slate-600 text-center">Écrivez-nous directement</p>
                 </a>
               </div>
 
-              {/* Formulaire de contact */}
-              <div id="contact-form" className="bg-white rounded-2xl p-8 border-2 border-slate-100 shadow-md scroll-mt-24">
-                <h3 className="text-xl font-bold text-slate-900 mb-2 text-center">Laissez-nous un message</h3>
-                <p className="text-sm text-slate-600 mb-6 text-center">Nous vous répondrons dans les plus brefs délais</p>
-                
-                <form className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="nom" className="block text-sm font-semibold text-slate-700 mb-2">
-                        Nom complet *
-                      </label>
-                      <input
-                        type="text"
-                        id="nom"
-                        required
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all"
-                        placeholder="Votre nom"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="contact-email" className="block text-sm font-semibold text-slate-700 mb-2">
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        id="contact-email"
-                        name="email"
-                        required
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all"
-                        placeholder="votre@email.com"
-                        suppressHydrationWarning
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="telephone" className="block text-sm font-semibold text-slate-700 mb-2">
-                      Téléphone
-                    </label>
-                    <input
-                      type="tel"
-                      id="telephone"
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all"
-                      placeholder="+225 XX XX XX XX XX"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="sujet" className="block text-sm font-semibold text-slate-700 mb-2">
-                      Sujet *
-                    </label>
-                    <input
-                      type="text"
-                      id="sujet"
-                      required
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all"
-                      placeholder="Objet de votre message"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
-                      Message *
-                    </label>
-                    <textarea
-                      id="message"
-                      required
-                      rows={5}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-all resize-none"
-                      placeholder="Décrivez votre demande ou question..."
-                    ></textarea>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition-all duration-300 .5"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <Mail className="w-5 h-5" />
-                      Envoyer le message
-                    </div>
-                  </button>
-                </form>
+              <div className="text-center">
+                <Button className="bg-cpu-orange hover:bg-orange-600 text-white" asChild>
+                  <a href="/support">Contacter le support</a>
+                </Button>
               </div>
             </div>
           </div>

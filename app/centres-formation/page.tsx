@@ -54,7 +54,7 @@ export default function CentresFormationPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Nos Centres de Formation",
             subtitle: "Découvrez nos espaces équipés et professionnels partout en Côte d'Ivoire",
             buttons: [
@@ -71,7 +71,7 @@ export default function CentresFormationPage() {
             ]
           },
           {
-            image: "/images/formation-tech.png",
+            image: "/images/default-formation.jpg",
             title: "Accessibilité Nationale",
             subtitle: "Présents dans toutes les grandes villes de Côte d'Ivoire",
             buttons: [

@@ -237,6 +237,25 @@ export interface UpdateCategoryDto {
 }
 
 // ============================================
+// FAQ Types
+// ============================================
+
+export interface Faq {
+  id: string;
+  question: string;
+  reponse: string;
+  categorie: string;
+  ordre: number;
+  vues: number;
+  utile: number;
+  statut: 'Publié' | 'Brouillon';
+  createdBy: unknown;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+// ============================================
 // Chapter Types
 // ============================================
 
