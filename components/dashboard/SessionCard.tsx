@@ -11,7 +11,7 @@ export function SessionCard({ session }: SessionCardProps) {
   const [mois, jour] = session.date.split(" ");
 
   return (
-    <div className="p-4 border-2 border-slate-100 rounded-lg hover:border-cpu-orange transition-all">
+    <div className="p-4 border-2 border-slate-100 rounded-lg hover:border-cpu-orange hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
       <div className="flex items-start gap-3">
         <div className="bg-orange-50 px-3 py-2 rounded-lg text-center flex-shrink-0 border border-orange-200">
           <div className="text-xs font-semibold text-cpu-orange">{mois}</div>

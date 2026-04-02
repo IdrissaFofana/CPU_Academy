@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageBanner } from "@/components/layout/PageBanner";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import {
   Award,
   BookOpen,
@@ -57,8 +58,13 @@ const initialUserProfile = {
 };
 
 export default function ProfilPage() {
+  const { canAccess } = useRequireAuth();
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [userProfile, setUserProfile] = useState(initialUserProfile);
+
+  if (!canAccess) {
+    return null;
+  }
 
   const handleProfileChange =
     (field: keyof typeof initialUserProfile) =>

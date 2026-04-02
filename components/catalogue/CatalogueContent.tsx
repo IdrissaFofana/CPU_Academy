@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { objectifsMetier, regions } from "@/data/constants";
-import { Search, Filter, X, Grid3x3, List, LayoutGrid, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal, Clock, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import { Search, Filter, X, Grid3x3, List, LayoutGrid, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal, Clock, ChevronLeft, ChevronRight, BookOpen, Video, MapPin, Wifi, Layers, Monitor } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -28,9 +28,66 @@ const DEFAULT_SECTEURS = ["Secteur Primaire", "Secteur Secondaire", "Secteur Ter
 const DEFAULT_NIVEAUX = ["Débutant", "Intermédiaire", "Avancé"] as const;
 const DEFAULT_FORMATS = ["Vidéo", "Live", "Présentiel", "Hybride"] as const;
 
+// Config de la barre de navigation Format
+const FORMAT_TABS = [
+  {
+    value: "all",
+    label: "Tous les formats",
+    shortLabel: "Tous",
+    icon: Layers,
+    color: "text-slate-600",
+    activeBg: "bg-slate-900",
+    activeText: "text-white",
+    hoverBg: "hover:bg-slate-100",
+    description: "Toutes les formations disponibles",
+  },
+  {
+    value: "Live",
+    label: "Webinaires live",
+    shortLabel: "Live",
+    icon: Wifi,
+    color: "text-orange-600",
+    activeBg: "bg-gradient-to-r from-orange-500 to-red-500",
+    activeText: "text-white",
+    hoverBg: "hover:bg-orange-50",
+    description: "Sessions en direct avec formateur",
+  },
+  {
+    value: "Présentiel",
+    label: "Présentiel",
+    shortLabel: "Présentiel",
+    icon: MapPin,
+    color: "text-emerald-600",
+    activeBg: "bg-gradient-to-r from-emerald-500 to-teal-500",
+    activeText: "text-white",
+    hoverBg: "hover:bg-emerald-50",
+    description: "En salle, dans un centre de formation",
+  },
+  {
+    value: "Vidéo",
+    label: "À son rythme",
+    shortLabel: "À son rythme",
+    icon: Monitor,
+    color: "text-violet-600",
+    activeBg: "bg-gradient-to-r from-violet-500 to-indigo-500",
+    activeText: "text-white",
+    hoverBg: "hover:bg-violet-50",
+    description: "Apprenez quand vous voulez, où vous voulez",
+  },
+] as const;
+
 type CatalogueFormation = Formation;
 
-export function CatalogueContent() {
+interface CatalogueContentProps {
+  /** When set, pre-filters to this raw API mode and hides the format filter */
+  lockedModalite?: string;
+  /** Human-readable label for the locked mode (shown in the toolbar chip) */
+  lockedModaliteLabel?: string;
+  /** Pass true when the parent page already renders a PageBanner */
+  hideBanner?: boolean;
+}
+
+export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBanner = false }: CatalogueContentProps = {}) {
   const searchParams = useSearchParams();
   const expertParam = searchParams.get('expert');
   const regionParam = searchParams.get('region');
@@ -169,6 +226,10 @@ export function CatalogueContent() {
       if (format && format !== "all" && formation.format !== format) {
         return false;
       }
+      // Locked mode filter (from parent page — filters on raw modalite field)
+      if (lockedModalite && formation.modalite?.toLowerCase() !== lockedModalite.toLowerCase()) {
+        return false;
+      }
       if (gratuit !== null && formation.gratuit !== gratuit) {
         return false;
       }
@@ -231,7 +292,6 @@ export function CatalogueContent() {
     region !== "all" ? region : "",
     secteur !== "all" ? secteur : "",
     niveau !== "all" ? niveau : "",
-    format !== "all" ? format : "",
     gratuit,
     certifiant,
     expertFilter,
@@ -248,7 +308,8 @@ export function CatalogueContent() {
 
   return (
     <>
-      <PageBanner 
+      {!hideBanner && (
+        <PageBanner 
         breadcrumb={[
           { label: "Accueil", href: "/" },
           { label: "Catalogue" }
@@ -276,11 +337,12 @@ export function CatalogueContent() {
             title: "Solutions Pour Entreprises",
             subtitle: "Des programmes adaptés aux besoins de votre organisation",
             buttons: [
-              { label: "Contactez-nous", href: "/entreprises", icon: <Building className="h-5 w-5" /> }
+              { label: "Contactez-nous", href: "/entreprises", icon: <Building className="h-5 w-5" /> },
             ]
           }
         ]}
       />
+      )}
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -300,6 +362,79 @@ export function CatalogueContent() {
 
 
           </div>
+
+          {/* ═══════════════════════════════════════════════════
+               BARRE DE NAVIGATION FORMAT
+          ═══════════════════════════════════════════════════ */}
+          {!lockedModalite && (
+            <div className="mb-8 animate-fade-in-up animation-delay-100">
+              {/* Titre de section */}
+              <div className="flex items-center gap-2 mb-4 justify-end">
+                <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Format de formation</span>
+                <Layers className="w-4 h-4 text-slate-400" />
+              </div>
+
+              {/* Tabs scrollables */}
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide justify-end">
+                {FORMAT_TABS.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = format === tab.value;
+                  // Compter les formations de ce format
+                  const count = tab.value === "all"
+                    ? baseFormations.length
+                    : baseFormations.filter((f) => f.format === tab.value).length;
+
+                  return (
+                    <button
+                      key={tab.value}
+                      onClick={() => { setFormat(tab.value); setCurrentPage(1); }}
+                      className={`
+                        group relative flex-shrink-0 flex flex-col items-center gap-1.5
+                        px-5 py-3.5 rounded-2xl border-2 transition-all duration-250
+                        cursor-pointer select-none
+                        ${isActive
+                          ? `${tab.activeBg} ${tab.activeText} border-transparent shadow-lg shadow-black/10 scale-[1.03]`
+                          : `bg-white border-slate-100 text-slate-600 ${tab.hoverBg} hover:border-slate-200 hover:shadow-md`
+                        }
+                      `}
+                      aria-pressed={isActive}
+                    >
+                      {/* Icone + label */}
+                      <div className="flex items-center gap-2">
+                        <Icon
+                          className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                            isActive ? "text-white" : tab.color
+                          }`}
+                        />
+                        <span className="font-semibold text-sm whitespace-nowrap">{tab.shortLabel}</span>
+                        {/* Badge count */}
+                        <span className={`
+                          inline-flex items-center justify-center min-w-[1.4rem] h-5 px-1.5
+                          rounded-full text-xs font-bold
+                          ${ isActive
+                            ? "bg-white/20 text-white"
+                            : "bg-slate-100 text-slate-500 group-hover:bg-slate-200"
+                          }
+                        `}>
+                          {count}
+                        </span>
+                      </div>
+                      {/* Description (visible uniquement md+) */}
+                      <span className={`hidden md:block text-[11px] leading-tight ${
+                        isActive ? "text-white/80" : "text-slate-400"
+                      }`}>
+                        {tab.description}
+                      </span>
+                      {/* Barre active en bas */}
+                      {isActive && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 rotate-45 bg-white/30 rounded-sm" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Mobile Filter Button */}
           <div className="md:hidden mb-6">
@@ -442,14 +577,12 @@ export function CatalogueContent() {
                         </button>
                       </Badge>
                     )}
-                    {format && format !== "all" && (
-                      <Badge variant="secondary" className="flex items-center gap-2">
-                        {format}
-                        <button onClick={() => setFormat("all")} className="cursor-pointer hover:text-red-600">
-                          <X className="h-3 w-3" />
-                        </button>
+                    {lockedModalite && lockedModaliteLabel && (
+                      <Badge className="flex items-center gap-1 bg-cpu-orange/10 text-cpu-orange border border-cpu-orange/30">
+                        {lockedModaliteLabel}
                       </Badge>
                     )}
+
                   </div>
                 )}
               </div>
@@ -462,19 +595,24 @@ export function CatalogueContent() {
                       : viewMode === "compact"
                       ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"
                       : "flex flex-col gap-4")}>
-                    {formationsPage.map((formation, index) => (
+                    {formationsPage.map((formation, index) => {
+                      const renderKey = `${formation.id || formation.slug || "formation"}-${startIndex + index}`;
+                      const cardId = formation.id || formation.slug || renderKey;
+
+                      return (
                       <div
-                        key={formation.id}
+                        key={renderKey}
                         className="animate-fade-in-up"
                         style={{ animationDelay: `${Math.min(index * 0.08, 0.6)}s` }}
                       >
                         <EnhancedFormationCard 
                           formation={formation}
-                          isFavorite={isFavorite(formation.id)}
-                          onFavoriteToggle={toggleFavorite}
+                          isFavorite={isFavorite(cardId)}
+                          onFavoriteToggle={() => toggleFavorite(cardId)}
                         />
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   {/* Pagination Controls */}

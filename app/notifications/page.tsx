@@ -24,6 +24,7 @@ import {
 import { useNotifications } from "@/contexts/NotificationContext";
 import Link from "next/link";
 import { useTestNotifications } from "@/lib/testNotifications";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type FilterType = "all" | "success" | "info" | "warning" | "error" | "message";
 
@@ -42,9 +43,14 @@ function formatTimeAgo(date: Date): string {
 }
 
 export default function NotificationsPage() {
+  const { canAccess } = useRequireAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } = useNotifications();
   const { createTestNotifications } = useTestNotifications();
   const [filter, setFilter] = useState<FilterType>("all");
+
+  if (!canAccess) {
+    return null;
+  }
 
   const filteredNotifications = filter === "all" 
     ? notifications 

@@ -688,6 +688,20 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Liens: toujours afficher le curseur main, meme sur leurs elements enfants */
+a,
+a *,
+[role="link"],
+[role="link"] * {
+  cursor: pointer;
+}
+
+/* Etats desactives: curseur explicite */
+a[aria-disabled="true"],
+[role="link"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;

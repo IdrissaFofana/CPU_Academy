@@ -40,7 +40,7 @@ function ParcoursCardGrid({
 }: Omit<ParcoursCardOptimizedProps, "variant">) {
   return (
     <Link href={`/parcours/${parcours.id}`} className="block h-full">
-      <Card className="group relative overflow-hidden bg-white h-full shadow-lg transition-all duration-500 border-0">
+      <Card className="group relative overflow-hidden bg-white h-full shadow-lg transition-all duration-500 border-0 hover:-translate-y-1 hover:shadow-xl">
         {/* CONTAINER PRINCIPAL */}
         <div className="relative h-full flex flex-col">
           {/* ═══════════════════════════════════════════ */}

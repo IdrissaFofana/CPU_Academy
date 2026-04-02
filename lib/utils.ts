@@ -6,6 +6,28 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Retourne l'image de fallback correspondant au type (mode/format) de la formation.
+ * webinaire / live      → formation-webinaire-default.svg
+ * presentiel            → formation-presentiel-default.svg
+ * a_son_rythme / vidéo  → formation-rythme-default.svg
+ */
+export function getModeFallbackImage(format?: string, modalite?: string): string {
+  const f = (format || "").toLowerCase();
+  const m = (modalite || "").toLowerCase();
+
+  if (f.includes("live") || m.includes("webinaire") || m.includes("live")) {
+    return "/images/formation-webinaire-default.svg";
+  }
+  if (f.includes("présentiel") || f.includes("presentiel") || m.includes("presentiel")) {
+    return "/images/formation-presentiel-default.svg";
+  }
+  if (f.includes("vidéo") || f.includes("video") || m.includes("a_son_rythme") || m.includes("rythme")) {
+    return "/images/formation-rythme-default.svg";
+  }
+  return "/images/formation-presentiel-default.svg";
+}
+
+/**
  * Retourne l'image de fallback correspondant au secteur de la formation.
  * Secteur Primaire  → formation-agriculture.png
  * Secteur Secondaire → formation-tech.png

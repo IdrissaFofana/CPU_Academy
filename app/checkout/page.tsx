@@ -24,8 +24,10 @@ import {
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function CheckoutPage() {
+  const { canAccess } = useRequireAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [promoCode, setPromoCode] = useState("");
@@ -34,6 +36,10 @@ export default function CheckoutPage() {
   // Utiliser le panier depuis le contexte
   const { items: cartItems, removeItem, clearCart } = useCart();
   const { addNotification } = useNotifications();
+
+  if (!canAccess) {
+    return null;
+  }
 
   const paymentMethods = [
     {

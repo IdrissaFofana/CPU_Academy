@@ -6,12 +6,14 @@ import Link from "next/link";
 import { formationsMock } from "@/data/mock";
 import { Question, Quiz } from "@/types";
 import { Button } from "@/components/ui/button";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function QuizPage({
   params,
 }: {
   params: Promise<{ slug: string; quizId: string }>;
 }) {
+  const { canAccess } = useRequireAuth();
   const { slug, quizId } = use(params);
   const router = useRouter();
   const formation = formationsMock.find((f) => f.slug === slug);
@@ -37,6 +39,10 @@ export default function QuizPage({
 
   if (!quiz) {
     notFound();
+  }
+
+  if (!canAccess) {
+    return null;
   }
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);

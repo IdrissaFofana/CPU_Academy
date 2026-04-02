@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SearchBar } from "@/components/ui/search-bar";
@@ -11,37 +10,121 @@ import {
   Send,
   Phone,
   Mail,
-  Clock,
-  Users,
-  Wifi,
-  Car,
-  Utensils,
-  Monitor,
-  Snowflake,
-  Bus,
-  ExternalLink,
-  Grid3x3,
-  List,
-  LayoutGrid
+  ArrowRight,
+  Building2,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
-import { centresFormationMock } from "@/data/mock";
+import { centreFormationService } from "@/lib/api/services";
+import type { CentreFormationApi } from "@/lib/api/types";
 
-type ViewMode = "grid" | "list" | "compact";
+type CentreCardData = {
+  id: string;
+  nom: string;
+  adresse: string;
+  ville: string;
+  region: string;
+  description?: string;
+  contact: {
+    telephone?: string;
+    email?: string;
+  };
+  displayOrder?: number;
+};
+
+// Palette de gradients — varie par index
+const CARD_GRADIENTS = [
+  "from-orange-500 via-amber-500 to-yellow-400",
+  "from-blue-600 via-indigo-500 to-violet-500",
+  "from-emerald-500 via-teal-500 to-cyan-500",
+  "from-rose-500 via-pink-500 to-fuchsia-500",
+  "from-violet-600 via-purple-500 to-indigo-500",
+  "from-amber-600 via-orange-500 to-red-500",
+  "from-cyan-500 via-sky-500 to-blue-500",
+  "from-green-500 via-emerald-600 to-teal-600",
+];
+
+const getGradient = (index: number) => CARD_GRADIENTS[index % CARD_GRADIENTS.length];
+
+const getInitials = (nom: string) =>
+  nom
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+
+const mapApiToCard = (centre: CentreFormationApi): CentreCardData => {
+  const ville = (centre.ville || "Ville non renseignée").trim();
+  return {
+    id: centre.id,
+    nom: centre.nom,
+    adresse: centre.adresse?.trim() || "Adresse non renseignée",
+    ville,
+    region: ville,
+    description: centre.description?.trim(),
+    contact: {
+      telephone: centre.telephone?.trim(),
+      email: centre.email?.trim(),
+    },
+    displayOrder: centre.display_order,
+  };
+};
 
 export default function CentresFormationPage() {
   const [selectedRegion, setSelectedRegion] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [searchTerm, setSearchTerm] = useState("");
+  const [centres, setCentres] = useState<CentreCardData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const regions = ["all", ...new Set(centresFormationMock.map((c) => c.region))];
+  useEffect(() => {
+    let mounted = true;
 
-  const filteredCentres = centresFormationMock.filter((centre) => {
+    const loadCentres = async () => {
+      setIsLoading(true);
+      try {
+        const apiCentres = await centreFormationService.getAll();
+
+        if (!mounted) return;
+
+        if (Array.isArray(apiCentres) && apiCentres.length > 0) {
+          const mapped = apiCentres
+            .map(mapApiToCard)
+            .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+          setCentres(mapped);
+          setLoadError(null);
+          return;
+        }
+
+        setCentres([]);
+        setLoadError("Aucun centre disponible pour le moment.");
+      } catch (_error) {
+        if (!mounted) return;
+        setCentres([]);
+        setLoadError("Impossible de charger les centres depuis l'API.");
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+
+    loadCentres();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const regions = useMemo(() => ["all", ...new Set(centres.map((c) => c.region))], [centres]);
+
+  const filteredCentres = centres.filter((centre) => {
     const matchRegion = selectedRegion === "all" || centre.region === selectedRegion;
-    const matchSearch = searchTerm === "" ||
+    const matchSearch =
+      searchTerm === "" ||
       centre.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
       centre.ville.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      centre.adresse.toLowerCase().includes(searchTerm.toLowerCase());
+      centre.adresse.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (centre.description || "").toLowerCase().includes(searchTerm.toLowerCase());
     return matchRegion && matchSearch;
   });
 
@@ -50,230 +133,295 @@ export default function CentresFormationPage() {
       <PageBanner
         breadcrumb={[
           { label: "Accueil", href: "/" },
-          { label: "Centres de Formation" }
+          { label: "Centres de Formation" },
         ]}
         slides={[
           {
             image: "/images/default-formation.jpg",
             title: "Nos Centres de Formation",
-            subtitle: "Découvrez nos espaces équipés et professionnels partout en Côte d'Ivoire",
+            subtitle:
+              "Découvrez nos espaces équipés et professionnels partout en Côte d'Ivoire",
             buttons: [
-              { label: "Trouver un centre", href: "#centres", icon: <MapPin className="h-5 w-5" /> },
-              { label: "Contactez-nous", href: "/support", variant: "outline", icon: <Send className="h-5 w-5" /> }
-            ]
+              {
+                label: "Trouver un centre",
+                href: "#centres",
+                icon: <MapPin className="h-5 w-5" />,
+              },
+              {
+                label: "Contactez-nous",
+                href: "/support",
+                variant: "outline",
+                icon: <Send className="h-5 w-5" />,
+              },
+            ],
           },
           {
             image: "/images/formation-agriculture.png",
             title: "Infrastructures Modernes",
             subtitle: "Des équipements de pointe pour une formation optimale",
             buttons: [
-              { label: "Visiter un centre", href: "#centres", icon: <MapPin className="h-5 w-5" /> }
-            ]
+              {
+                label: "Visiter un centre",
+                href: "#centres",
+                icon: <MapPin className="h-5 w-5" />,
+              },
+            ],
           },
           {
             image: "/images/default-formation.jpg",
             title: "Accessibilité Nationale",
             subtitle: "Présents dans toutes les grandes villes de Côte d'Ivoire",
             buttons: [
-              { label: "Localisation", href: "/regions", icon: <MapPin className="h-5 w-5" /> }
-            ]
-          }
+              {
+                label: "Localisation",
+                href: "/regions",
+                icon: <MapPin className="h-5 w-5" />,
+              },
+            ],
+          },
         ]}
       />
 
-      <div className="min-h-screen bg-slate-50">
-        <div className="container mx-auto px-6 lg:px-16 max-w-7xl py-8 lg:py-12">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-16 max-w-7xl py-10 lg:py-14">
 
+          {/* ─── Two-column layout ─── */}
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-10" id="centres">
 
-          {/* Main layout */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-            {/* Sidebar */}
-            <aside className="w-full lg:w-64 flex-shrink-0">
-              <Card className="p-6 border border-slate-200 sticky top-24">
-                <h2 className="text-lg font-bold text-slate-900 mb-6">Filtres</h2>
-                <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wide text-slate-700">Région</h3>
-                <div className="space-y-2">
-                  {regions.map((region) => (
-                    <Button
-                      key={region}
-                      onClick={() => setSelectedRegion(region)}
-                      variant="ghost"
-                      className={`w-full justify-start text-sm transition-all ${
-                        selectedRegion === region
-                          ? "bg-cpu-orange text-white hover:bg-cpu-orange"
-                          : "text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      {region === "all" ? "Toutes les régions" : region}
-                    </Button>
-                  ))}
-                </div>
-              </Card>
-            </aside>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              {/* Recherche + Nombre de résultats + View Mode Toggle */}
-              <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
-                <div className="flex-1 max-w-md">
-                  <SearchBar 
+            {/* ── Sidebar ── */}
+            <aside className="w-full lg:w-60 flex-shrink-0">
+              <div className="sticky top-24 space-y-6">
+                {/* Search */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">
+                    Recherche
+                  </label>
+                  <SearchBar
                     value={searchTerm}
                     onChange={setSearchTerm}
-                    placeholder="Rechercher un centre..."
+                    placeholder="Nom, ville…"
                     size="md"
                   />
                 </div>
-                <div className="flex items-center gap-4">
-                  <p className="text-sm text-slate-600">
-                    <span className="font-semibold">{filteredCentres.length}</span> centre{filteredCentres.length > 1 ? "s" : ""} trouvé{filteredCentres.length > 1 ? "s" : ""}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={viewMode === "grid" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setViewMode("grid")}
-                      className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
-                    >
-                      <Grid3x3 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === "list" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setViewMode("list")}
-                      className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
-                    >
-                      <List className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === "compact" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setViewMode("compact")}
-                      className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                    </Button>
+
+                {/* Region filter */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                    Ville / Région
+                  </label>
+                  <div className="space-y-1">
+                    {regions.map((region) => (
+                      <button
+                        key={region}
+                        onClick={() => setSelectedRegion(region)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                          selectedRegion === region
+                            ? "bg-cpu-orange text-white shadow-sm"
+                            : "text-slate-600 hover:bg-slate-100"
+                        }`}
+                      >
+                        {region === "all" ? "Tous les centres" : region}
+                      </button>
+                    ))}
                   </div>
                 </div>
+
+                {/* Stats chip */}
+                {!isLoading && (
+                  <div className="rounded-xl bg-orange-50 border border-orange-100 px-4 py-3 text-center">
+                    <p className="text-2xl font-extrabold text-cpu-orange leading-none">
+                      {filteredCentres.length}
+                    </p>
+                    <p className="text-xs text-orange-700 mt-0.5">
+                      centre{filteredCentres.length > 1 ? "s" : ""} disponible{filteredCentres.length > 1 ? "s" : ""}
+                    </p>
+                  </div>
+                )}
               </div>
+            </aside>
 
-              <div className={(viewMode === "grid" 
-                  ? "grid lg:grid-cols-2 gap-6" 
-                  : viewMode === "compact" 
-                  ? "grid md:grid-cols-3 gap-4" 
-                  : "space-y-4") + " mb-12"}>
-                {filteredCentres.map((centre, idx) => {
-                  const isListMode = viewMode === "list";
-                  const isCompactMode = viewMode === "compact";
-                  const cardPadding = isListMode ? "p-0 overflow-hidden flex flex-col md:flex-row" : "p-6";
-                  const cardClassName = "border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 animate-fade-in-up " + cardPadding;
-                  const photoClassName = isListMode ? "relative overflow-hidden group md:w-64 h-48 md:h-auto flex-shrink-0" : "relative overflow-hidden group h-56 rounded-lg mb-5";
-                  const badgeClassName = isListMode ? "absolute top-4 left-4 bg-cpu-orange text-white border-0 shadow-lg" : "absolute top-4 right-4 bg-cpu-orange text-white border-0 shadow-lg";
-                  const contentClassName = isListMode ? "flex-1 p-6 space-y-4" : "space-y-4";
-                  const titleClassName = isCompactMode ? "font-bold text-slate-900 text-base mb-2" : "font-bold text-slate-900 text-xl mb-2";
-                  const addressClassName = isCompactMode ? "text-slate-600 flex items-start gap-2 text-xs" : "text-slate-600 flex items-start gap-2 text-sm";
-                  const iconSize = isCompactMode ? "w-3 h-3" : "w-4 h-4";
-                  const iconSizeSmall = isCompactMode ? "w-2 h-2" : "w-3 h-3";
-                  const textSize = isCompactMode ? "text-xs" : "text-xs md:text-sm";
-                  const buttonTextSize = isCompactMode ? "text-xs" : "text-sm";
-                  const buttonPadding = isCompactMode ? "text-xs px-2" : "text-sm";
-                  const animationDelay = Math.min(idx * 0.1, 0.8) + "s";
-                  const headerClassName = isCompactMode ? "font-semibold text-slate-900 flex items-center gap-2 text-xs mb-2" : "font-semibold text-slate-900 flex items-center gap-2 text-sm mb-3";
-                  const headerTitle = isCompactMode ? "Équipements" : "Équipements & Services";
-                  const badgeTextSize = "text-xs";
-                  const buttonText = isCompactMode ? "Formations" : "Voir les formations";
-                  
-                  return (
-                  <Card key={centre.id} className={cardClassName} style={{ animationDelay: animationDelay }}>
-                    {/* Photo */}
-                    <div className={photoClassName}>
-                      <img src={centre.photos[0]} alt={centre.nom} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                      <Badge className={badgeClassName}>
-                        <MapPin className="w-3 h-3 mr-1" />{centre.ville}
-                      </Badge>
-                    </div>
-
-                    {/* Content */}
-                    <div className={contentClassName}>
-                      <div>
-                        <h3 className={titleClassName}>{centre.nom}</h3>
-                        <p className={addressClassName}>
-                          <MapPin className={iconSize + " flex-shrink-0 mt-0.5 text-cpu-orange"} />
-                          {centre.adresse}
-                        </p>
-                      </div>
-
-                      <div className={"grid grid-cols-1 gap-2 pt-3 pb-3 border-t border-b border-slate-100 " + textSize}>
-                        {!isCompactMode && (
-                          <>
-                            <div className="flex items-center gap-2 text-slate-600">
-                              <Phone className={"text-cpu-orange flex-shrink-0 " + iconSize} />
-                              <a href={"tel:" + centre.contact.telephone} className="hover:text-cpu-orange transition-colors truncate">{centre.contact.telephone}</a>
-                            </div>
-                            <div className="flex items-center gap-2 text-slate-600">
-                              <Mail className={"text-cpu-orange flex-shrink-0 " + iconSize} />
-                              <a href={"mailto:" + centre.contact.email} className="hover:text-cpu-orange transition-colors truncate">{centre.contact.email}</a>
-                            </div>
-                          </>
-                        )}
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <Clock className={"text-cpu-orange flex-shrink-0 " + iconSize} />
-                          {centre.horaires}
-                        </div>
-                      </div>
-
-                      <div>
-                        <h4 className={headerClassName}>
-                          <Monitor className={"text-cpu-orange " + iconSize} />
-                          {headerTitle}
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className={"bg-emerald-50 border-emerald-200 text-emerald-700 " + badgeTextSize}>
-                            <Users className={"mr-1 " + iconSizeSmall} />
-                            {centre.capacite}
-                          </Badge>
-                          {centre.parking && <Badge className={"bg-blue-50 border-blue-200 text-blue-700 " + badgeTextSize}><Car className={"mr-1 " + iconSizeSmall} />Parking</Badge>}
-                          {!isCompactMode && centre.restauration && <Badge className="bg-orange-50 border-orange-200 text-orange-700 text-xs"><Utensils className="w-3 h-3 mr-1" />Restauration</Badge>}
-                          {centre.equipements.includes("Wi-Fi") && <Badge className={"bg-purple-50 border-purple-200 text-purple-700 " + badgeTextSize}><Wifi className={"mr-1 " + iconSizeSmall} />Wi-Fi</Badge>}
-                          {!isCompactMode && centre.equipements.includes("Climatisation") && <Badge className="bg-cyan-50 border-cyan-200 text-cyan-700 text-xs"><Snowflake className="w-3 h-3 mr-1" />Climatisé</Badge>}
-                        </div>
-                      </div>
-
-                      {!isCompactMode && centre.transportsPublics && centre.transportsPublics.length > 0 && (
-                        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs md:text-sm">
-                          <p className="font-medium text-slate-700 mb-1 flex items-center gap-2"><Bus className="w-4 h-4 text-cpu-orange" />Transports publics</p>
-                          <p className="text-slate-600">{centre.transportsPublics.join(", ")}</p>
-                        </div>
-                      )}
-
-                      <div className="flex gap-3 pt-2">
-                        <Link href={"/catalogue?centre=" + centre.id} className="flex-1">
-                          <Button className={"w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white " + buttonTextSize}>
-                            {buttonText}
-                          </Button>
-                        </Link>
-                        <Button variant="outline" className={"hover:bg-cpu-orange hover:text-white hover:border-cpu-orange " + buttonPadding} onClick={() => window.open("https://www.google.com/maps?q=" + centre.coordonnees.lat + "," + centre.coordonnees.lng, "_blank")}>
-                          <ExternalLink className={iconSize} />
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                  );
-                })}
-              </div>
-
-              {filteredCentres.length === 0 && (
-                <div className="text-center py-12 md:py-16">
-                  <MapPin className="w-12 h-12 md:w-16 md:h-16 text-slate-300 mx-auto mb-3 md:mb-4" />
-                  <p className="text-slate-500 text-sm md:text-base">Aucun centre ne correspond à votre sélection.</p>
+            {/* ── Main content ── */}
+            <div className="flex-1 min-w-0">
+              {loadError && (
+                <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 flex items-center gap-3">
+                  <Building2 className="w-5 h-5 flex-shrink-0 text-amber-500" />
+                  {loadError}
                 </div>
               )}
 
-              <div className="mt-8 md:mt-12 lg:mt-16 bg-cpu-orange rounded-xl md:rounded-2xl p-8 md:p-12 text-center text-white">
-                <h2 className="text-2xl md:text-3xl font-bold mb-3">Vous ne trouvez pas de centre près de chez vous ?</h2>
-                <p className="text-base md:text-lg text-orange-50 mb-6 max-w-2xl mx-auto">Découvrez nos formations en ligne accessibles partout, à tout moment, avec des experts de haut niveau.</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link href="/catalogue"><Button className="bg-white text-cpu-orange hover:bg-orange-50 font-bold">Explorer les formations en ligne</Button></Link>
-                  <Link href="/support"><Button variant="outline" className="border-white text-white hover:bg-white/10 font-bold">Nous contacter</Button></Link>
+              {/* ── Skeleton ── */}
+              {isLoading ? (
+                <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <div
+                      key={`skeleton-${idx}`}
+                      className="rounded-2xl overflow-hidden border border-slate-100 bg-white shadow-sm animate-pulse"
+                    >
+                      <div className="h-36 bg-slate-200" />
+                      <div className="p-5 space-y-3">
+                        <div className="h-5 w-3/4 bg-slate-200 rounded-lg" />
+                        <div className="h-4 w-full bg-slate-100 rounded-lg" />
+                        <div className="h-4 w-5/6 bg-slate-100 rounded-lg" />
+                        <div className="h-9 w-full bg-slate-200 rounded-xl mt-2" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {/* ── Grid ── */}
+                  <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filteredCentres.map((centre, idx) => {
+                      const gradient = getGradient(idx);
+                      const initials = getInitials(centre.nom);
+                      const delay = `${Math.min(idx * 0.07, 0.6)}s`;
+
+                      return (
+                        <article
+                          key={centre.id}
+                          className="group relative flex flex-col rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
+                          style={{ animationDelay: delay }}
+                        >
+                          {/* ── Gradient header ── */}
+                          <div className={`relative h-36 bg-gradient-to-br ${gradient} flex items-center justify-center overflow-hidden`}>
+                            {/* Decorative circles */}
+                            <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10" />
+                            <div className="absolute -bottom-8 -left-4 w-24 h-24 rounded-full bg-white/10" />
+                            <div className="absolute bottom-2 right-4 w-10 h-10 rounded-full bg-white/10" />
+
+                            {/* Initials medallion */}
+                            <div className="relative z-10 flex flex-col items-center gap-1">
+                              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-lg">
+                                <span className="text-white font-extrabold text-2xl tracking-tight leading-none select-none">
+                                  {initials || <Building2 className="w-8 h-8 text-white" />}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* City badge */}
+                            <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/25 backdrop-blur-sm rounded-full px-2.5 py-1">
+                              <MapPin className="w-3 h-3 text-white/90 flex-shrink-0" />
+                              <span className="text-white text-xs font-semibold truncate max-w-[120px]">
+                                {centre.ville}
+                              </span>
+                            </div>
+
+                            {/* Order badge */}
+                            {typeof centre.displayOrder === "number" && centre.displayOrder > 0 && (
+                              <div className="absolute top-3 right-3 bg-black/20 backdrop-blur-sm rounded-full w-7 h-7 flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">{centre.displayOrder}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* ── Card body ── */}
+                          <div className="flex flex-col flex-1 p-5 gap-4">
+                            {/* Name + description */}
+                            <div>
+                              <h3 className="font-bold text-slate-900 text-base leading-snug group-hover:text-cpu-orange transition-colors duration-200">
+                                {centre.nom}
+                              </h3>
+                              {centre.description ? (
+                                <p className="text-slate-500 text-sm mt-1.5 line-clamp-2 leading-relaxed">
+                                  {centre.description}
+                                </p>
+                              ) : (
+                                <p className="text-slate-400 text-xs mt-1.5 italic">
+                                  Aucune description disponible
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Address */}
+                            <div className="flex items-start gap-2 text-sm text-slate-600">
+                              <MapPin className="w-4 h-4 text-cpu-orange flex-shrink-0 mt-0.5" />
+                              <span className="line-clamp-2">{centre.adresse}</span>
+                            </div>
+
+                            {/* Contact */}
+                            {(centre.contact.telephone || centre.contact.email) && (
+                              <div className="space-y-1.5 pt-1 border-t border-slate-100">
+                                {centre.contact.telephone && (
+                                  <a
+                                    href={`tel:${centre.contact.telephone}`}
+                                    className="flex items-center gap-2 text-xs text-slate-500 hover:text-cpu-orange transition-colors group/link"
+                                  >
+                                    <span className="w-6 h-6 rounded-lg bg-orange-50 flex items-center justify-center flex-shrink-0 group-hover/link:bg-cpu-orange transition-colors">
+                                      <Phone className="w-3 h-3 text-cpu-orange group-hover/link:text-white transition-colors" />
+                                    </span>
+                                    <span className="truncate font-medium">{centre.contact.telephone}</span>
+                                  </a>
+                                )}
+                                {centre.contact.email && (
+                                  <a
+                                    href={`mailto:${centre.contact.email}`}
+                                    className="flex items-center gap-2 text-xs text-slate-500 hover:text-cpu-orange transition-colors group/link"
+                                  >
+                                    <span className="w-6 h-6 rounded-lg bg-orange-50 flex items-center justify-center flex-shrink-0 group-hover/link:bg-cpu-orange transition-colors">
+                                      <Mail className="w-3 h-3 text-cpu-orange group-hover/link:text-white transition-colors" />
+                                    </span>
+                                    <span className="truncate font-medium">{centre.contact.email}</span>
+                                  </a>
+                                )}
+                              </div>
+                            )}
+
+                            {/* CTA */}
+                            <div className="mt-auto pt-2">
+                              <Link href={`/catalogue?region=${encodeURIComponent(centre.ville)}`} className="block">
+                                <Button className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white rounded-xl text-sm font-semibold group/btn">
+                                  Voir les formations
+                                  <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                                </Button>
+                              </Link>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+
+                  {/* ── Empty state ── */}
+                  {filteredCentres.length === 0 && !loadError && (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                      <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                        <Search className="w-8 h-8 text-slate-300" />
+                      </div>
+                      <p className="text-slate-700 font-semibold text-lg mb-1">Aucun centre trouvé</p>
+                      <p className="text-slate-400 text-sm max-w-xs">
+                        Essayez de modifier votre recherche ou de changer de filtre régional.
+                      </p>
+                      <button
+                        onClick={() => { setSearchTerm(""); setSelectedRegion("all"); }}
+                        className="mt-4 text-sm text-cpu-orange hover:underline font-medium"
+                      >
+                        Réinitialiser les filtres
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* ── CTA Banner ── */}
+              <div className="mt-14 relative overflow-hidden rounded-2xl bg-gradient-to-r from-cpu-orange via-orange-500 to-amber-500 p-10 text-center text-white shadow-xl">
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
+                <h2 className="text-2xl md:text-3xl font-extrabold mb-3 relative">
+                  Vous ne trouvez pas de centre près de chez vous ?
+                </h2>
+                <p className="text-orange-100 text-base md:text-lg mb-7 max-w-xl mx-auto relative">
+                  Nos formations en ligne sont accessibles partout, à tout moment, avec des experts de haut niveau.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center relative">
+                  <Link href="/catalogue">
+                    <Button className="bg-white text-cpu-orange hover:bg-orange-50 font-bold px-6">
+                      Explorer les formations en ligne
+                    </Button>
+                  </Link>
+                  <Link href="/support">
+                    <Button variant="outline" className="border-white text-white hover:bg-white/10 font-bold px-6">
+                      Nous contacter
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { SlidersHorizontal, X, Target, MapPin, Building2, BarChart3, Monitor, Check } from "lucide-react";
+import { SlidersHorizontal, X, Target, MapPin, Building2, BarChart3, Check } from "lucide-react";
 import type { Niveau, Format } from "@/types";
 
 type Option = { value: string; label: string };
@@ -172,23 +172,6 @@ export function CatalogueFilters({
           placeholder="Tous les niveaux"
           searchPlaceholder="Rechercher un niveau..."
           emptyText="Aucun niveau trouvé"
-        />
-      </div>
-
-      {/* Format */}
-      <div className="mb-6">
-        <Label htmlFor={isMobile ? "format-mobile" : "format"} className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
-          <Monitor className="w-4 h-4 text-cpu-orange" />
-          Format
-        </Label>
-        <SearchableSelect
-          triggerId={isMobile ? "format-mobile" : "format"}
-          value={format}
-          onValueChange={setFormat}
-          options={formatSelectOptions}
-          placeholder="Tous les formats"
-          searchPlaceholder="Rechercher un format..."
-          emptyText="Aucun format trouvé"
         />
       </div>
 

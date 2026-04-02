@@ -1,6 +1,6 @@
 import type { Chapitre } from "@/types";
 import { mapApiFormationToAppFormation } from "@/lib/adapters/formation-adapter";
-import { cleanApiText, decodeHtmlEntities, getSecteurFallbackImage } from "@/lib/utils";
+import { cleanApiText, decodeHtmlEntities, getModeFallbackImage } from "@/lib/utils";
 
 export type WebinaireStatus = "a-venir" | "live" | "termine";
 
@@ -129,7 +129,7 @@ export function mapApiFormationToWebinaire(raw: any): WebinaireViewModel {
   const date = parseDate(raw?.date || raw?.startDate || raw?.created_at || raw?.updated_at);
   const statut = getWebinaireStatus(raw);
 
-  const fallbackImage = getSecteurFallbackImage(formation.secteur);
+  const fallbackImage = getModeFallbackImage(raw?.mode || formation.format, raw?.mode || formation.modalite);
   const image = normalizeUrl(raw?.image || raw?.thumbnail || formation.image);
   const liveUrl = normalizeUrl(raw?.lien);
   const fileUrl = normalizeUrl(raw?.fichier);

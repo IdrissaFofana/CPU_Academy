@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { formationsMock } from "@/data/mock";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface FormationProgress {
   id: string;
@@ -46,8 +47,13 @@ interface FormationProgress {
 }
 
 export default function MesFormationsPage() {
+  const { canAccess } = useRequireAuth();
   const [activeTab, setActiveTab] = useState<"en-cours" | "completees" | "toutes">("en-cours");
   const [searchTerm, setSearchTerm] = useState("");
+
+  if (!canAccess) {
+    return null;
+  }
   const [formations, setFormations] = useState<FormationProgress[]>([]);
 
   useEffect(() => {

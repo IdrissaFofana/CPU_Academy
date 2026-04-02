@@ -32,13 +32,19 @@ import {
   Rocket,
 } from "lucide-react";
 import Link from "next/link";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 type ViewMode = "grid" | "list" | "compact";
 type FilterStatus = "all" | "in-progress" | "completed" | "upcoming";
 
 export default function DashboardPage() {
+  const { canAccess } = useRequireAuth();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+
+  if (!canAccess) {
+    return null;
+  }
 
   // Données utilisateur
   const user = {

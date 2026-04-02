@@ -41,6 +41,7 @@ import {
   LogIn,
   MapPin,
   Menu,
+  Monitor,
   Newspaper,
   Rocket,
   Search,
@@ -61,14 +62,19 @@ import { CommandPalette } from "@/components/layout/CommandPalette";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useCart } from "@/contexts/CartContext";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { useSimpleAuth } from "@/contexts/SimpleAuthContext";
+import { formationService } from "@/lib/api/services/formation.service";
+import { centreFormationService } from "@/lib/api/services/centreFormation.service";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn] = useState(true); // TODO: Remplacer par vraie authentification
   const [scrolled, setScrolled] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [accountDrawerOpen, setAccountDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [formationCount, setFormationCount] = useState<number | null>(null);
+  const [centreCount, setCentreCount] = useState<number | null>(null);
+  const { isAuthenticated: isLoggedIn, isReady, logout } = useSimpleAuth();
   const pathname = usePathname();
   
   // Panier depuis CartContext
@@ -86,6 +92,32 @@ export function Navbar() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Charge les compteurs réels depuis les APIs (silencieux, pas de spinner)
+  useEffect(() => {
+    let mounted = true;
+    const fetchCounts = async () => {
+      try {
+        const [formationsRes, centresRes] = await Promise.allSettled([
+          formationService.getPublic(),
+          centreFormationService.getAll(),
+        ]);
+        if (!mounted) return;
+        if (formationsRes.status === "fulfilled") {
+          const raw = formationsRes.value as any;
+          const items = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
+          setFormationCount(items.length);
+        }
+        if (centresRes.status === "fulfilled") {
+          setCentreCount(centresRes.value.length);
+        }
+      } catch {
+        // Silently ignore — fallback values are displayed
+      }
+    };
+    fetchCounts();
+    return () => { mounted = false; };
   }, []);
 
   useEffect(() => {
@@ -154,10 +186,14 @@ export function Navbar() {
                 title="Explorer" 
                 icon={<Compass className="w-4 h-4 mr-1" />}
                 items={[
-                  { label: "Catalogue de formations", href: "/catalogue", icon: <Book className="w-4 h-4" />, description: "245 formations disponibles" },
-                  { label: "Parcours métiers", href: "/parcours", icon: <Rocket className="w-4 h-4" />, description: "Programmes complets certifiants" },
-                  { label: "Centres de formation", href: "/centres-formation", icon: <MapPin className="w-4 h-4" />, description: "15 centres en Côte d'Ivoire" },
+                  { sectionLabel: "Par format" },
+                  { label: "Toutes les formations", href: "/catalogue", icon: <Book className="w-4 h-4" />, description: formationCount !== null ? `${formationCount} formation${formationCount > 1 ? "s" : ""} disponible${formationCount > 1 ? "s" : ""}` : "Catalogue de formations" },
                   { label: "Webinaires live", href: "/webinaires", icon: <Video className="w-4 h-4" />, description: "Sessions interactives en direct" },
+                  { label: "Formations présentiel", href: "/presentiel", icon: <MapPin className="w-4 h-4" />, description: "Apprenez en salle avec un expert" },
+                  { label: "À son rythme", href: "/a-son-rythme", icon: <Monitor className="w-4 h-4" />, description: "E-learning flexible 24h/24" },
+                  { sectionLabel: "Accompagnement" },
+                  { label: "Parcours métiers", href: "/parcours", icon: <Rocket className="w-4 h-4" />, description: "Programmes complets certifiants" },
+                  { label: "Centres de formation", href: "/centres-formation", icon: <MapPin className="w-4 h-4" />, description: centreCount !== null ? `${centreCount} centre${centreCount > 1 ? "s" : ""} en Côte d'Ivoire` : "Centres de formation" },
                   { label: "Certifications", href: "/certifications", icon: <Award className="w-4 h-4" />, description: "Validez vos compétences" },
                 ]}
                 isMegaMenu={true}
@@ -193,7 +229,7 @@ export function Navbar() {
                   items={[
                     { label: "Guides pratiques", href: "/ressources/guides", icon: <FileText className="w-4 h-4" />, description: "Documentations et tutoriels" },
                     { label: "Centre d'aide (FAQ)", href: "/ressources/faq", icon: <HelpCircle className="w-4 h-4" />, description: "Réponses à vos questions" },
-                    { label: "Webinaires", href: "/ressources/webinaires", icon: <Video className="w-4 h-4" />, description: "Replays et formations live" },
+
                   ]}
                   isMegaMenu={false}
                 />
@@ -254,8 +290,8 @@ export function Navbar() {
                 </>
               )}
 
-              {isLoggedIn ? (
-                <UserMenu userProgress={userProgress} isOpen={accountDrawerOpen} setIsOpen={setAccountDrawerOpen} />
+              {isReady && isLoggedIn ? (
+                <UserMenu userProgress={userProgress} isOpen={accountDrawerOpen} setIsOpen={setAccountDrawerOpen} onLogout={logout} />
               ) : (
                 <Button 
                   size="sm" 
@@ -297,7 +333,7 @@ export function Navbar() {
       {isMenuOpen && (
         <div className="lg:hidden bg-white/98 backdrop-blur-md pb-4 px-4 shadow-2xl max-h-[80vh] overflow-y-auto animate-in slide-in-from-top-2 duration-300 border-t border-gray-100 custom-scrollbar">
           {/* Header du menu mobile avec avatar et progression */}
-          {isLoggedIn && (
+          {isReady && isLoggedIn && (
             <div className="py-4 mb-3 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -345,7 +381,16 @@ export function Navbar() {
               </div>
             </div>
             <MobileNavLink href="/catalogue" icon={<Book className="w-5 h-5" />}>
-              Catalogue de formations
+              Toutes les formations
+            </MobileNavLink>
+            <MobileNavLink href="/webinaires" icon={<Video className="w-5 h-5" />}>
+              Webinaires live
+            </MobileNavLink>
+            <MobileNavLink href="/presentiel" icon={<MapPin className="w-5 h-5" />}>
+              Formations présentiel
+            </MobileNavLink>
+            <MobileNavLink href="/a-son-rythme" icon={<Monitor className="w-5 h-5" />}>
+              À son rythme
             </MobileNavLink>
             <MobileNavLink href="/parcours" icon={<Rocket className="w-5 h-5" />}>
               Parcours métiers
@@ -353,14 +398,11 @@ export function Navbar() {
             <MobileNavLink href="/centres-formation" icon={<MapPin className="w-5 h-5" />}>
               Centres de formation
             </MobileNavLink>
-            <MobileNavLink href="/webinaires" icon={<Video className="w-5 h-5" />}>
-              Webinaires live
-            </MobileNavLink>
             <MobileNavLink href="/certifications" icon={<Award className="w-5 h-5" />}>
               Certifications
             </MobileNavLink>
             
-            {isLoggedIn && (
+            {isReady && isLoggedIn && (
               <>
                 <div className="py-2 mt-2">
                   <div className="px-3 py-1.5 bg-gradient-to-r from-orange-50 to-transparent rounded-lg flex items-center justify-between">
@@ -372,12 +414,6 @@ export function Navbar() {
                 </div>
                 <MobileNavLink href="/dashboard" icon={<GraduationCap className="w-5 h-5" />}>
                   Dashboard Apprenant
-                </MobileNavLink>
-                <MobileNavLink href="/dashboard-entreprise" icon={<Building className="w-5 h-5" />}>
-                  Dashboard Entreprise
-                </MobileNavLink>
-                <MobileNavLink href="/dashboard-formateur" icon={<Users className="w-5 h-5" />}>
-                  Dashboard Formateur
                 </MobileNavLink>
                 
                 <div className="py-2 mt-2">
@@ -432,7 +468,7 @@ export function Navbar() {
           </div>
 
           <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
-            {isLoggedIn ? (
+            {isReady && isLoggedIn ? (
               <>
                 <MobileNavLink href="/profil" icon={<User className="w-5 h-5" />}>
                   Mon profil
@@ -440,12 +476,13 @@ export function Navbar() {
                 <Button
                   variant="outline"
                   className="w-full justify-start border-2 border-red-200 text-red-600 hover:bg-red-50"
-                  asChild
+                  onClick={() => {
+                    logout();
+                    setIsMenuOpen(false);
+                  }}
                 >
-                  <Link href="/deconnexion" className="flex items-center gap-2">
-                    <LogIn className="w-5 h-5 rotate-180" />
-                    Déconnexion
-                  </Link>
+                  <LogIn className="w-5 h-5 rotate-180 mr-2" />
+                  Déconnexion
                 </Button>
               </>
             ) : (
@@ -500,6 +537,10 @@ const NavLink = ({ href, children, icon }: { href: string; children: React.React
 };
 
 // Composant de lien avec dropdown
+type NavDropdownItem =
+  | { label: string; href: string; icon?: React.ReactNode; description?: string; sectionLabel?: never }
+  | { sectionLabel: string; label?: never; href?: never; icon?: never; description?: never };
+
 const NavLinkWithDropdown = ({ 
   title, 
   items, 
@@ -507,14 +548,15 @@ const NavLinkWithDropdown = ({
   isMegaMenu = false,
 }: { 
   title: string; 
-  items: { label: string; href: string; icon?: React.ReactNode; description?: string }[]; 
+  items: NavDropdownItem[]; 
   icon?: React.ReactNode;
   isMegaMenu?: boolean;
 }) => {
   const pathname = usePathname();
   // Extract base path from items (remove hash anchors)
   const isActive = items.some(item => {
-    const basePath = item.href.split('#')[0];
+    if (item.sectionLabel) return false;
+    const basePath = item.href!.split('#')[0];
     return pathname === basePath || pathname.startsWith(basePath + '/');
   });
   const [isOpen, setIsOpen] = useState(false);
@@ -544,36 +586,47 @@ const NavLinkWithDropdown = ({
             </h3>
           </div>
         )}
-        {items.map((item, index) => (
-          <DropdownMenuItem 
-            key={item.href} 
-            asChild
-            className={`${index !== 0 ? "mt-1" : ""}`}
-          >
-            <Link 
-              href={item.href} 
-              className={`w-full flex items-start gap-3 cursor-pointer px-3 py-2.5 rounded-md transition-all duration-200 group/item ${
-                pathname === item.href 
-                  ? "bg-orange-100 text-cpu-orange font-medium" 
-                  : "text-gray-700 hover:bg-orange-50 hover:text-cpu-orange"
-              }`}
-            >
-              <span className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 flex-shrink-0 ${
-                pathname === item.href 
-                  ? "bg-cpu-orange text-white" 
-                  : "bg-gray-50 text-gray-600 group-hover/item:bg-orange-100 group-hover/item:text-cpu-orange"
-              }`}>
-                {item.icon}
-              </span>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium">{item.label}</div>
-                {isMegaMenu && item.description && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.description}</p>
-                )}
+        {items.map((item, index) => {
+          if (item.sectionLabel) {
+            return (
+              <div key={`section-${index}`}>
+                {index > 0 && <DropdownMenuSeparator className="my-1" />}
+                <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  {item.sectionLabel}
+                </p>
               </div>
-            </Link>
-          </DropdownMenuItem>
-        ))}
+            );
+          }
+          return (
+            <DropdownMenuItem 
+              key={item.href} 
+              asChild
+            >
+              <Link 
+                href={item.href!} 
+                className={`w-full flex items-start gap-3 cursor-pointer px-3 py-2.5 rounded-md transition-all duration-200 group/item ${
+                  pathname === item.href 
+                    ? "bg-orange-100 text-cpu-orange font-medium" 
+                    : "text-gray-700 hover:bg-orange-50 hover:text-cpu-orange"
+                }`}
+              >
+                <span className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 flex-shrink-0 ${
+                  pathname === item.href 
+                    ? "bg-cpu-orange text-white" 
+                    : "bg-gray-50 text-gray-600 group-hover/item:bg-orange-100 group-hover/item:text-cpu-orange"
+                }`}>
+                  {item.icon}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium">{item.label}</div>
+                  {isMegaMenu && item.description && (
+                    <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
+                  )}
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          );
+        })}
         {isMegaMenu && (
           <div className="px-3 py-2 bg-gray-50 border-t border-gray-100">
             <Link 
@@ -617,7 +670,7 @@ const MobileNavLink = ({ href, children, icon }: { href: string; children: React
 };
 
 // Menu utilisateur avec drawer animé
-const UserMenu = ({ userProgress, isOpen, setIsOpen }: { userProgress: number, isOpen: boolean, setIsOpen: (open: boolean) => void }) => {
+const UserMenu = ({ userProgress, isOpen, setIsOpen, onLogout }: { userProgress: number, isOpen: boolean, setIsOpen: (open: boolean) => void, onLogout: () => void }) => {
   // TODO: Remplacer par le vrai type d'utilisateur depuis le contexte d'authentification
   // Pour le développement, tous les dashboards sont visibles
   
@@ -720,36 +773,6 @@ const UserMenu = ({ userProgress, isOpen, setIsOpen }: { userProgress: number, i
               </div>
               <ChevronDown className="w-4 h-4 text-gray-400 rotate-[-90deg]" />
             </Link>
-            
-            <Link 
-              href="/dashboard-entreprise" 
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-orange-50 transition-all group border border-transparent hover:border-orange-200"
-            >
-              <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
-                <Building className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <span className="font-semibold text-gray-900 block">Dashboard Entreprise</span>
-                <span className="text-xs text-gray-500">Gérez votre organisation</span>
-              </div>
-              <ChevronDown className="w-4 h-4 text-gray-400 rotate-[-90deg]" />
-            </Link>
-            
-            <Link 
-              href="/dashboard-formateur" 
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-orange-50 transition-all group border border-transparent hover:border-orange-200"
-            >
-              <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform">
-                <Users className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <span className="font-semibold text-gray-900 block">Dashboard Formateur</span>
-                <span className="text-xs text-gray-500">Espace formateur</span>
-              </div>
-              <ChevronDown className="w-4 h-4 text-gray-400 rotate-[-90deg]" />
-            </Link>
           </div>
         </div>
         
@@ -846,14 +869,17 @@ const UserMenu = ({ userProgress, isOpen, setIsOpen }: { userProgress: number, i
             <ChevronDown className="w-4 h-4 text-gray-400 rotate-[-90deg]" />
           </Link>
           
-          <Link 
-            href="/deconnexion" 
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 transition-all group border border-transparent hover:border-red-200"
+          <button
+            type="button"
+            onClick={() => {
+              onLogout();
+              setIsOpen(false);
+            }}
+            className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 transition-all group border border-transparent hover:border-red-200"
           >
             <LogIn className="w-5 h-5 text-red-600 rotate-180 group-hover:scale-110 transition-transform" />
             <span className="flex-1 font-semibold text-red-600">Déconnexion</span>
-          </Link>
+          </button>
         </div>
       </SheetContent>
     </Sheet>

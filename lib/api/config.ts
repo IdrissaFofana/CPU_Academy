@@ -39,6 +39,24 @@ export const API_ENDPOINTS = {
     BASE: '/api/formation/chapitres',
     LECONS: '/api/formation/chapitres/lecons',
   },
+
+  SESSIONS: {
+    PUBLIC: '/api/formation/sessions/public',
+    PUBLIC_BY_ID: (id: string) => `/api/formation/sessions/public/${id}`,
+  },
+
+  PARTICIPANTS: {
+    BASE: '/api/formation/participants',
+    BY_ID: (id: string) => `/api/formation/participants/${id}`,
+    BY_FORMATION: (formationId: string) => `/api/formation/participants/formation/${formationId}`,
+    BY_USER: (userId: string) => `/api/formation/participants/user/${userId}`,
+    ME_FORMATIONS: '/api/formation/participant/me/formations',
+  },
+
+  CENTRE_FORMATIONS: {
+    BASE: '/api/centre-formations',
+    BY_ID: (id: string) => `/api/centre-formations/${id}`,
+  },
   
   // Users
   USERS: {

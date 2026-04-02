@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Formation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { useSimpleAuth } from "@/contexts/SimpleAuthContext";
 import { ShoppingCart, Check } from "lucide-react";
+import { participantService } from "@/lib/api/services";
 
 interface FormationSidebarProps {
   formation: Formation;
@@ -16,9 +19,35 @@ export function FormationSidebar({ formation }: FormationSidebarProps) {
   const [isEnrolled] = useState(false); // TODO: Vérifier si l'utilisateur est inscrit
   const { addItem, isInCart, removeItem } = useCart();
   const { addNotification } = useNotifications();
+  const { isAuthenticated, user } = useSimpleAuth();
+  const router = useRouter();
+  const pathname = usePathname();
   const inCart = isInCart(formation.id.toString());
 
+  const ensureAuth = () => {
+    if (isAuthenticated) return true;
+    const redirect = encodeURIComponent(pathname || `/formations/${formation.slug}`);
+    router.push(`/connexion?redirect=${redirect}`);
+    return false;
+  };
+
+  const createParticipation = async () => {
+    try {
+      await participantService.create({
+        formation_id: formation.id,
+        user_id: user!.id,
+        status: "pending",
+      });
+    } catch (error: any) {
+      const status = error?.response?.status;
+      if (status !== 409) {
+        throw error;
+      }
+    }
+  };
+
   const handleAddToCart = () => {
+    if (!ensureAuth()) return;
     addItem({
       id: formation.id.toString(),
       titre: formation.titre,
@@ -45,14 +74,25 @@ export function FormationSidebar({ formation }: FormationSidebarProps) {
   };
   
   const handleStartFreeFormation = () => {
-    // Notification pour formation gratuite
-    addNotification({
-      type: "success",
-      titre: "Inscription réussie !",
-      message: `Vous êtes maintenant inscrit à "${formation.titre}". Commencez dès maintenant !`,
-      icon: "🎓",
-      link: `/formations/${formation.slug}/learn`,
-    });
+    if (!ensureAuth()) return;
+    createParticipation()
+      .then(() => {
+        addNotification({
+          type: "success",
+          titre: "Inscription réussie !",
+          message: `Vous êtes maintenant inscrit à "${formation.titre}". Commencez dès maintenant !`,
+          icon: "🎓",
+          link: `/formations/${formation.slug}/learn`,
+        });
+      })
+      .catch(() => {
+        addNotification({
+          type: "warning",
+          titre: "Inscription non finalisée",
+          message: "Impossible d'enregistrer votre participation pour le moment.",
+          icon: "⚠️",
+        });
+      });
   };
 
   return (

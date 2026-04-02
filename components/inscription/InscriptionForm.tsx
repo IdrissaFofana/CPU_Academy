@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -20,12 +21,20 @@ import {
 } from "lucide-react";
 import { formationsMock } from "@/data/mock";
 import type { Formation } from "@/types";
+import { useSimpleAuth } from "@/contexts/SimpleAuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { participantService } from "@/lib/api/services";
 
 export function InscriptionForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const formationId = searchParams.get("formation");
+  const { isAuthenticated, user } = useSimpleAuth();
+  const { addNotification } = useNotifications();
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     // Informations personnelles
     civilite: "",
@@ -68,11 +77,75 @@ export function InscriptionForm() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Ici, envoyer les données au backend
-    console.log("Inscription soumise:", { formation: selectedFormation, data: formData });
-    alert("Votre inscription a été enregistrée ! Nous vous contacterons sous 24h.");
+
+    if (!selectedFormation) return;
+
+    if (!isAuthenticated || !user) {
+      const redirectPath = encodeURIComponent(
+        `${pathname || "/inscription"}${typeof window !== "undefined" ? window.location.search : ""}`
+      );
+      router.push(`/connexion?redirect=${redirectPath}`);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await participantService.create({
+        formation_id: selectedFormation.id,
+        user_id: user.id,
+        status: "pending",
+      });
+
+      addNotification({
+        type: "success",
+        titre: "Inscription enregistrée",
+        message: `Votre demande d'inscription pour "${selectedFormation.titre}" a été envoyée.`,
+        icon: "✅",
+        link: "/mes-formations",
+      });
+
+      router.push("/mes-formations");
+    } catch (error: unknown) {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+
+      if (status === 409) {
+        addNotification({
+          type: "info",
+          titre: "Déjà inscrit",
+          message: "Vous êtes déjà inscrit à cette formation.",
+          icon: "ℹ️",
+          link: "/mes-formations",
+        });
+        router.push("/mes-formations");
+        return;
+      }
+
+      if (status === 401) {
+        addNotification({
+          type: "warning",
+          titre: "Session expirée",
+          message: "Veuillez vous reconnecter pour finaliser l'inscription.",
+          icon: "🔒",
+          link: "/connexion",
+        });
+        const redirectPath = encodeURIComponent(
+          `${pathname || "/inscription"}${typeof window !== "undefined" ? window.location.search : ""}`
+        );
+        router.push(`/connexion?redirect=${redirectPath}`);
+        return;
+      }
+
+      addNotification({
+        type: "error",
+        titre: "Inscription échouée",
+        message: "Une erreur est survenue lors de l'enregistrement de votre participation.",
+        icon: "⚠️",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!selectedFormation) {
@@ -539,10 +612,11 @@ export function InscriptionForm() {
                         </button>
                         <button
                           type="submit"
+                          disabled={isSubmitting}
                           className="px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg transition-all flex items-center gap-2"
                         >
                           <CheckCircle2 className="w-5 h-5" />
-                          Confirmer mon inscription
+                          {isSubmitting ? "Envoi en cours..." : "Confirmer mon inscription"}
                         </button>
                       </div>
                     </div>

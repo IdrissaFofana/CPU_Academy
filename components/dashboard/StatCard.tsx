@@ -22,7 +22,7 @@ export function StatCard({
   const TrendIcon = trend === "up" ? ArrowUp : ArrowDown;
 
   return (
-    <Card className="p-6 transition-all duration-300 border-0 bg-white">
+    <Card className="p-6 transition-all duration-300 border-0 bg-white hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-start justify-between mb-4">
         <div className="bg-orange-50 p-3 rounded-xl">
           <Icon className="w-6 h-6 text-cpu-orange" />

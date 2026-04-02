@@ -36,7 +36,7 @@ export function ParcoursCard({ parcours, onInscription, isFavorite = false, onTo
 
   return (
     <Link href={`/parcours/${parcours.id}`} className="block">
-      <Card className="group relative overflow-hidden bg-white shadow-lg transition-all duration-500 border-0 animate-fade-in-up h-full">
+      <Card className="group relative overflow-hidden bg-white shadow-lg transition-all duration-500 border-0 animate-fade-in-up h-full hover:-translate-y-1 hover:shadow-2xl">
         {/* Bouton Favori */}
         <button
           onClick={(e) => {

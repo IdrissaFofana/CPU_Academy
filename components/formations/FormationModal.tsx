@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Formation } from "@/types";
+import { getModeFallbackImage } from "@/lib/utils";
 import { 
   Clock, MapPin, Users, Star, CheckCircle2, Award, BookOpen, 
   Target, GraduationCap, FileText, Package, Calendar, TrendingUp 
@@ -16,6 +17,9 @@ interface FormationModalProps {
 }
 
 export function FormationModal({ formation, open, onOpenChange }: FormationModalProps) {
+  const fallbackImage = getModeFallbackImage(formation.format, formation.modalite);
+  const heroImage = formation.image || fallbackImage;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden p-0">
@@ -26,12 +30,19 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
           <div className="lg:col-span-2 overflow-y-auto">
             {/* Hero Section avec Image */}
             <div className="relative h-80 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden animate-fade-in">
-              {formation.image ? (
+              {heroImage ? (
                 <>
                   <img 
-                    src={formation.image} 
+                    src={heroImage} 
                     alt={formation.titre}
                     className="w-full h-full object-cover opacity-40"
+                    onError={(event) => {
+                      const target = event.currentTarget;
+                      if (target.src.endsWith(fallbackImage)) {
+                        return;
+                      }
+                      target.src = fallbackImage;
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 </>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { formationsMock } from "@/data/mock";
 import { Quiz } from "@/types";
 import { Button } from "@/components/ui/button";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 interface QuizResult {
   score: number;
@@ -21,6 +22,7 @@ export default function QuizResultsPage({
 }: {
   params: Promise<{ slug: string; quizId: string }>;
 }) {
+  const { canAccess } = useRequireAuth();
   const { slug, quizId } = use(params);
   const router = useRouter();
   const formation = formationsMock.find((f) => f.slug === slug);
@@ -50,6 +52,10 @@ export default function QuizResultsPage({
 
   if (!quiz) {
     notFound();
+  }
+
+  if (!canAccess) {
+    return null;
   }
 
   // Charger les résultats

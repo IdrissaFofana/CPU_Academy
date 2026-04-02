@@ -10,7 +10,7 @@ import { FormationModal } from "./FormationModal";
 import type { Formation } from "@/types";
 import { Clock, MapPin, Users, Star, BookOpen, ShoppingCart, Check } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { getSecteurFallbackImage } from "@/lib/utils";
+import { getModeFallbackImage } from "@/lib/utils";
 
 interface FormationCardProps {
   formation: Formation;
@@ -19,7 +19,7 @@ interface FormationCardProps {
 
 export function FormationCard({ formation, variant = "default" }: FormationCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const fallbackImage = getSecteurFallbackImage(formation.secteur);
+  const fallbackImage = getModeFallbackImage(formation.format, formation.modalite);
   const [imageSrc, setImageSrc] = useState<string>(formation.image || fallbackImage);
   const { addItem, isInCart } = useCart();
   const inCart = isInCart(formation.id.toString());
@@ -72,7 +72,7 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
   };
 
   return (
-    <Card className="h-full transition-all duration-300  overflow-hidden animate-slide-up">
+    <Card className="h-full flex flex-col group transition-all duration-300 overflow-hidden animate-slide-up hover:-translate-y-1 hover:shadow-xl">
       {/* Image de la formation */}
       <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
         {imageSrc ? (
@@ -80,7 +80,7 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
             src={imageSrc} 
             alt={formation.titre}
             fill
-            className="object-cover"
+            className="object-cover group-hover:scale-110 transition-transform duration-500"
             loading="lazy"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             onError={() => setImageSrc(fallbackImage)}
@@ -108,7 +108,7 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
         )}
       </div>
 
-      <CardHeader className="pb-3">
+      <CardHeader className="flex-1 pb-3">
         {/* Badges secteur et niveau */}
         <div className="flex items-center justify-between gap-2 mb-3">
           <span className={`px-2.5 py-1 rounded text-xs font-medium ${getSecteurBadgeColor(formation.secteur)}`}>
@@ -146,12 +146,14 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
         </div>
 
         {/* Note */}
-        {formation.notesMoyenne && (
-          <div className="flex items-center gap-1 mt-2">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-semibold">{formation.notesMoyenne}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-1 mt-2 min-h-[1.5rem]">
+          {formation.notesMoyenne ? (
+            <>
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span className="text-sm font-semibold">{formation.notesMoyenne}</span>
+            </>
+          ) : null}
+        </div>
       </CardHeader>
 
       <CardContent className="pt-0">

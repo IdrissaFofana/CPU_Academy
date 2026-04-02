@@ -43,6 +43,10 @@ export interface LoginResponse {
   token_type: string;
   admin: Admin;
 }
+// ============================================
+// Participant Types (Formation)
+// ============================================
+
 
 export interface RefreshTokenDto {
   refresh_token: string;
@@ -70,6 +74,76 @@ export interface TokenPayload {
 // ============================================
 // Admin Types
 // ============================================
+export interface Participant {
+  id: string;
+  formation_id: string;
+  user_id: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  registered_at: string;
+  progression?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateParticipantDto {
+  formation_id: string;
+  user_id: string;
+  status?: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+}
+
+export interface CentreFormationApi {
+  id: string;
+  nom: string;
+  adresse?: string;
+  ville?: string;
+  description?: string;
+  telephone?: string;
+  email?: string;
+  display_order?: number;
+}
+
+export interface CreateCentreFormationDto {
+  nom: string;
+  adresse?: string;
+  ville?: string;
+  description?: string;
+  telephone?: string;
+  email?: string;
+  display_order?: number;
+}
+
+export interface UpdateCentreFormationDto {
+  nom?: string;
+  adresse?: string;
+  ville?: string;
+  description?: string;
+  telephone?: string;
+  email?: string;
+  display_order?: number;
+}
+
+export interface FormationSessionPublicApi {
+  id: string;
+  formationId?: string;
+  formation_id?: string;
+  centreFormationId?: string;
+  centre_formation_id?: string;
+  dateDebut?: string;
+  date_debut?: string;
+  startDate?: string;
+  dateFin?: string;
+  date_fin?: string;
+  endDate?: string;
+  horaires?: string;
+  capaciteMax?: number;
+  capacite?: number;
+  inscrits?: number;
+  prix?: number;
+  price?: number;
+  materielFourni?: string[];
+  restauration?: boolean;
+  centreFormation?: CentreFormationApi;
+}
 
 export interface Admin {
   id: string;

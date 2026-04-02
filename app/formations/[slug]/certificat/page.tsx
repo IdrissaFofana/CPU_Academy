@@ -5,18 +5,24 @@ import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { formationsMock } from "@/data/mock";
 import { Button } from "@/components/ui/button";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function CertificatPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const { canAccess } = useRequireAuth();
   const { slug } = use(params);
   const router = useRouter();
   const formation = formationsMock.find((f) => f.slug === slug);
 
   if (!formation) {
     notFound();
+  }
+
+  if (!canAccess) {
+    return null;
   }
 
   const [examResult, setExamResult] = useState<any>(null);

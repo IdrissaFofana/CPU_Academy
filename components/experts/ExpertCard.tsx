@@ -257,7 +257,7 @@ export function ExpertCard({
   // Grid variant (default)
   return (
     <Card 
-      className="group transition-all duration-300 overflow-hidden flex flex-col"
+      className="group transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

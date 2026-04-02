@@ -21,8 +21,12 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSimpleAuth } from "@/contexts/SimpleAuthContext";
 
 export default function ConnexionPage() {
+  const router = useRouter();
+  const { login } = useSimpleAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<"individuel" | "entreprise" | "formateur">("individuel");
@@ -37,8 +41,18 @@ export default function ConnexionPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Logique de connexion/inscription
+
+    // Auth temporaire locale (sans API)
+    login({
+      name: `${formData.prenom || "Utilisateur"} ${formData.nom || "CPU"}`.trim(),
+      email: formData.email || "utilisateur@cpu.local",
+    });
+
+    const redirectTo =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("redirect") || "/dashboard"
+        : "/dashboard";
+    router.push(redirectTo);
   };
 
   return (

@@ -1,0 +1,18 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="700" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#0EA5A4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  <g opacity="0.2">
+    <circle cx="1010" cy="110" r="170" fill="white"/>
+    <circle cx="160" cy="620" r="220" fill="white"/>
+  </g>
+  <g transform="translate(600 320)">
+    <path d="M0 -72C-40 -72 -72 -40 -72 0C-72 50 0 120 0 120C0 120 72 50 72 0C72 -40 40 -72 0 -72Z" stroke="white" stroke-width="12" fill="none"/>
+    <circle cx="0" cy="0" r="20" stroke="white" stroke-width="12" fill="none"/>
+  </g>
+  <text x="600" y="460" text-anchor="middle" fill="white" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="700">Presentiel</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="700" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F97316"/>
+      <stop offset="1" stop-color="#EF4444"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  <g opacity="0.2">
+    <circle cx="1020" cy="120" r="180" fill="white"/>
+    <circle cx="140" cy="620" r="220" fill="white"/>
+  </g>
+  <g transform="translate(600 320)">
+    <rect x="-55" y="-36" width="84" height="60" rx="10" stroke="white" stroke-width="12"/>
+    <path d="M40 -8L82 -34V22L40 -4V-8Z" stroke="white" stroke-width="12" stroke-linejoin="round"/>
+  </g>
+  <text x="600" y="460" text-anchor="middle" fill="white" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="700">Webinaire</text>
+</svg>

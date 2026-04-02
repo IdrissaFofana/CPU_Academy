@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useFormations } from "@/hooks/useFormations";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { getModeFallbackImage } from "@/lib/utils";
 import {
   ArrowRight,
   BookOpen,
@@ -76,18 +78,27 @@ interface ApiFormation {
 
 function FormationCard({ formation }: { formation: ApiFormation }) {
   const isFree = !formation.isPaid || formation.price === 0 || formation.price === null;
+  const fallbackImage = getModeFallbackImage(formation.mode, formation.mode);
+  const [imageSrc, setImageSrc] = useState<string>(formation.image || fallbackImage);
 
   return (
     <div className="group bg-white rounded-2xl border-2 border-slate-100 overflow-hidden hover:border-orange-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
       {/* Image */}
       <div className="relative h-44 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
-        {formation.image ? (
+        {imageSrc ? (
           <Image
-            src={formation.image}
+            src={imageSrc}
             alt={formation.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            onError={() => {
+              if (imageSrc !== fallbackImage) {
+                setImageSrc(fallbackImage);
+              } else {
+                setImageSrc("");
+              }
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50">

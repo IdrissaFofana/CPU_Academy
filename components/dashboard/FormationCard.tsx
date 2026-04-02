@@ -13,7 +13,7 @@ interface FormationCardProps {
 
 export function FormationCard({ formation }: FormationCardProps) {
   return (
-    <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange transition-all duration-300 group">
+    <Card className="p-6 border-2 border-slate-100 hover:border-cpu-orange hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 group">
       <div className="flex items-center gap-4 mb-4">
         <div className="w-16 h-16 rounded-lg bg-orange-50 flex items-center justify-center flex-shrink-0">
           <BookOpen className="w-8 h-8 text-cpu-orange" />

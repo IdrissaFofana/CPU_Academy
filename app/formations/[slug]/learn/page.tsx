@@ -11,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, ChevronLeft, ChevronRight, X, Play, BookOpen, Award, Clock, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useFormationContent, useFormations } from "@/hooks/useFormations";
 import { mapApiFormationToAppFormation } from "@/lib/adapters/formation-adapter";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function LearnPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { canAccess } = useRequireAuth();
   const { slug } = use(params);
   const router = useRouter();
   const { formations, isLoading, hasFetched } = useFormations({ limit: 200 });
@@ -51,6 +53,10 @@ export default function LearnPage({ params }: { params: Promise<{ slug: string }
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  if (!canAccess) {
+    return null;
+  }
 
   // Détecter si on est en mode mobile
   useEffect(() => {

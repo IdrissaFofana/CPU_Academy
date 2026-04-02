@@ -18,8 +18,10 @@ import {
   Star,
   Shield,
 } from "lucide-react";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function MesCertificationsPage() {
+  const { canAccess } = useRequireAuth();
   const [certifications] = useState([
     {
       id: 1,
@@ -65,6 +67,10 @@ export default function MesCertificationsPage() {
       color: "from-purple-500 to-purple-600",
     },
   ]);
+
+  if (!canAccess) {
+    return null;
+  }
 
   const [badges] = useState([
     {

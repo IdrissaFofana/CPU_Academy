@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { X, Bookmark, Zap, Star, Trophy, BookOpen, Check, Clock, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { X, Bookmark, Zap, Star, Trophy, BookOpen, Check, Clock, Users, Video, MapPin, Monitor } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { getSecteurFallbackImage } from '@/lib/utils';
+import { getModeFallbackImage } from '@/lib/utils';
 
 interface EnhancedFormationCardProps {
   formation: any;
@@ -17,7 +18,26 @@ export function EnhancedFormationCard({
   isFavorite = false, 
   onFavoriteToggle 
 }: EnhancedFormationCardProps) {
-  const fallbackImage = getSecteurFallbackImage(formation.secteur);
+  const router = useRouter();
+
+  // Visual identity per formation type
+  function getTypeVisual(format?: string, modalite?: string) {
+    const f = (format || "").toLowerCase();
+    const m = (modalite || "").toLowerCase();
+    if (f.includes("live") || m.includes("webinaire") || m.includes("live")) {
+      return { gradient: "from-orange-500 to-red-500", Icon: Video, label: "Webinaire" };
+    }
+    if (f.includes("présentiel") || f.includes("presentiel") || m.includes("presentiel")) {
+      return { gradient: "from-emerald-500 to-teal-600", Icon: MapPin, label: "Présentiel" };
+    }
+    if (f.includes("vidéo") || f.includes("video") || m.includes("a_son_rythme")) {
+      return { gradient: "from-violet-500 to-indigo-600", Icon: Monitor, label: "À son rythme" };
+    }
+    return { gradient: "from-slate-500 to-slate-700", Icon: BookOpen, label: "Formation" };
+  }
+
+  const typeVisual = getTypeVisual(formation.format, formation.modalite);
+  const fallbackImage = getModeFallbackImage(formation.format, formation.modalite);
   const [imageSrc, setImageSrc] = useState<string>(formation.image || fallbackImage);
   // Utiliser des valeurs déterministes basées sur l'ID pour éviter l'hydration mismatch
   const formationIdHash = formation.id ? formation.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) : 0;
@@ -28,16 +48,18 @@ export function EnhancedFormationCard({
   
   return (
     <article 
+      onClick={() => router.push(`/formations/${formation.slug}`)}
       className={`
         relative group overflow-hidden
         rounded-xl
         bg-white
         border border-slate-100
         hover:border-cpu-orange/30
-       -orange/10
-        shadow-md
+        shadow-md hover:shadow-xl
+        hover:-translate-y-1
         transition-all duration-300
         h-full flex flex-col
+        cursor-pointer
       `}
     >
       {/* Badge Container - Top Left */}
@@ -68,12 +90,13 @@ export function EnhancedFormationCard({
             src={imageSrc}
             alt={formation.titre}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={() => setImageSrc(fallbackImage)}
+            className="object-cover group-hover:scale-110 transition-transform duration-500"
+            onError={() => setImageSrc("")}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-cpu-orange/20 to-cpu-green/20 flex items-center justify-center">
-            <span className="text-gray-400">Pas d'image</span>
+          <div className={`w-full h-full bg-gradient-to-br ${typeVisual.gradient} flex flex-col items-center justify-center gap-2`}>
+            <typeVisual.Icon className="w-10 h-10 text-white/80" />
+            <span className="text-white/90 text-sm font-semibold tracking-wide">{typeVisual.label}</span>
           </div>
         )}
         
@@ -81,6 +104,7 @@ export function EnhancedFormationCard({
         <button
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             onFavoriteToggle?.(formation.id);
           }}
           className="absolute top-3 right-3 p-2 bg-white/90 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-cpu-orange/10"
@@ -134,6 +158,16 @@ export function EnhancedFormationCard({
           </div>
         </div>
 
+        {/* Certification Badge */}
+        {formation.certifiant && (
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-cpu-green/10 rounded-lg border border-cpu-green/30">
+            <Trophy className="w-4 h-4 text-cpu-green" />
+            <span className="text-xs text-cpu-green font-semibold">
+              Certificat inclus
+            </span>
+          </div>
+        )}
+
         {/* Price + CTA */}
         <div className="pt-2 flex justify-between items-center mt-auto">
           <div className="flex flex-col">
@@ -149,16 +183,6 @@ export function EnhancedFormationCard({
               <Link href={`/formations/${formation.slug}`}>Voir →</Link>
             </Button>
         </div>
-
-        {/* Certification Badge */}
-        {formation.certifiant && (
-          <div className="mt-2 flex items-center gap-2 px-3 py-1.5 bg-cpu-green/10 rounded-lg border border-cpu-green/30">
-            <Trophy className="w-4 h-4 text-cpu-green" />
-            <span className="text-xs text-cpu-green font-semibold">
-              Certificat inclus
-            </span>
-          </div>
-        )}
       </div>
     </article>
   );
