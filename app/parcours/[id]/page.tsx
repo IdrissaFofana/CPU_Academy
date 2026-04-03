@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,60 +17,54 @@ import {
   Check,
   Heart,
   Share2,
-  Download,
   Book,
   Target,
   Zap,
-  MessageSquare
+  AlertCircle,
 } from "lucide-react";
-import { parcoursMock, formationsMock } from "@/data/mock";
+import { useParcours } from "@/hooks/useParcours";
+import { buildParcoursDetailsFromApi } from "@/lib/adapters/parcours-adapter";
 import { useFavorites, useTelemetry } from "@/hooks/useStorage";
 
-interface ParcoursDetailPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) {
+export default function ParcoursDetailPage() {
   const router = useRouter();
-  const [parcours, setParcours] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const params = useParams<{ id: string }>();
+  const parcoursId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const { isParcoursLiked, toggleParcoursFavorite } = useFavorites();
   const { trackCardClick } = useTelemetry();
+  const { parcours: apiParcours, isLoading, error } = useParcours();
+
+  const parcours = useMemo(() => {
+    if (!parcoursId) return null;
+    return buildParcoursDetailsFromApi(apiParcours, parcoursId);
+  }, [apiParcours, parcoursId]);
 
   useEffect(() => {
-    // Unwrap params promise
-    params.then(({ id }) => {
-      let found = parcoursMock.find((p) => p.id === id);
-      
-      if (found) {
-        // Enrich formations with data from formationsMock
-        const enrichedFormations = found.formationsIds
-          ?.map((formationId: string) => {
-            return formationsMock.find((f) => f.id === formationId);
-          })
-          .filter((formation): formation is typeof formationsMock[0] => !!formation) || [];
-        
-        found = {
-          ...found,
-          formations: enrichedFormations
-        };
-      }
-      
-      setParcours(found);
-      setLoading(false);
+    if (!parcoursId || !parcours) return;
+    trackCardClick(parcoursId, `/parcours/${parcoursId}`);
+  }, [parcoursId, parcours, trackCardClick]);
 
-      if (found) {
-        trackCardClick(id, `/parcours/${id}`);
-      }
-    });
-  }, [params, trackCardClick]);
-
-  if (loading) {
+  if (isLoading && !parcours) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-cpu-orange border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-slate-600">Chargement du parcours...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !parcours) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
+        <div className="text-center space-y-6 max-w-xl">
+          <AlertCircle className="w-14 h-14 mx-auto text-red-500" />
+          <h1 className="text-3xl font-bold text-slate-900">Erreur de chargement</h1>
+          <p className="text-slate-600">Impossible de charger les données du parcours pour le moment.</p>
+          <Button onClick={() => router.push("/parcours")} variant="outline">
+            Retourner aux parcours
+          </Button>
         </div>
       </div>
     );
@@ -122,7 +116,7 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
               {
                 icon: "building",
                 color: "blue",
-                title: parcours.duree,
+                title: `${parcours.dureeTotal}h`,
                 subtitle: "Durée totale"
               }
             ]
@@ -169,8 +163,24 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                   {parcours.description}
                 </p>
                 <p className="text-slate-600 leading-relaxed">
-                  {parcours.contenuDetaille || "Parcours complète conçu pour vous permettre de maîtriser toutes les compétences essentielles dans ce domaine."}
+                  Ce parcours est généré dynamiquement à partir des formations actuellement publiées sur la plateforme.
+                  Vous bénéficiez ainsi d'un contenu toujours à jour avec les besoins réels du marché.
                 </p>
+              </Card>
+
+              <Card className="p-8 border border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                  <Target className="w-6 h-6 text-cpu-orange" />
+                  Objectifs du parcours
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {parcours.objectifs.map((objectif, index) => (
+                    <div key={index} className="flex items-start gap-2 p-3 rounded-lg bg-slate-50 border border-slate-200">
+                      <Check className="w-4 h-4 mt-0.5 text-cpu-orange flex-shrink-0" />
+                      <span className="text-sm text-slate-700">{objectif}</span>
+                    </div>
+                  ))}
+                </div>
               </Card>
 
               {/* Modules et contenu */}
@@ -206,7 +216,7 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                               </span>
                               {formation.expert && (
                                 <span className="flex items-center gap-1 text-xs text-slate-600">
-                                  👤 <span className="font-medium">{formation.expert.nom}</span>
+                                  👤 <span className="font-medium">{formation.expert.prenom} {formation.expert.nom}</span>
                                 </span>
                               )}
                             </div>
@@ -246,40 +256,52 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                 </div>
               </Card>
 
-              {/* Avis et commentaires */}
+              {/* Étapes dynamiques */}
               <Card className="p-8 border border-slate-200">
                 <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                  <MessageSquare className="w-6 h-6 text-cpu-orange" />
-                  Avis des participants
+                  <Target className="w-6 h-6 text-cpu-orange" />
+                  Étapes suggérées
                 </h2>
                 <div className="space-y-4">
-                  {[1, 2, 3].map((_, idx) => (
+                  {parcours.etapes.map((etape, idx) => (
                     <div key={idx} className="flex gap-4 pb-4 border-b border-slate-200 last:border-0">
-                      <AvatarImage
-                        alt={`Participant ${idx + 1}`}
-                        className="w-10 h-10 rounded-full"
-                      />
+                      <div className="w-10 h-10 rounded-full bg-cpu-orange text-white font-bold flex items-center justify-center flex-shrink-0">
+                        {idx + 1}
+                      </div>
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-semibold text-slate-900">Participant {idx + 1}</span>
-                          <div className="flex gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < 4 + (idx % 2)
-                                    ? "fill-cpu-orange text-cpu-orange"
-                                    : "text-slate-300"
-                                }`}
-                              />
-                            ))}
-                          </div>
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <span className="font-semibold text-slate-900">{etape.titre}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {etape.duree}h
+                          </Badge>
                         </div>
-                        <p className="text-sm text-slate-600">
-                          Excellent parcours! Les contenus sont très bien expliqués et les instructeurs sont passionnés.
-                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {etape.formations.length > 0 ? (
+                            etape.formations.map((item, index) => (
+                              <Badge key={index} className="bg-slate-100 text-slate-700 border-0 text-xs">
+                                {item}
+                              </Badge>
+                            ))
+                          ) : (
+                            <span className="text-sm text-slate-500">Contenu modulaire à découvrir dans la formation.</span>
+                          )}
+                        </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </Card>
+
+              <Card className="p-8 border border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                  <Award className="w-6 h-6 text-cpu-orange" />
+                  Compétences développées
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {parcours.competences.map((competence, idx) => (
+                    <Badge key={idx} className="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1">
+                      {competence}
+                    </Badge>
                   ))}
                 </div>
               </Card>
@@ -294,13 +316,13 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                   <div className="flex items-baseline gap-2">
                     {parcours.prixOriginal && parcours.prix !== parcours.prixOriginal && (
                       <span className="text-lg text-slate-400 line-through">
-                        {parcours.prixOriginal} CFA
+                        {parcours.prixOriginal.toLocaleString()} CFA
                       </span>
                     )}
                     <span className="text-4xl font-bold text-cpu-orange">
-                      {parcours.prix}
+                      {parcours.prix > 0 ? parcours.prix.toLocaleString() : "Gratuit"}
                     </span>
-                    <span className="text-slate-600">CFA</span>
+                    {parcours.prix > 0 && <span className="text-slate-600">CFA</span>}
                   </div>
                 </div>
 
@@ -325,9 +347,9 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                   <div className="flex items-center gap-3">
                     <Star className="w-5 h-5 text-cpu-orange flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-slate-600">Évaluation</p>
+                      <p className="text-xs text-slate-600">Évaluation cumulée</p>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-900">{parcours.notesMoyenne || 4.8}/5</span>
+                        <span className="font-semibold text-slate-900">{(parcours.notesMoyenne || 0).toFixed(1)} pts</span>
                         <span className="text-xs text-slate-600">({parcours.nbAvis || 150} avis)</span>
                       </div>
                     </div>
@@ -337,7 +359,7 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                     <Award className="w-5 h-5 text-cpu-orange flex-shrink-0" />
                     <div>
                       <p className="text-xs text-slate-600">Certificat</p>
-                      <p className="font-semibold text-slate-900">Inclus à la fin</p>
+                      <p className="font-semibold text-slate-900">{parcours.certifiant ? "Inclus à la fin" : "Selon modules"}</p>
                     </div>
                   </div>
                 </div>
@@ -364,10 +386,10 @@ export default function ParcoursDetailPage({ params }: ParcoursDetailPageProps) 
                 <div className="mb-6 space-y-3">
                   <p className="text-sm font-semibold text-slate-900">Ce que vous obtiendrez</p>
                   {[
-                    "Accès illimité au contenu",
-                    "Certificat de complétion",
-                    "Support communautaire",
-                    "Mises à jour gratuites"
+                    `${parcours.formations.length} formations structurées`,
+                    `${parcours.dureeTotal}h de montée en compétence`,
+                    parcours.certifiant ? "Parcours certifiant" : "Parcours professionnalisant",
+                    `Format dominant: ${parcours.format}`,
                   ].map((benefit, idx) => (
                     <div key={idx} className="flex gap-2 items-center text-sm text-slate-700">
                       <Check className="w-4 h-4 text-cpu-orange flex-shrink-0" />

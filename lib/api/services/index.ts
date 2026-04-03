@@ -11,3 +11,4 @@ export { faqService } from './faq.service';
 export { participantService } from './participant.service';
 export { centreFormationService } from './centreFormation.service';
 export { sessionService } from './session.service';
+export { parcoursService } from '@/lib/api/services/parcours.service';

@@ -30,6 +30,11 @@ interface ParcoursCardOptimizedProps {
   onInscription?: (id: string) => void;
 }
 
+function getAverageRating(parcours: Parcours): number {
+  const formationCount = parcours.formations?.length || 1;
+  return (parcours.notesMoyenne || 0) / formationCount;
+}
+
 // ==================== GRID VIEW (DÉFAUT) ====================
 function ParcoursCardGrid({
   parcours,
@@ -90,7 +95,7 @@ function ParcoursCardGrid({
               )}
 
               {/* Top Rated Badge */}
-              {parcours.notesMoyenne && parcours.notesMoyenne >= 4.7 && (
+              {getAverageRating(parcours) >= 4.7 && (
                 <Badge className="bg-yellow-500/90 backdrop-blur-sm text-white border-0 shadow-lg hover:scale-110 transition-transform flex items-center gap-1">
                   <Star className="w-3 h-3 fill-white" />
                   Top Rated
@@ -160,7 +165,7 @@ function ParcoursCardGrid({
                   <Star
                     key={i}
                     className={`w-3.5 h-3.5 ${
-                      i < Math.floor(parcours.notesMoyenne || 0)
+                      i < Math.floor(getAverageRating(parcours))
                         ? "fill-yellow-400 text-yellow-400"
                         : "text-slate-300"
                     }`}
@@ -168,7 +173,7 @@ function ParcoursCardGrid({
                 ))}
               </div>
               <span className="font-semibold text-slate-900">
-                {parcours.notesMoyenne || 0}/5
+                {(parcours.notesMoyenne || 0).toFixed(1)} pts
               </span>
               <span className="text-slate-500">({parcours.nbAvis || 0})</span>
             </div>
@@ -308,7 +313,7 @@ function ParcoursCardList({
               <div className="flex items-center gap-1">
                 <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                 <span className="font-semibold">
-                  {parcours.notesMoyenne || 0}/5
+                  {(parcours.notesMoyenne || 0).toFixed(1)} pts
                 </span>
                 <span className="text-slate-500">({parcours.nbAvis || 0})</span>
               </div>
@@ -405,7 +410,7 @@ function ParcoursCardCompact({
             </h3>
             <div className="flex items-center gap-2 text-xs text-slate-600">
               <span className="font-semibold">
-                {parcours.notesMoyenne || 0}★
+                {(parcours.notesMoyenne || 0).toFixed(1)} pts
               </span>
               <span>{parcours.dureeTotal}h</span>
               <span>{parcours.niveau}</span>

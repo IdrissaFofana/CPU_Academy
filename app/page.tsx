@@ -8,6 +8,7 @@ import { CalendarSection } from "@/components/home/CalendarSection";
 import { CertificationsSection } from "@/components/home/CertificationsSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { HomeFaqSection } from "@/components/home/HomeFaqSection";
+import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://cpu-formation.ci'),
@@ -52,25 +53,50 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
+      {/* Hero — its own internal animations, no extra wrapper needed */}
       <Hero />
-      <StatsSection />
-      <section id="parcours">
-        <ParcoursSection />
-      </section>
-      <AboutSection />
-      <ImpactSection />
-      <section id="calendrier">
-        <CalendarSection />
-      </section>
-      <section id="certifications">
-        <CertificationsSection />
-      </section>
-      <section id="temoignages">
-        <TestimonialsSection />
-      </section>
-      <section id="faq">
-        <HomeFaqSection />
-      </section>
+
+      <AnimateOnScroll variant="fade-up" duration={650}>
+        <StatsSection />
+      </AnimateOnScroll>
+
+      <AnimateOnScroll variant="fade-up" delay={80} duration={700}>
+        <section id="parcours">
+          <ParcoursSection />
+        </section>
+      </AnimateOnScroll>
+
+      <AnimateOnScroll variant="fade-right" delay={0} duration={750}>
+        <AboutSection />
+      </AnimateOnScroll>
+
+      <AnimateOnScroll variant="zoom" delay={0} duration={800}>
+        <ImpactSection />
+      </AnimateOnScroll>
+
+      <AnimateOnScroll variant="fade-left" delay={0} duration={750}>
+        <section id="calendrier">
+          <CalendarSection />
+        </section>
+      </AnimateOnScroll>
+
+      <AnimateOnScroll variant="fade-up" delay={0} duration={700}>
+        <section id="certifications">
+          <CertificationsSection />
+        </section>
+      </AnimateOnScroll>
+
+      <AnimateOnScroll variant="zoom" delay={0} duration={800}>
+        <section id="temoignages">
+          <TestimonialsSection />
+        </section>
+      </AnimateOnScroll>
+
+      <AnimateOnScroll variant="fade-up" delay={0} duration={700}>
+        <section id="faq">
+          <HomeFaqSection />
+        </section>
+      </AnimateOnScroll>
     </>
   );
 }

@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import type { Metadata } from "next";
+import { useState, useEffect, useMemo } from "react";
 import { PageBanner } from "@/components/layout/PageBanner";
-import { ParcoursCard } from "@/components/parcours/ParcoursCard";
 import { ParcoursCardOptimized, ViewModeToggle } from "@/components/parcours/ParcoursCardOptimized";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +9,6 @@ import { Card } from "@/components/ui/card";
 import { SearchBar } from "@/components/ui/search-bar";
 import {
   Target,
-  Filter,
   Search,
   TrendingUp,
   Users,
@@ -22,37 +19,180 @@ import {
   CheckCircle2,
   Zap,
   Trophy,
-  GraduationCap
+  GraduationCap,
+  SlidersHorizontal,
+  RotateCcw,
+  Monitor,
+  Video,
+  Globe,
+  Layers,
+  Clock,
+  Tag,
+  Star,
+  Medal,
+  X,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Gift,
+  CreditCard,
+  Flame
 } from "lucide-react";
-import { parcoursMock, formationsMock } from "@/data/mock";
-import { useViewMode, useFavorites, useTelemetry, usePrefersReducedMotion } from "@/hooks/useStorage";
+import { useParcours } from "@/hooks/useParcours";
+import { buildParcoursFromApi } from "@/lib/adapters/parcours-adapter";
+import { useViewMode, useFavorites, useTelemetry } from "@/hooks/useStorage";
 
 export default function ParcoursPage() {
   const [filtreNiveau, setFiltreNiveau] = useState<string>("all");
+  const [filtreFormats, setFiltreFormats] = useState<string[]>([]);
+  const [filtreDuree, setFiltreDuree] = useState<string>("all");
+  const [filtrePrix, setFiltrePrix] = useState<string>("all");
+  const [filtreCertifiant, setFiltreCertifiant] = useState(false);
+  const [filtreBestseller, setFiltreBestseller] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [triPar, setTriPar] = useState<string>("populaire");
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
+  const toggleSection = (section: string) =>
+    setOpenSection(prev => (prev === section ? null : section));
+
+  const openSections = {
+    niveau: openSection === "niveau",
+    format: openSection === "format",
+    duree: openSection === "duree",
+    prix: openSection === "prix",
+    options: openSection === "options",
+    tri: openSection === "tri",
+  };
+
+  const activeFiltersCount = [
+    filtreNiveau !== "all",
+    filtreFormats.length > 0,
+    filtreDuree !== "all",
+    filtrePrix !== "all",
+    filtreCertifiant,
+    filtreBestseller,
+  ].filter(Boolean).length;
   
   // Use custom hooks for persistent state
   const [viewMode, setViewMode] = useViewMode("grid");
-  const { favorites, toggleParcoursFavorite, isParcoursLiked } = useFavorites();
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const { trackViewModeChange, trackFavoriteToggle, trackCardClick, trackCardImpression } = useTelemetry();
-  
-  // Associer les formations aux parcours
-  const parcoursAvecFormations = parcoursMock.map(parcours => ({
-    ...parcours,
-    formations: formationsMock.filter(f => 
-      parcours.formationsIds.includes(f.id)
-    )
-  }));
+  const { toggleParcoursFavorite, isParcoursLiked } = useFavorites();
+  const { trackViewModeChange, trackFavoriteToggle, trackCardImpression } = useTelemetry();
+  const { parcours: apiParcours, isLoading: isParcoursLoading, error: parcoursError } = useParcours();
+
+  const parcoursAvecFormations = useMemo(() => buildParcoursFromApi(apiParcours), [apiParcours]);
+
+  const parcoursMetrics = useMemo(() => {
+    const totalParcours = parcoursAvecFormations.length;
+    const totalInscrits = parcoursAvecFormations.reduce((sum, parcours) => sum + (parcours.nbInscrits || 0), 0);
+    const averageRating = totalParcours
+      ? parcoursAvecFormations.reduce((sum, parcours) => sum + (parcours.notesMoyenne || 0), 0) / totalParcours
+      : 0;
+    const certifiantRate = totalParcours
+      ? Math.round((parcoursAvecFormations.filter((parcours) => parcours.certifiant).length / totalParcours) * 100)
+      : 0;
+
+    return {
+      totalParcours,
+      totalInscrits,
+      averageRating: Number(averageRating.toFixed(1)),
+      certifiantRate,
+    };
+  }, [parcoursAvecFormations]);
+
+  const bannerSlides = useMemo(
+    () => [
+      {
+        image: "/images/default-formation.jpg",
+        title: "Parcours de Formation",
+        subtitle: "Accélérez votre carrière avec nos parcours certifiants",
+        badge: {
+          icon: "+",
+          number: String(parcoursMetrics.totalParcours || 0),
+          text: "Parcours disponibles",
+          subtext: "Construits à partir des formations publiées",
+        },
+        trustBadges: [
+          {
+            icon: "check" as const,
+            color: "green",
+            title: `${parcoursMetrics.certifiantRate}% certifiants`,
+            subtitle: "Reconnaissance professionnelle",
+          },
+          {
+            icon: "users" as const,
+            color: "orange",
+            title: `${parcoursMetrics.totalInscrits.toLocaleString()}+ inscrits`,
+            subtitle: "Apprenants actifs",
+          },
+          {
+            icon: "check" as const,
+            color: "blue",
+            title: `${parcoursMetrics.averageRating.toFixed(1)} score cumulé`,
+            subtitle: "Évaluation totale des parcours",
+          },
+        ],
+        buttons: [
+          { label: "Commencer maintenant", href: "/inscription", icon: <Rocket className="h-5 w-5" /> },
+          { label: "Voir le catalogue", href: "/catalogue", variant: "outline" as const, icon: <BookOpen className="h-5 w-5" /> },
+        ],
+      },
+      {
+        image: "/images/formation-agriculture.png",
+        title: "Parcours orientés métier",
+        subtitle: "Des programmes dynamiques alignés sur les besoins du marché",
+        badge: {
+          number: `${parcoursMetrics.certifiantRate}%`,
+          text: "Parcours certifiants",
+          subtext: "Évolution continue du catalogue",
+        },
+        trustBadges: [
+          {
+            icon: "users" as const,
+            color: "purple",
+            title: "Formats flexibles",
+            subtitle: "Présentiel, live et hybride",
+          },
+          {
+            icon: "building" as const,
+            color: "orange",
+            title: "Parcours orientés entreprise",
+            subtitle: "Compétences immédiatement activables",
+          },
+          {
+            icon: "check" as const,
+            color: "green",
+            title: "Données API en temps réel",
+            subtitle: "Catalogue toujours à jour",
+          },
+        ],
+        buttons: [{ label: "Explorer les parcours", href: "#parcours", variant: "outline" as const, icon: <BookOpen className="h-5 w-5" /> }],
+      },
+    ],
+    [parcoursMetrics]
+  );
 
   // Filtrer les parcours
   const parcoursFiltres = parcoursAvecFormations.filter(parcours => {
     const matchNiveau = filtreNiveau === "all" || parcours.niveau === filtreNiveau;
-    const matchSearch = searchTerm === "" || 
+    const matchSearch = searchTerm === "" ||
       parcours.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
       parcours.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchNiveau && matchSearch;
+    const matchFormat = filtreFormats.length === 0 || filtreFormats.includes(parcours.format);
+    const duree = parcours.dureeTotal || 0;
+    const matchDuree =
+      filtreDuree === "all" ? true :
+      filtreDuree === "lt10" ? duree < 10 :
+      filtreDuree === "10-30" ? duree >= 10 && duree <= 30 :
+      filtreDuree === "30-60" ? duree > 30 && duree <= 60 :
+      filtreDuree === "gt60" ? duree > 60 : true;
+    const matchPrix =
+      filtrePrix === "all" ? true :
+      filtrePrix === "gratuit" ? parcours.gratuit :
+      !parcours.gratuit;
+    const matchCertifiant = !filtreCertifiant || parcours.certifiant;
+    const matchBestseller = !filtreBestseller || (parcours.nbInscrits || 0) >= 1000;
+    return matchNiveau && matchSearch && matchFormat && matchDuree && matchPrix && matchCertifiant && matchBestseller;
   });
   
   // Trier les parcours
@@ -60,12 +200,16 @@ export default function ParcoursPage() {
     switch(triPar) {
       case "populaire":
         return (b.nbInscrits || 0) - (a.nbInscrits || 0);
+      case "note":
+        return (b.notesMoyenne || 0) - (a.notesMoyenne || 0);
       case "duree-asc":
         return (a.dureeTotal || 0) - (b.dureeTotal || 0);
       case "duree-desc":
         return (b.dureeTotal || 0) - (a.dureeTotal || 0);
-      case "note":
-        return (b.notesMoyenne || 0) - (a.notesMoyenne || 0);
+      case "prix-asc":
+        return (a.prixPublic || 0) - (b.prixPublic || 0);
+      case "prix-desc":
+        return (b.prixPublic || 0) - (a.prixPublic || 0);
       default:
         return 0;
     }
@@ -101,6 +245,22 @@ export default function ParcoursPage() {
     // TODO: Rediriger vers la page d'inscription
   };
 
+  const resetFilters = () => {
+    setFiltreNiveau("all");
+    setFiltreFormats([]);
+    setFiltreDuree("all");
+    setFiltrePrix("all");
+    setFiltreCertifiant(false);
+    setFiltreBestseller(false);
+    setSearchTerm("");
+  };
+
+  const toggleFormat = (format: string) => {
+    setFiltreFormats(prev =>
+      prev.includes(format) ? prev.filter(f => f !== format) : [...prev, format]
+    );
+  };
+
   return (
     <>
       <PageBanner
@@ -108,110 +268,7 @@ export default function ParcoursPage() {
           { label: "Accueil", href: "/" },
           { label: "Parcours" }
         ]}
-        slides={[
-          {
-            image: "/images/default-formation.jpg",
-            title: "Parcours de Formation",
-            subtitle: "Accélérez votre carrière avec nos parcours certifiants",
-            badge: {
-              icon: "+",
-              number: "12",
-              text: "Parcours disponibles",
-              subtext: "Pour tous les profils"
-            },
-            trustBadges: [
-              {
-                icon: "check",
-                color: "green",
-                title: "Certifications officielles",
-                subtitle: "Reconnues par l'État"
-              },
-              {
-                icon: "users",
-                color: "orange",
-                title: "10,000+",
-                subtitle: "Apprenants formés"
-              },
-              {
-                icon: "check",
-                color: "blue",
-                title: "Accompagnement personnalisé",
-                subtitle: "Suivi individuel"
-              }
-            ],
-            buttons: [
-              { label: "Commencer maintenant", href: "/inscription", icon: <Rocket className="h-5 w-5" /> },
-              { label: "Voir le catalogue", href: "/catalogue", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
-            ]
-          },
-          {
-            image: "/images/formation-agriculture.png",
-            title: "Formation Continue d'Excellence",
-            subtitle: "Des parcours adaptés à vos objectifs professionnels",
-            badge: {
-              number: "92%",
-              text: "Taux de réussite",
-              subtext: "À nos certifications"
-            },
-            trustBadges: [
-              {
-                icon: "users",
-                color: "purple",
-                title: "Flexibilité totale",
-                subtitle: "À votre rythme"
-              },
-              {
-                icon: "building",
-                color: "orange",
-                title: "Entreprises partenaires",
-                subtitle: "Débouchés garantis"
-              },
-              {
-                icon: "check",
-                color: "green",
-                title: "Contenu mis à jour",
-                subtitle: "Selon les tendances"
-              }
-            ],
-            buttons: [
-              { label: "Explorer les parcours", href: "#parcours", variant: "outline", icon: <BookOpen className="h-5 w-5" /> }
-            ]
-          },
-          {
-            image: "/images/default-formation.jpg",
-            title: "Certifications Professionnelles",
-            subtitle: "Obtenez une reconnaissance officielle de vos compétences",
-            badge: {
-              icon: "🏆 ",
-              number: "98%",
-              text: "Recommandation",
-              subtext: "Par nos alumni"
-            },
-            trustBadges: [
-              {
-                icon: "check",
-                color: "blue",
-                title: "Diplômes reconnus",
-                subtitle: "Secteur public et privé"
-              },
-              {
-                icon: "users",
-                color: "orange",
-                title: "Réseau d'experts",
-                subtitle: "Professionnels aguerris"
-              },
-              {
-                icon: "check",
-                color: "green",
-                title: "Évaluation continue",
-                subtitle: "Progression mesurée"
-              }
-            ],
-            buttons: [
-              { label: "Voir les certifications", href: "/certifications", icon: <BookOpen className="h-5 w-5" /> }
-            ]
-          }
-        ]}
+        slides={bannerSlides}
       />
 
       <div className="min-h-screen bg-slate-50">
@@ -226,7 +283,7 @@ export default function ParcoursPage() {
             <div className="text-center mb-12 animate-fade-in-up">
               <Badge className="mb-4 bg-cpu-orange text-white border-0 shadow-lg px-4 py-2 text-sm">
                 <Sparkles className="w-4 h-4 mr-2" />
-                {parcoursMock.length} Parcours disponibles
+                {parcoursMetrics.totalParcours} Parcours disponibles
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
                 Transformez votre carrière
@@ -247,116 +304,393 @@ export default function ParcoursPage() {
           <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
               {/* Sidebar Filtres */}
-              <aside className="w-full lg:w-64 flex-shrink-0">
-                <Card className="p-6 border-2 border-slate-200 shadow-lg sticky top-24 bg-white">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                      <div className="w-1 h-6 bg-cpu-orange rounded-full"></div>
-                      Filtres
-                    </h2>
-                    {(filtreNiveau !== "all" || searchTerm !== "") && (
-                      <button
-                        onClick={() => {
-                          setFiltreNiveau("all");
-                          setSearchTerm("");
-                        }}
-                        className="text-xs text-cpu-orange hover:underline font-medium"
-                      >
-                        Réinitialiser
-                      </button>
-                    )}
-                  </div>
-                  
-                  {/* Filtres actifs */}
-                  {(filtreNiveau !== "all" || searchTerm !== "") && (
-                    <div className="mb-6 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                      <p className="text-xs font-semibold text-orange-900 mb-2">Filtres actifs:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {filtreNiveau !== "all" && (
-                          <Badge className="bg-cpu-orange text-white text-xs">
-                            {filtreNiveau}
-                          </Badge>
-                        )}
-                        {searchTerm !== "" && (
-                          <Badge className="bg-slate-700 text-white text-xs">
-                            Recherche: {searchTerm.substring(0, 10)}...
-                          </Badge>
+              <aside className="w-full lg:w-72 flex-shrink-0">
+                <div className="sticky top-24 space-y-3">
+
+                  {/* ── Header ── */}
+                  <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-slate-900 to-slate-800">
+                    <div className="p-5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-cpu-orange flex items-center justify-center shadow-lg">
+                            <SlidersHorizontal className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <h2 className="text-white font-bold text-base leading-none">Filtres</h2>
+                            <p className="text-slate-400 text-xs mt-0.5">
+                              {activeFiltersCount === 0 ? "Aucun filtre actif" : `${activeFiltersCount} filtre${activeFiltersCount > 1 ? "s" : ""} actif${activeFiltersCount > 1 ? "s" : ""}`}
+                            </p>
+                          </div>
+                        </div>
+                        {activeFiltersCount > 0 && (
+                          <button
+                            onClick={resetFilters}
+                            className="flex items-center gap-1.5 text-xs text-orange-400 hover:text-orange-300 transition-colors bg-orange-400/10 hover:bg-orange-400/20 px-3 py-1.5 rounded-full"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            Reset
+                          </button>
                         )}
                       </div>
+
+                      {/* Chips filtres actifs */}
+                      {activeFiltersCount > 0 && (
+                        <div className="mt-4 flex flex-wrap gap-1.5">
+                          {filtreNiveau !== "all" && (
+                            <button
+                              onClick={() => setFiltreNiveau("all")}
+                              className="inline-flex items-center gap-1 bg-cpu-orange text-white text-xs px-2.5 py-1 rounded-full hover:bg-orange-600 transition-colors"
+                            >
+                              {filtreNiveau}
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                          {filtreFormats.map(f => (
+                            <button
+                              key={f}
+                              onClick={() => toggleFormat(f)}
+                              className="inline-flex items-center gap-1 bg-blue-500 text-white text-xs px-2.5 py-1 rounded-full hover:bg-blue-600 transition-colors"
+                            >
+                              {f}
+                              <X className="w-3 h-3" />
+                            </button>
+                          ))}
+                          {filtreDuree !== "all" && (
+                            <button
+                              onClick={() => setFiltreDuree("all")}
+                              className="inline-flex items-center gap-1 bg-indigo-500 text-white text-xs px-2.5 py-1 rounded-full hover:bg-indigo-600 transition-colors"
+                            >
+                              {filtreDuree === "lt10" ? "< 10h" : filtreDuree === "10-30" ? "10–30h" : filtreDuree === "30-60" ? "30–60h" : "> 60h"}
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                          {filtrePrix !== "all" && (
+                            <button
+                              onClick={() => setFiltrePrix("all")}
+                              className="inline-flex items-center gap-1 bg-green-600 text-white text-xs px-2.5 py-1 rounded-full hover:bg-green-700 transition-colors"
+                            >
+                              {filtrePrix === "gratuit" ? "Gratuit" : "Payant"}
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                          {filtreCertifiant && (
+                            <button
+                              onClick={() => setFiltreCertifiant(false)}
+                              className="inline-flex items-center gap-1 bg-purple-600 text-white text-xs px-2.5 py-1 rounded-full hover:bg-purple-700 transition-colors"
+                            >
+                              Certifiant
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                          {filtreBestseller && (
+                            <button
+                              onClick={() => setFiltreBestseller(false)}
+                              className="inline-flex items-center gap-1 bg-yellow-500 text-white text-xs px-2.5 py-1 rounded-full hover:bg-yellow-600 transition-colors"
+                            >
+                              Bestseller
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  
-                  {/* Filtrer par niveau */}
-                  <div className="mb-6 pb-6 border-b-2 border-slate-100">
-                    <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
-                      <Target className="w-4 h-4 text-cpu-orange" />
-                      Niveau
-                    </h3>
-                    <div className="space-y-2">
-                      {["all", "Débutant", "Intermédiaire", "Avancé"].map((niveau) => {
-                        const count = parcoursMock.filter(p => niveau === "all" || p.niveau === niveau).length;
-                        const Icon = niveau === "all" ? Rocket : niveau === "Débutant" ? Sparkles : niveau === "Intermédiaire" ? Trophy : GraduationCap;
-                        const colorClass = niveau === "Débutant" ? "text-green-600" : niveau === "Intermédiaire" ? "text-blue-600" : niveau === "Avancé" ? "text-purple-600" : "text-slate-600";
-                        
-                        return (
-                          <Button
-                            key={niveau}
-                            onClick={() => setFiltreNiveau(niveau)}
-                            variant="ghost"
-                            className={`w-full justify-between text-sm transition-all group ${
-                              filtreNiveau === niveau
-                                ? "bg-cpu-orange text-white hover:bg-cpu-orange shadow-md scale-105"
-                                : "text-slate-700 hover:bg-slate-100 hover:scale-[1.02]"
-                            }`}
-                          >
-                            <span className="flex items-center gap-2">
-                              <Icon className={`w-4 h-4 ${filtreNiveau === niveau ? "text-white" : colorClass}`} />
-                              {niveau === "all" ? "Tous" : niveau}
-                            </span>
-                            <Badge 
-                              className={`text-xs ${
-                                filtreNiveau === niveau
-                                  ? "bg-white/20 text-white border-0"
-                                  : "bg-slate-200 text-slate-700 border-0"
+                  </Card>
+
+                  {/* ── Niveau ── */}
+                  <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <button
+                      onClick={() => toggleSection("niveau")}
+                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-bold text-slate-800 uppercase tracking-wider">
+                        <Target className="w-4 h-4 text-cpu-orange" />
+                        Niveau
+                      </span>
+                      {openSections.niveau ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                    </button>
+                    {openSections.niveau && (
+                      <div className="px-4 pb-4 space-y-1.5">
+                        {[
+                          { value: "all", label: "Tous les niveaux", Icon: Rocket, color: "text-slate-600" },
+                          { value: "Débutant", label: "Débutant", Icon: Sparkles, color: "text-green-600" },
+                          { value: "Intermédiaire", label: "Intermédiaire", Icon: Trophy, color: "text-blue-600" },
+                          { value: "Avancé", label: "Avancé", Icon: GraduationCap, color: "text-purple-600" },
+                        ].map(({ value, label, Icon, color }) => {
+                          const count = parcoursAvecFormations.filter(p => value === "all" || p.niveau === value).length;
+                          const active = filtreNiveau === value;
+                          return (
+                            <button
+                              key={value}
+                              onClick={() => setFiltreNiveau(value)}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all ${
+                                active
+                                  ? "bg-cpu-orange text-white shadow-md"
+                                  : "text-slate-700 hover:bg-slate-50 border border-slate-100"
                               }`}
                             >
-                              {count}
-                            </Badge>
-                          </Button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                              <span className="flex items-center gap-2.5">
+                                <Icon className={`w-4 h-4 ${active ? "text-white" : color}`} />
+                                {label}
+                              </span>
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${active ? "bg-white/25 text-white" : "bg-slate-100 text-slate-600"}`}>
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </Card>
 
-                  {/* Tri */}
-                  <div className="mb-6">
-                    <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-cpu-orange" />
-                      Trier par
-                    </h3>
-                    <select
-                      value={triPar}
-                      onChange={(e) => setTriPar(e.target.value)}
-                      className="w-full px-4 py-2.5 border-2 border-slate-200 rounded-lg focus:border-cpu-orange focus:outline-none bg-white text-slate-700 cursor-pointer transition-all text-sm"
+                  {/* ── Format ── */}
+                  <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <button
+                      onClick={() => toggleSection("format")}
+                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
                     >
-                      <option value="populaire">Plus populaires</option>
-                      <option value="note">Mieux notés</option>
-                      <option value="duree-asc">Durée croissante</option>
-                      <option value="duree-desc">Durée décroissante</option>
-                    </select>
-                  </div>
+                      <span className="flex items-center gap-2 text-sm font-bold text-slate-800 uppercase tracking-wider">
+                        <Monitor className="w-4 h-4 text-cpu-orange" />
+                        Format
+                      </span>
+                      {openSections.format ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                    </button>
+                    {openSections.format && (
+                      <div className="px-4 pb-4 grid grid-cols-2 gap-2">
+                        {[
+                          { value: "Vidéo", Icon: Video, color: "blue" },
+                          { value: "Live", Icon: Globe, color: "green" },
+                          { value: "Présentiel", Icon: Users, color: "orange" },
+                          { value: "Hybride", Icon: Layers, color: "purple" },
+                        ].map(({ value, Icon, color }) => {
+                          const active = filtreFormats.includes(value);
+                          const count = parcoursAvecFormations.filter(p => p.format === value).length;
+                          return (
+                            <button
+                              key={value}
+                              onClick={() => toggleFormat(value)}
+                              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-semibold transition-all ${
+                                active
+                                  ? `border-${color}-500 bg-${color}-50 text-${color}-700`
+                                  : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                              }`}
+                            >
+                              <div className={`relative w-8 h-8 rounded-lg flex items-center justify-center ${active ? `bg-${color}-100` : "bg-slate-100"}`}>
+                                <Icon className={`w-4 h-4 ${active ? `text-${color}-600` : "text-slate-500"}`} />
+                                {active && <Check className={`w-3 h-3 text-${color}-600 absolute -top-1 -right-1 bg-white rounded-full`} />}
+                              </div>
+                              {value}
+                              <span className={`text-xs ${active ? `text-${color}-500` : "text-slate-400"}`}>({count})</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </Card>
 
-                  {/* Info helper */}
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-xs text-blue-800 leading-relaxed">
-                      <span className="font-semibold">Astuce:</span> Combinez recherche et filtres pour trouver le parcours idéal
-                    </p>
-                  </div>
-                </Card>
+                  {/* ── Durée ── */}
+                  <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <button
+                      onClick={() => toggleSection("duree")}
+                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-bold text-slate-800 uppercase tracking-wider">
+                        <Clock className="w-4 h-4 text-cpu-orange" />
+                        Durée
+                      </span>
+                      {openSections.duree ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                    </button>
+                    {openSections.duree && (
+                      <div className="px-4 pb-4 space-y-1.5">
+                        {[
+                          { value: "all", label: "Toutes durées" },
+                          { value: "lt10", label: "Moins de 10h" },
+                          { value: "10-30", label: "10 – 30h" },
+                          { value: "30-60", label: "30 – 60h" },
+                          { value: "gt60", label: "Plus de 60h" },
+                        ].map(({ value, label }) => {
+                          const active = filtreDuree === value;
+                          const count = value === "all"
+                            ? parcoursAvecFormations.length
+                            : parcoursAvecFormations.filter(p => {
+                                const d = p.dureeTotal || 0;
+                                return value === "lt10" ? d < 10 : value === "10-30" ? d >= 10 && d <= 30 : value === "30-60" ? d > 30 && d <= 60 : d > 60;
+                              }).length;
+                          return (
+                            <button
+                              key={value}
+                              onClick={() => setFiltreDuree(value)}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all ${
+                                active
+                                  ? "bg-indigo-600 text-white shadow-md"
+                                  : "text-slate-700 hover:bg-slate-50 border border-slate-100"
+                              }`}
+                            >
+                              <span className="flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full ${active ? "bg-white" : "bg-slate-300"}`} />
+                                {label}
+                              </span>
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${active ? "bg-white/25 text-white" : "bg-slate-100 text-slate-600"}`}>
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </Card>
+
+                  {/* ── Prix ── */}
+                  <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <button
+                      onClick={() => toggleSection("prix")}
+                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-bold text-slate-800 uppercase tracking-wider">
+                        <Tag className="w-4 h-4 text-cpu-orange" />
+                        Prix
+                      </span>
+                      {openSections.prix ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                    </button>
+                    {openSections.prix && (
+                      <div className="px-4 pb-4 grid grid-cols-3 gap-2">
+                        {[
+                          { value: "all", label: "Tous", Icon: Tag },
+                          { value: "gratuit", label: "Gratuit", Icon: Gift },
+                          { value: "payant", label: "Payant", Icon: CreditCard },
+                        ].map(({ value, label, Icon }) => {
+                          const active = filtrePrix === value;
+                          return (
+                            <button
+                              key={value}
+                              onClick={() => setFiltrePrix(value)}
+                              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-semibold transition-all ${
+                                active
+                                  ? "border-green-500 bg-green-50 text-green-700"
+                                  : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                              }`}
+                            >
+                              <Icon className={`w-4 h-4 ${active ? "text-green-600" : "text-slate-500"}`} />
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </Card>
+
+                  {/* ── Options spéciales ── */}
+                  <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <button
+                      onClick={() => toggleSection("options")}
+                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-bold text-slate-800 uppercase tracking-wider">
+                        <Star className="w-4 h-4 text-cpu-orange" />
+                        Options
+                      </span>
+                      {openSections.options ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                    </button>
+                    {openSections.options && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {[
+                          {
+                            value: filtreCertifiant,
+                            setter: setFiltreCertifiant,
+                            label: "Certifiant",
+                            sub: "Avec certificat officiel",
+                            Icon: Medal,
+                            activeColor: "bg-purple-600",
+                          },
+                          {
+                            value: filtreBestseller,
+                            setter: setFiltreBestseller,
+                            label: "Bestseller",
+                            sub: "1 000+ inscrits",
+                            Icon: Flame,
+                            activeColor: "bg-yellow-500",
+                          },
+                        ].map(({ value, setter, label, sub, Icon, activeColor }) => (
+                          <button
+                            key={label}
+                            onClick={() => setter(!value)}
+                            className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl border-2 text-left transition-all ${
+                              value
+                                ? "border-slate-700 bg-slate-900"
+                                : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${value ? activeColor : "bg-slate-100"}`}>
+                              <Icon className={`w-4 h-4 ${value ? "text-white" : "text-slate-500"}`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-semibold ${value ? "text-white" : "text-slate-800"}`}>{label}</p>
+                              <p className={`text-xs ${value ? "text-slate-400" : "text-slate-500"}`}>{sub}</p>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                              value ? "bg-cpu-orange border-cpu-orange" : "border-slate-300"
+                            }`}>
+                              {value && <Check className="w-3 h-3 text-white" />}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+
+                  {/* ── Trier par ── */}
+                  <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <button
+                      onClick={() => toggleSection("tri")}
+                      className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-bold text-slate-800 uppercase tracking-wider">
+                        <TrendingUp className="w-4 h-4 text-cpu-orange" />
+                        Trier par
+                      </span>
+                      {openSections.tri ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                    </button>
+                    {openSections.tri && (
+                      <div className="px-4 pb-4 space-y-1.5">
+                        {[
+                          { value: "populaire", label: "Plus populaires", Icon: Users },
+                          { value: "note", label: "Mieux évalués", Icon: Star },
+                          { value: "duree-asc", label: "Durée croissante", Icon: Clock },
+                          { value: "duree-desc", label: "Durée décroissante", Icon: Clock },
+                          { value: "prix-asc", label: "Prix croissant", Icon: Tag },
+                          { value: "prix-desc", label: "Prix décroissant", Icon: Tag },
+                        ].map(({ value, label, Icon }) => {
+                          const active = triPar === value;
+                          return (
+                            <button
+                              key={value}
+                              onClick={() => setTriPar(value)}
+                              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all ${
+                                active
+                                  ? "bg-slate-900 text-white"
+                                  : "text-slate-700 hover:bg-slate-50 border border-slate-100"
+                              }`}
+                            >
+                              <Icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-cpu-orange" : "text-slate-400"}`} />
+                              {label}
+                              {active && <Check className="w-3.5 h-3.5 ml-auto text-cpu-orange" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </Card>
+
+                </div>
               </aside>
 
               {/* Contenu principal */}
               <div className="flex-1 min-w-0">
+                {parcoursError && parcoursAvecFormations.length === 0 && (
+                  <Card className="mb-6 p-4 border border-red-200 bg-red-50 text-red-700">
+                    Impossible de charger certains parcours. Les données affichées peuvent être partielles.
+                  </Card>
+                )}
+
                 {/* Barre de recherche + VIEW MODE TOGGLE */}
                 <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
                   <div className="flex-1 max-w-md">
@@ -375,7 +709,15 @@ export default function ParcoursPage() {
                   </div>
                 </div>
 
-                {parcoursTries.length > 0 ? (
+                {isParcoursLoading && parcoursAvecFormations.length === 0 && (
+                  <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <div key={index} className="h-[410px] rounded-2xl bg-slate-200 animate-pulse" />
+                    ))}
+                  </div>
+                )}
+
+                {!isParcoursLoading && parcoursTries.length > 0 ? (
                   <div
                     className={`
                       ${
@@ -422,13 +764,10 @@ export default function ParcoursPage() {
                         Essayez de modifier vos critères de recherche ou vos filtres
                       </p>
                       <Button 
-                        onClick={() => {
-                          setSearchTerm("");
-                          setFiltreNiveau("all");
-                        }}
+                        onClick={resetFilters}
                         className="bg-gradient-to-r from-cpu-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:scale-105 transition-all duration-200 shine-effect"
                       >
-                        <Zap className="mr-2 h-5 w-5" />
+                        <RotateCcw className="mr-2 h-5 w-5" />
                         Réinitialiser les filtres
                       </Button>
                     </div>
@@ -526,7 +865,7 @@ export default function ParcoursPage() {
                 Prêt à démarrer votre parcours ?
               </h2>
               <p className="text-xl mb-10 text-slate-300 max-w-2xl mx-auto leading-relaxed">
-                Rejoignez des <span className="text-cpu-orange font-semibold">{parcoursMock.reduce((acc, p) => acc + (p.nbInscrits || 0), 0).toLocaleString()}</span> apprenants qui transforment leur carrière avec CPU Formation
+                Rejoignez des <span className="text-cpu-orange font-semibold">{parcoursMetrics.totalInscrits.toLocaleString()}</span> apprenants qui transforment leur carrière avec CPU Formation
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">

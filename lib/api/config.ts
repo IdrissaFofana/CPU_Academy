@@ -35,6 +35,12 @@ export const API_ENDPOINTS = {
     BY_ID: (id: string) => `/api/formation/formations/${id}`,
   },
 
+  PARCOURS: {
+    BASE: '/api/formation/parcours',
+    PUBLIC: '/api/formation/parcours/public',
+    BY_ID: (id: string) => `/api/formation/parcours/${id}`,
+  },
+
   CHAPITRES: {
     BASE: '/api/formation/chapitres',
     LECONS: '/api/formation/chapitres/lecons',
@@ -78,6 +84,13 @@ export const API_ENDPOINTS = {
     BY_ID: (id: string) => `/api/formation/faqs/${id}`,
     VIEW: (id: string) => `/api/formation/faqs/${id}/view`,
     USEFUL: (id: string) => `/api/formation/faqs/${id}/utile`,
+  },
+
+  // Ressources
+  RESSOURCES: {
+    BASE: '/api/formation/ressources',
+    PUBLIC: '/api/formation/ressources',
+    BY_ID: (id: string) => `/api/formation/ressources/${id}`,
   },
   
   // Enrollments

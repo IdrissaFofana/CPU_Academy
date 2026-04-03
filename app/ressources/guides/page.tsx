@@ -1,124 +1,163 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { 
-  FileText, 
-  Download, 
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/config";
+import {
+  FileText,
+  Download,
   Search,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 
-const categories = [
-  "Tous",
-  "Création d'entreprise",
-  "Business Plan",
-  "Fiscalité",
-  "RH",
-  "Marchés publics",
-  "Qualité"
-];
+type GuideResource = {
+  id: string;
+  titre: string;
+  description: string;
+  pages: number;
+  telechargements: number;
+  format: string;
+  formatColor: string;
+  categorie: string;
+  url: string;
+};
 
-const ressources = [
-  {
-    id: 1,
-    titre: "Guide de création d'entreprise en Côte d'Ivoire",
-    description: "Toutes les étapes pour créer votre entreprise, de l'idée à l'immatriculation",
-    pages: 45,
-    telechargements: 1250,
-    format: "PDF",
-    formatColor: "bg-green-500",
-    categorie: "Création d'entreprise"
-  },
-  {
-    id: 2,
-    titre: "Modèle de Business Plan",
-    description: "Template complet avec exemples pour construire votre business plan",
-    pages: 20,
-    telechargements: 890,
-    format: "Word/Excel",
-    formatColor: "bg-blue-500",
-    categorie: "Business Plan"
-  },
-  {
-    id: 3,
-    titre: "Kit de réponse aux appels d'offres",
-    description: "Tous les documents types pour répondre aux marchés publics",
-    pages: 35,
-    telechargements: 670,
-    format: "ZIP",
-    formatColor: "bg-orange-500",
-    categorie: "Marchés publics"
-  },
-  {
-    id: 4,
-    titre: "Guide fiscal des PME",
-    description: "Comprendre et optimiser sa fiscalité en Côte d'Ivoire",
-    pages: 60,
-    telechargements: 540,
-    format: "PDF",
-    formatColor: "bg-green-500",
-    categorie: "Fiscalité"
-  },
-  {
-    id: 5,
-    titre: "Modèles de contrats de travail",
-    description: "CDD, CDI, stage : tous les modèles conformes au droit ivoirien",
-    pages: 15,
-    telechargements: 980,
-    format: "Word",
-    formatColor: "bg-blue-500",
-    categorie: "RH"
-  },
-  {
-    id: 6,
-    titre: "Check-list qualité HACCP",
-    description: "Guide pratique pour la mise en conformité agroalimentaire",
-    pages: 25,
-    telechargements: 320,
-    format: "PDF",
-    formatColor: "bg-green-500",
-    categorie: "Qualité"
-  },
-  {
-    id: 7,
-    titre: "Plan de trésorerie prévisionnel",
-    description: "Modèle Excel avec formules automatiques sur 3 ans",
-    pages: 12,
-    telechargements: 1120,
-    format: "Excel",
-    formatColor: "bg-emerald-500",
-    categorie: "Business Plan"
-  },
-  {
-    id: 8,
-    titre: "Guide des aides aux entreprises",
-    description: "Panorama complet des financements et subventions disponibles",
-    pages: 38,
-    telechargements: 760,
-    format: "PDF",
-    formatColor: "bg-green-500",
-    categorie: "Création d'entreprise"
-  },
-  {
-    id: 9,
-    titre: "Modèles de factures et devis",
-    description: "Templates professionnels conformes aux normes comptables",
-    pages: 8,
-    telechargements: 2150,
-    format: "Word/Excel",
-    formatColor: "bg-blue-500",
-    categorie: "Fiscalité"
-  }
-];
+const GUIDES_PER_PAGE = 9;
+
+function normalizeArray(payload: any): any[] {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
+  return [];
+}
+
+function normalizeUrl(value: unknown): string {
+  if (typeof value !== "string") return "";
+  const cleaned = value.trim();
+  if (!cleaned) return "";
+  if (/^https?:\/\//i.test(cleaned)) return cleaned;
+  if (cleaned.startsWith("//")) return `https:${cleaned}`;
+  if (cleaned.startsWith("/")) return cleaned;
+  return "";
+}
+
+function inferFormat(url: string, fallbackName = ""): string {
+  const ref = `${url} ${fallbackName}`.toLowerCase();
+  if (ref.includes(".pdf")) return "PDF";
+  if (ref.includes(".doc") || ref.includes(".docx")) return "Word";
+  if (ref.includes(".xls") || ref.includes(".xlsx")) return "Excel";
+  if (ref.includes(".ppt") || ref.includes(".pptx")) return "PowerPoint";
+  if (ref.includes(".zip") || ref.includes(".rar")) return "ZIP";
+  return "Lien";
+}
+
+function isDocumentLike(url: string, type: string): boolean {
+  const t = type.toLowerCase();
+  if (t === "video") return false;
+  if (/youtube\.com|youtu\.be|vimeo\.com/i.test(url)) return false;
+  return true;
+}
+
+function formatColor(format: string): string {
+  if (format === "PDF") return "bg-green-500";
+  if (format === "Word") return "bg-blue-500";
+  if (format === "Excel") return "bg-emerald-500";
+  if (format === "PowerPoint") return "bg-orange-500";
+  if (format === "ZIP") return "bg-amber-500";
+  return "bg-slate-500";
+}
+
+function normalizeGuideResources(payload: any): GuideResource[] {
+  const items = normalizeArray(payload)
+    .map((item: any, idx: number) => {
+      const url = normalizeUrl(item?.url || item?.file_url || item?.document_url || item?.download_url || item?.lien);
+      const type = String(item?.type || item?.ressource_type || item?.format || "");
+      const title = String(item?.titre || item?.title || item?.nom || item?.name || `Ressource ${idx + 1}`);
+      const format = String(item?.format || inferFormat(url, title)).toUpperCase();
+
+      if (!url || !isDocumentLike(url, type)) {
+        return null;
+      }
+
+      return {
+        id: String(item?.id || item?._id || `res-${idx}`),
+        titre: title,
+        description: String(item?.description || item?.resume || item?.summary || "Ressource telechargeable"),
+        pages: Math.max(1, Number(item?.pages || item?.nbPages || item?.nombrePages || 8)),
+        telechargements: Math.max(0, Number(item?.telechargements || item?.downloads || item?.download_count || 0)),
+        format,
+        formatColor: formatColor(format),
+        categorie: String(item?.categorie || item?.category || item?.theme || "Ressources"),
+        url,
+      } as GuideResource;
+    })
+    .filter(Boolean) as GuideResource[];
+
+  const byUrl = new Map<string, GuideResource>();
+  items.forEach((item) => {
+    if (!byUrl.has(item.url)) {
+      byUrl.set(item.url, item);
+    }
+  });
+
+  return Array.from(byUrl.values());
+}
 
 export default function GuidesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tous");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ressources, setRessources] = useState<GuideResource[]>([]);
+  const [isGuidesLoading, setIsGuidesLoading] = useState(true);
+  const [guidesError, setGuidesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function fetchGuidesFromApi() {
+      setIsGuidesLoading(true);
+      setGuidesError(null);
+
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.RESSOURCES.PUBLIC);
+        const merged = normalizeGuideResources(response);
+
+        if (!isCancelled) {
+          setRessources(merged);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          setGuidesError(error instanceof Error ? error.message : "Erreur API inattendue");
+          setRessources([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsGuidesLoading(false);
+        }
+      }
+    }
+
+    fetchGuidesFromApi();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  const categories = useMemo(
+    () => ["Tous", ...Array.from(new Set(ressources.map((ressource) => ressource.categorie))).sort()],
+    [ressources]
+  );
+
+  useEffect(() => {
+    if (!categories.includes(selectedCategory)) {
+      setSelectedCategory("Tous");
+    }
+  }, [categories, selectedCategory]);
 
   const filteredRessources = ressources.filter((ressource) => {
     // Filtre de recherche
@@ -132,6 +171,20 @@ export default function GuidesPage() {
     
     return matchSearch && matchCategory;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredRessources.length / GUIDES_PER_PAGE));
+  const startIndex = (currentPage - 1) * GUIDES_PER_PAGE;
+  const paginatedRessources = filteredRessources.slice(startIndex, startIndex + GUIDES_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   return (
     <>
@@ -217,8 +270,8 @@ export default function GuidesPage() {
               <div className="text-sm text-slate-600">Ressources</div>
             </div>
             <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md">
-              <div className="text-3xl font-bold text-green-600 mb-1">100%</div>
-              <div className="text-sm text-slate-600">Gratuit</div>
+              <div className="text-3xl font-bold text-green-600 mb-1">API</div>
+              <div className="text-sm text-slate-600">Source de données</div>
             </div>
             <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md">
               <div className="text-3xl font-bold text-blue-600 mb-1">
@@ -232,10 +285,24 @@ export default function GuidesPage() {
             </div>
           </div>
 
+          {isGuidesLoading && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <Card key={idx} className="h-72 animate-pulse bg-slate-100 border-0" />
+              ))}
+            </div>
+          )}
+
+          {guidesError && (
+            <Card className="max-w-3xl mx-auto p-6 bg-red-50 border-red-200 text-red-800 mb-8">
+              Impossible de charger les guides depuis l'API. {guidesError}
+            </Card>
+          )}
+
           {/* Grille de ressources */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {filteredRessources.length > 0 ? (
-              filteredRessources.map((ressource, idx) => (
+            {!isGuidesLoading && !guidesError && paginatedRessources.length > 0 ? (
+              paginatedRessources.map((ressource, idx) => (
                 <Card
                   key={ressource.id}
                   className="group flex flex-col transition-all duration-500 border-2 border-slate-100 hover:border-orange-200 bg-white overflow-hidden animate-fade-in "
@@ -287,23 +354,64 @@ export default function GuidesPage() {
                     </div>
 
                     {/* Bouton télécharger */}
-                    <Button
-                      className="w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold shadow-md transition-all duration-300 group-hover:scale-105"
-                    >
-                      <Download className="mr-2 h-4 w-4 group-hover:animate-bounce" />
-                      Télécharger
+                    <Button asChild className="w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold shadow-md transition-all duration-300 group-hover:scale-105">
+                      <a href={ressource.url} target="_blank" rel="noopener noreferrer">
+                        <Download className="mr-2 h-4 w-4 group-hover:animate-bounce" />
+                        Télécharger
+                      </a>
                     </Button>
                   </div>
                 </Card>
               ))
-            ) : (
+            ) : !isGuidesLoading ? (
               <div className="col-span-full text-center py-12">
                 <FileText className="w-16 h-16 mx-auto mb-4 text-slate-300" />
                 <p className="text-lg text-slate-500">Aucune ressource trouvée</p>
                 <p className="text-sm text-slate-400 mt-2">Essayez de modifier vos critères de recherche</p>
               </div>
-            )}
+            ) : null}
           </div>
+
+          {!isGuidesLoading && !guidesError && filteredRessources.length > 0 && (
+            <div className="max-w-7xl mx-auto mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-slate-600">
+                Page <span className="font-semibold text-slate-900">{currentPage}</span> sur <span className="font-semibold text-slate-900">{totalPages}</span>
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Précédent
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2))
+                  .map((pageNum) => (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      className={currentPage === pageNum ? "bg-cpu-orange text-white hover:bg-cpu-orange" : ""}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  ))}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Suivant
+                </Button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </>

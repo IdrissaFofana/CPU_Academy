@@ -10,6 +10,8 @@ import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { CartProvider } from "@/contexts/CartContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { SimpleAuthProvider } from "@/contexts/SimpleAuthContext";
+import { NavigationProgress } from "@/components/layout/NavigationProgress";
+import { PageTransition } from "@/components/layout/PageTransition";
 
 // Configuration des polices Google Fonts
 const inter = Inter({ 
@@ -41,11 +43,14 @@ export default function RootLayout({
         <SimpleAuthProvider>
           <NotificationProvider>
             <CartProvider>
+              <NavigationProgress />
               <ScrollProgress />
               <AnnouncementBar />
               <Navbar />
               <main className="min-h-screen pb-16 lg:pb-0">
-                {children}
+                <PageTransition>
+                  {children}
+                </PageTransition>
               </main>
               <Footer />
               <StickyCTA />

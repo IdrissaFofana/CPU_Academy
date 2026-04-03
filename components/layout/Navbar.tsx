@@ -576,7 +576,7 @@ const NavLinkWithDropdown = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="start" 
-        className={`${isMegaMenu ? 'w-80' : 'w-64'} bg-white shadow-2xl border-2 border-orange-100 rounded-xl animate-in slide-in-from-top-2 duration-200 overflow-hidden`}
+        className={`${isMegaMenu ? 'w-80' : 'w-64'} bg-white shadow-2xl border-2 border-orange-100 rounded-xl animate-in slide-in-from-top-3 fade-in duration-250 overflow-hidden`}
       >
         {isMegaMenu && (
           <div className="px-4 py-3 bg-gradient-to-r from-orange-50 to-transparent border-b border-gray-100">
@@ -589,7 +589,7 @@ const NavLinkWithDropdown = ({
         {items.map((item, index) => {
           if (item.sectionLabel) {
             return (
-              <div key={`section-${index}`}>
+              <div key={`section-${index}`} className="animate-dropdown-item" style={{ animationDelay: `${index * 40}ms` }}>
                 {index > 0 && <DropdownMenuSeparator className="my-1" />}
                 <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
                   {item.sectionLabel}
@@ -604,11 +604,12 @@ const NavLinkWithDropdown = ({
             >
               <Link 
                 href={item.href!} 
-                className={`w-full flex items-start gap-3 cursor-pointer px-3 py-2.5 rounded-md transition-all duration-200 group/item ${
+                className={`w-full flex items-start gap-3 cursor-pointer px-3 py-2.5 rounded-md transition-all duration-200 group/item animate-dropdown-item ${
                   pathname === item.href 
                     ? "bg-orange-100 text-cpu-orange font-medium" 
                     : "text-gray-700 hover:bg-orange-50 hover:text-cpu-orange"
                 }`}
+                style={{ animationDelay: `${index * 45}ms` }}
               >
                 <span className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 flex-shrink-0 ${
                   pathname === item.href 

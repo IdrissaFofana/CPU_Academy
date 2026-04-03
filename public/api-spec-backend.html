@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spécifications API — CPU Formation | Backend Team</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #f97316;
+      --orange-light: #fff7ed;
+      --orange-dark: #c2410c;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --green: #22c55e;
+      --green-light: #f0fdf4;
+      --green-dark: #15803d;
+      --blue: #3b82f6;
+      --blue-light: #eff6ff;
+      --blue-dark: #1d4ed8;
+      --red: #ef4444;
+      --red-light: #fef2f2;
+      --purple: #a855f7;
+      --purple-light: #faf5ff;
+      --yellow: #eab308;
+      --yellow-light: #fefce8;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+      background: var(--slate-50);
+      color: var(--slate-800);
+      line-height: 1.6;
+    }
+
+    /* ── LAYOUT ── */
+    .wrapper { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+    
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--slate-900) 0%, #1a2744 100%);
+      padding: 48px 0 40px;
+      margin-bottom: 40px;
+    }
+    header .wrapper { padding-top: 0; padding-bottom: 0; }
+    .header-inner { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
+    .logo-area { display: flex; align-items: center; gap: 16px; }
+    .logo-dot { width: 48px; height: 48px; background: var(--orange); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: white; }
+    .logo-text { color: white; }
+    .logo-text h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+    .logo-text p { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+    .header-meta { text-align: right; color: #94a3b8; font-size: 13px; }
+    .header-meta strong { display: block; color: white; font-size: 15px; margin-bottom: 4px; }
+    .header-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.4);
+      color: #fb923c; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-top: 8px;
+    }
+
+    /* ── SOMMAIRE ── */
+    .toc {
+      background: white; border: 2px solid var(--slate-200); border-radius: 16px; padding: 28px 32px; margin-bottom: 40px;
+    }
+    .toc h2 { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--slate-600); margin-bottom: 16px; }
+    .toc-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+    .toc-list a { text-decoration: none; color: var(--blue-dark); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .toc-list a:hover { color: var(--orange); }
+    .toc-num { display: inline-block; width: 22px; height: 22px; background: var(--orange); color: white; border-radius: 6px; font-size: 11px; font-weight: 800; text-align: center; line-height: 22px; margin-right: 8px; flex-shrink: 0; }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 48px; }
+    .section-header {
+      display: flex; align-items: center; gap: 14px;
+      background: white; border: 2px solid var(--slate-200); border-radius: 16px 16px 0 0;
+      padding: 20px 28px; border-bottom: none;
+    }
+    .section-icon {
+      width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .icon-orange { background: var(--orange-light); }
+    .icon-green { background: var(--green-light); }
+    .icon-blue { background: var(--blue-light); }
+    .icon-purple { background: var(--purple-light); }
+    .section-header-text h2 { font-size: 20px; font-weight: 800; color: var(--slate-900); }
+    .section-header-text p { font-size: 14px; color: var(--slate-600); margin-top: 2px; }
+    .section-body {
+      background: white; border: 2px solid var(--slate-200); border-top: none; border-radius: 0 0 16px 16px; padding: 28px;
+    }
+
+    /* ── CONTEXT BOX ── */
+    .context-box {
+      background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px;
+      padding: 16px 20px; margin-bottom: 24px; font-size: 14px; color: #78350f; line-height: 1.6;
+    }
+    .context-box strong { color: #92400e; }
+
+    /* ── ENDPOINT CARD ── */
+    .endpoint-group { margin-bottom: 32px; }
+    .endpoint-group-title {
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--slate-600); padding-bottom: 10px; border-bottom: 2px solid var(--slate-100); margin-bottom: 16px;
+    }
+    .endpoint-card {
+      border: 1.5px solid var(--slate-200); border-radius: 12px; overflow: hidden; margin-bottom: 16px; transition: box-shadow 0.2s;
+    }
+    .endpoint-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .endpoint-top {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+      background: var(--slate-50); padding: 14px 18px; border-bottom: 1px solid var(--slate-200);
+    }
+    .method-badge {
+      font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.05em; flex-shrink: 0;
+    }
+    .method-get { background: #dcfce7; color: #15803d; }
+    .method-post { background: #dbeafe; color: #1d4ed8; }
+    .method-put { background: #fef9c3; color: #92400e; }
+    .method-delete { background: #fee2e2; color: #991b1b; }
+    .method-patch { background: #ede9fe; color: #6b21a8; }
+    .endpoint-url {
+      font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+      font-size: 14px; font-weight: 600; color: var(--slate-800); background: white;
+      padding: 4px 10px; border-radius: 6px; border: 1px solid var(--slate-200);
+    }
+    .auth-badge {
+      margin-left: auto; font-size: 11px; padding: 3px 10px; border-radius: 6px; font-weight: 600;
+    }
+    .auth-public { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .auth-admin { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .endpoint-body { padding: 16px 18px; }
+    .endpoint-desc { font-size: 14px; color: var(--slate-700); margin-bottom: 14px; }
+    .endpoint-desc strong { color: var(--slate-900); }
+
+    /* ── SCHEMA ── */
+    .schema-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-500); margin-bottom: 8px; }
+    pre {
+      background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 16px 18px;
+      font-family: 'Fira Code', 'Cascadia Code', monospace; font-size: 13px; line-height: 1.7;
+      overflow-x: auto; margin-bottom: 14px; border: 1px solid #1e293b;
+    }
+    .tok-key { color: #7dd3fc; }
+    .tok-string { color: #a3e635; }
+    .tok-num { color: #f59e0b; }
+    .tok-bool { color: #f472b6; }
+    .tok-null { color: #94a3b8; }
+    .tok-comment { color: #64748b; font-style: italic; }
+    .tok-type { color: #c084fc; }
+
+    /* ── FIELDS TABLE ── */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 13px; }
+    th { background: var(--slate-800); color: white; padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+    th:first-child { border-radius: 8px 0 0 0; }
+    th:last-child { border-radius: 0 8px 0 0; }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--slate-100); color: var(--slate-700); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--slate-50); }
+    .field-name { font-family: monospace; font-size: 13px; font-weight: 600; color: var(--blue-dark); }
+    .field-type { font-family: monospace; font-size: 12px; color: var(--purple); background: var(--purple-light); padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+    .required-badge { background: #fef2f2; color: #991b1b; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecaca; }
+    .optional-badge { background: var(--slate-100); color: var(--slate-600); font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+
+    /* ── PRIORITY TAGS ── */
+    .priority { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-right: 8px; margin-bottom: 8px; }
+    .priority-high { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .priority-medium { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+    .priority-low { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+
+    /* ── NOTES ── */
+    .note {
+      border-left: 4px solid; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 14px; font-size: 13.5px;
+    }
+    .note-info { border-color: var(--blue); background: var(--blue-light); color: #1e40af; }
+    .note-warn { border-color: var(--yellow); background: var(--yellow-light); color: #78350f; }
+    .note-ok { border-color: var(--green); background: var(--green-light); color: #166534; }
+    .note-title { font-weight: 700; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── TAGS ── */
+    .tag { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 5px; font-weight: 600; margin-right: 4px; margin-bottom: 4px; }
+    .tag-orange { background: var(--orange-light); color: var(--orange-dark); border: 1px solid #fed7aa; }
+    .tag-blue { background: var(--blue-light); color: var(--blue-dark); border: 1px solid #bfdbfe; }
+    .tag-green { background: var(--green-light); color: var(--green-dark); border: 1px solid #bbf7d0; }
+    .tag-purple { background: var(--purple-light); color: #6b21a8; border: 1px solid #e9d5ff; }
+
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 2px dashed var(--slate-200); margin: 28px 0; }
+
+    /* ── SUMMARY BOX ── */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin: 24px 0; }
+    .summary-card { background: white; border: 2px solid var(--slate-200); border-radius: 12px; padding: 18px; text-align: center; }
+    .summary-card .number { font-size: 32px; font-weight: 900; color: var(--orange); line-height: 1; margin-bottom: 6px; }
+    .summary-card .label { font-size: 13px; color: var(--slate-600); font-weight: 500; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--slate-900); color: #94a3b8; text-align: center; padding: 28px 24px; font-size: 13px; margin-top: 60px;
+    }
+    footer strong { color: white; }
+    .footer-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .header-meta { text-align: left; }
+      .endpoint-top { flex-direction: column; align-items: flex-start; }
+      .auth-badge { margin-left: 0; }
+      .toc-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════════════════ -->
+<header>
+  <div class="wrapper">
+    <div class="header-inner">
+      <div class="logo-area">
+        <div class="logo-dot">C</div>
+        <div class="logo-text">
+          <h1>CPU Formation</h1>
+          <p>Spécifications API — Équipe Backend</p>
+        </div>
+      </div>
+      <div class="header-meta">
+        <strong>📄 Document de spécifications techniques</strong>
+        Émis par : Équipe Frontend<br>
+        Version : 1.0 — Avril 2026<br>
+        <span class="header-badge">🔒 Usage interne</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     WRAPPER PRINCIPAL
+════════════════════════════════════════════════════════════ -->
+<div class="wrapper">
+
+  <!-- Sommaire -->
+  <nav class="toc">
+    <h2>📋 Sommaire</h2>
+    <ul class="toc-list">
+      <li><a href="#section-context"><span class="toc-num">0</span>Contexte & Base URL</a></li>
+      <li><a href="#section-packs"><span class="toc-num">1</span>Packs Métiers Entreprises</a></li>
+      <li><a href="#section-certifications"><span class="toc-num">2</span>Certifications & Labels</a></li>
+      <li><a href="#section-financement"><span class="toc-num">3</span>Options de Financement (FDFP)</a></li>
+      <li><a href="#section-leads"><span class="toc-num">4</span>Formulaires Entreprises (Leads)</a></li>
+      <li><a href="#section-recap"><span class="toc-num">5</span>Récapitulatif des endpoints</a></li>
+    </ul>
+  </nav>
+
+  <!-- ══ SECTION 0 : CONTEXTE ══ -->
+  <section class="section" id="section-context">
+    <div class="section-header">
+      <div class="section-icon icon-blue">🌐</div>
+      <div class="section-header-text">
+        <h2>Contexte & Informations générales</h2>
+        <p>Base de travail pour l'équipe backend</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="context-box">
+        <strong>Objectif :</strong> Ce document recense les <strong>4 nouvelles ressources API</strong> que l'équipe frontend requiert pour rendre dynamiques les sections de la page <em>Entreprises</em> du site CPU Formation. Les données sont actuellement statiques (hardcodées) dans le frontend.
+      </div>
+
+      <div class="note note-info">
+        <div class="note-title">ℹ️ Base URL actuelle</div>
+        Toutes les routes sont préfixées par : <code>https://back.cpupme.com</code><br>
+        Variable d'environnement frontend : <code>NEXT_PUBLIC_API_URL</code>
+      </div>
+
+      <div class="note note-ok">
+        <div class="note-title">✅ Convention de réponse déjà adoptée</div>
+        Le frontend s'attend au format uniforme suivant pour toutes les réponses :
+      </div>
+
+      <pre><span class="tok-comment">// Format de réponse standard (déjà utilisé sur /api/formation/formations/public)</span>
+{
+  <span class="tok-key">"success"</span>: <span class="tok-bool">true</span>,
+  <span class="tok-key">"message"</span>: <span class="tok-string">"..."</span>,
+  <span class="tok-key">"data"</span>: <span class="tok-comment">/* [] ou {} selon la ressource */</span>
+}
+
+<span class="tok-comment">// En cas d'erreur</span>
+{
+  <span class="tok-key">"success"</span>: <span class="tok-bool">false</span>,
+  <span class="tok-key">"message"</span>: <span class="tok-string">"Description de l'erreur"</span>,
+  <span class="tok-key">"data"</span>: <span class="tok-null">null</span>
+}</pre>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="number">4</div>
+          <div class="label">Nouvelles ressources API</div>
+        </div>
+        <div class="summary-card">
+          <div class="number">15</div>
+          <div class="label">Endpoints à créer</div>
+        </div>
+        <div class="summary-card">
+          <div class="number">2</div>
+          <div class="label">Uploads fichiers (PDF/images)</div>
+        </div>
+        <div class="summary-card">
+          <div class="number">🔴</div>
+          <div class="label">Priorité haute : Certifs, Leads & Packs</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 1 : PACKS MÉTIERS
+  ════════════════════════════════════════════════════════════ -->
+  <section class="section" id="section-packs">
+    <div class="section-header">
+      <div class="section-icon icon-orange">📦</div>
+      <div class="section-header-text">
+        <h2>1. Packs Métiers Entreprises</h2>
+        <p>Ressource : <code>/api/entreprises/packs</code></p>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="context-box">
+        <strong>Contexte frontend :</strong> La section "Packs Métiers" de la page <em>/entreprises</em> affiche actuellement
+        <strong>6 packs statiques</strong> codés en dur (Direction & Management, Commercial & Marketing, Finance, RH, Production, Digital & IT).
+        Ces packs ont chacun une grille de prix B2B spécifique (par personne, groupe 8+, groupe 15+) et des informations de financement FDFP.
+        <br><br>
+        <strong>Pourquoi une API dédiée ?</strong> Ces données ne peuvent pas être dérivées de l'API formations existante car :
+        les prix sont journaliers (pas annuels), la structure de groupe n'existe pas, et les taux FDFP sont des valeurs métier.
+      </div>
+
+      <span class="priority priority-high">🔴 Priorité Haute</span>
+      <span class="tag tag-orange">B2B</span>
+      <span class="tag tag-blue">Public + Admin</span>
+
+      <hr class="divider">
+
+      <!-- ── GET public list ── -->
+      <div class="endpoint-group">
+        <div class="endpoint-group-title">Lecture publique</div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-url">/api/entreprises/packs</span>
+            <span class="auth-badge auth-public">🔓 Public</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Retourne la liste complète de tous les packs métiers <strong>publiés</strong>, triés par ordre d'affichage.</p>
+            <div class="note note-info">
+              <div class="note-title">📥 Query params optionnels</div>
+              <code>?categorie=finance</code> — filtrer par catégorie métier<br>
+              <code>?actif=true</code> — n'afficher que les packs actifs (défaut : <code>true</code>)
+            </div>
+            <div class="schema-title">Exemple de réponse</div>
+            <pre>{
+  <span class="tok-key">"success"</span>: <span class="tok-bool">true</span>,
+  <span class="tok-key">"data"</span>: [
+    {
+      <span class="tok-key">"id"</span>: <span class="tok-string">"pack-direction-management"</span>,
+      <span class="tok-key">"titre"</span>: <span class="tok-string">"Pack Direction &amp; Management"</span>,
+      <span class="tok-key">"slug"</span>: <span class="tok-string">"direction-management"</span>,
+      <span class="tok-key">"description"</span>: <span class="tok-string">"Pour les dirigeants et managers"</span>,
+      <span class="tok-key">"categorie"</span>: <span class="tok-string">"management"</span>,
+      <span class="tok-key">"couleur"</span>: <span class="tok-string">"orange"</span>,
+      <span class="tok-key">"icone"</span>: <span class="tok-string">"target"</span>,
+      <span class="tok-key">"dureeJours"</span>: <span class="tok-num">8</span>,
+      <span class="tok-key">"nbModules"</span>: <span class="tok-num">6</span>,
+      <span class="tok-key">"ordre"</span>: <span class="tok-num">1</span>,
+      <span class="tok-key">"actif"</span>: <span class="tok-bool">true</span>,
+      <span class="tok-key">"formations"</span>: [
+        <span class="tok-string">"Leadership stratégique"</span>,
+        <span class="tok-string">"Gestion financière avancée"</span>,
+        <span class="tok-string">"Prise de décision et gestion des risques"</span>,
+        <span class="tok-string">"Management d'équipe performante"</span>
+      ],
+      <span class="tok-key">"prix"</span>: {
+        <span class="tok-key">"parPersonne"</span>: <span class="tok-num">480000</span>,
+        <span class="tok-key">"groupe8Plus"</span>: <span class="tok-num">408000</span>,
+        <span class="tok-key">"groupe15Plus"</span>: <span class="tok-num">360000</span>,
+        <span class="tok-key">"devise"</span>: <span class="tok-string">"XOF"</span>
+      },
+      <span class="tok-key">"financement"</span>: {
+        <span class="tok-key">"fdfpEligible"</span>: <span class="tok-bool">true</span>,
+        <span class="tok-key">"tauxPriseEnCharge"</span>: <span class="tok-string">"60-70%"</span>,
+        <span class="tok-key">"resteACharge"</span>: <span class="tok-num">144000</span>
+      },
+      <span class="tok-key">"created_at"</span>: <span class="tok-string">"2025-01-15T10:00:00.000Z"</span>,
+      <span class="tok-key">"updated_at"</span>: <span class="tok-string">"2026-03-01T08:30:00.000Z"</span>
+    }
+  ]
+}</pre>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-url">/api/entreprises/packs/:id</span>
+            <span class="auth-badge auth-public">🔓 Public</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Retourne le détail d'un pack par son <code>id</code> ou son <code>slug</code>. Utile pour une future page détail pack.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CRUD admin ── -->
+      <div class="endpoint-group">
+        <div class="endpoint-group-title">Administration (routes protégées — rôle admin)</div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-url">/api/entreprises/packs</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Crée un nouveau pack métier. Corps de la requête : même structure que la réponse GET (sans <code>id</code>, <code>created_at</code>, <code>updated_at</code>).</p>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-put">PUT</span>
+            <span class="endpoint-url">/api/entreprises/packs/:id</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Met à jour un pack existant (prix, formations, statut actif…).</p>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-delete">DELETE</span>
+            <span class="endpoint-url">/api/entreprises/packs/:id</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Supprime ou archive un pack (préférer un soft-delete via <code>actif: false</code>).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Modèle de données ── -->
+      <hr class="divider">
+      <div class="schema-title">📐 Modèle de données complet — Champs requis</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Champ</th>
+            <th>Type</th>
+            <th>Obligation</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="field-name">id</td>
+            <td><span class="field-type">string (UUID)</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Identifiant unique généré côté backend</td>
+          </tr>
+          <tr>
+            <td class="field-name">titre</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Nom affiché du pack. Ex : "Pack Direction &amp; Management"</td>
+          </tr>
+          <tr>
+            <td class="field-name">slug</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Version slug URL du titre. Ex : "direction-management"</td>
+          </tr>
+          <tr>
+            <td class="field-name">description</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Sous-titre court. Ex : "Pour les dirigeants et managers"</td>
+          </tr>
+          <tr>
+            <td class="field-name">categorie</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Code catégorie. Valeurs : management, commercial, finance, rh, production, digital</td>
+          </tr>
+          <tr>
+            <td class="field-name">couleur</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Couleur du thème UI. Valeurs : orange, blue, green, purple, indigo, cyan</td>
+          </tr>
+          <tr>
+            <td class="field-name">icone</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Nom d'icône Lucide-React. Ex : "target", "trending-up", "bar-chart"</td>
+          </tr>
+          <tr>
+            <td class="field-name">dureeJours</td>
+            <td><span class="field-type">number</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Durée du pack en jours. Ex : 8</td>
+          </tr>
+          <tr>
+            <td class="field-name">nbModules</td>
+            <td><span class="field-type">number</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Nombre de modules inclus</td>
+          </tr>
+          <tr>
+            <td class="field-name">formations</td>
+            <td><span class="field-type">string[]</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Liste des noms de formations incluses dans le pack (min 1)</td>
+          </tr>
+          <tr>
+            <td class="field-name">prix.parPersonne</td>
+            <td><span class="field-type">number</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Tarif plein par personne en XOF</td>
+          </tr>
+          <tr>
+            <td class="field-name">prix.groupe8Plus</td>
+            <td><span class="field-type">number</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Tarif dégressif pour groupe de 8 personnes et plus</td>
+          </tr>
+          <tr>
+            <td class="field-name">prix.groupe15Plus</td>
+            <td><span class="field-type">number</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Tarif dégressif pour groupe de 15 personnes et plus</td>
+          </tr>
+          <tr>
+            <td class="field-name">prix.devise</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Devise. Défaut : "XOF"</td>
+          </tr>
+          <tr>
+            <td class="field-name">financement.fdfpEligible</td>
+            <td><span class="field-type">boolean</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Le pack est-il éligible à la prise en charge FDFP ?</td>
+          </tr>
+          <tr>
+            <td class="field-name">financement.tauxPriseEnCharge</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Fourchette de prise en charge. Ex : "60-70%". Null si non éligible</td>
+          </tr>
+          <tr>
+            <td class="field-name">financement.resteACharge</td>
+            <td><span class="field-type">number</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Montant net restant à payer après FDFP en XOF</td>
+          </tr>
+          <tr>
+            <td class="field-name">ordre</td>
+            <td><span class="field-type">number</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Ordre d'affichage dans la liste (1 = en premier)</td>
+          </tr>
+          <tr>
+            <td class="field-name">actif</td>
+            <td><span class="field-type">boolean</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Masquer/afficher le pack. Défaut : true</td>
+          </tr>
+          <tr>
+            <td class="field-name">created_at</td>
+            <td><span class="field-type">ISO 8601</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Date de création (générée automatiquement)</td>
+          </tr>
+          <tr>
+            <td class="field-name">updated_at</td>
+            <td><span class="field-type">ISO 8601</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Date de dernière modification (générée automatiquement)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note note-warn">
+        <div class="note-title">⚠️ Note sur les packs existants</div>
+        Voici les <strong>6 packs actuellement affichés en statique</strong> qu'il faudra insérer en base lors de la création de l'API :<br>
+        Direction &amp; Management (8j, 480k) · Commercial &amp; Marketing (6j, 360k) · Finance &amp; Comptabilité (7j, 420k) · Ressources Humaines (6j, 360k) · Production &amp; Qualité (5j, 300k) · Digital &amp; IT (7j, 420k)
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 2 : CERTIFICATIONS & LABELS
+  ════════════════════════════════════════════════════════════ -->
+  <section class="section" id="section-certifications">
+    <div class="section-header">
+      <div class="section-icon icon-green">🏅</div>
+      <div class="section-header-text">
+        <h2>2. Certifications & Labels de l'organisme</h2>
+        <p>Ressource : <code>/api/organisme/certifications</code></p>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="context-box">
+        <strong>Contexte frontend :</strong> La page <em>/entreprises</em> possède une section "Nos certifications &amp; labels" qui affiche les
+        certifications officielles <strong>détenues par CPU Formation en tant qu'organisme</strong> (Qualiopi, ISO 9001, FDFP Agréé, Datadock…).
+        Ces certificats de conformité doivent pouvoir être mis à jour par l'équipe admin sans redéploiement frontend.
+        <br><br>
+        <strong>Besoin supplémentaire :</strong> Possibilité de joindre une <strong>copie scannée (PDF ou image)</strong> du certificat, affichable ou téléchargeable sur le site.
+      </div>
+
+      <span class="priority priority-high">🔴 Priorité Haute</span>
+      <span class="tag tag-green">Certifications organisme</span>
+      <span class="tag tag-blue">Upload fichier</span>
+
+      <hr class="divider">
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title">Lecture publique</div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-url">/api/organisme/certifications</span>
+            <span class="auth-badge auth-public">🔓 Public</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Retourne la liste des certifications et labels détenus par CPU Formation en tant qu'organisme de formation, triés par <code>ordre</code>.</p>
+            <div class="schema-title">Exemple de réponse</div>
+            <pre>{
+  <span class="tok-key">"success"</span>: <span class="tok-bool">true</span>,
+  <span class="tok-key">"data"</span>: [
+    {
+      <span class="tok-key">"id"</span>: <span class="tok-string">"cert-qualiopi"</span>,
+      <span class="tok-key">"nom"</span>: <span class="tok-string">"Qualiopi"</span>,
+      <span class="tok-key">"description"</span>: <span class="tok-string">"Certification qualité des formations professionnelles"</span>,
+      <span class="tok-key">"delivrePar"</span>: <span class="tok-string">"Ministère du Travail — France"</span>,
+      <span class="tok-key">"numeroReference"</span>: <span class="tok-string">"2024-QLP-00142"</span>,
+      <span class="tok-key">"dateObtention"</span>: <span class="tok-string">"2024-03-15"</span>,
+      <span class="tok-key">"dateExpiration"</span>: <span class="tok-string">"2027-03-14"</span>,
+      <span class="tok-key">"logo_url"</span>: <span class="tok-string">"https://back.cpupme.com/uploads/certifications/qualiopi-logo.png"</span>,
+      <span class="tok-key">"document_url"</span>: <span class="tok-string">"https://back.cpupme.com/uploads/certifications/qualiopi-certificat.pdf"</span>,
+      <span class="tok-key">"couleur"</span>: <span class="tok-string">"blue"</span>,
+      <span class="tok-key">"badge"</span>: <span class="tok-string">"Certifié"</span>,
+      <span class="tok-key">"actif"</span>: <span class="tok-bool">true</span>,
+      <span class="tok-key">"ordre"</span>: <span class="tok-num">1</span>,
+      <span class="tok-key">"created_at"</span>: <span class="tok-string">"2024-03-15T00:00:00.000Z"</span>,
+      <span class="tok-key">"updated_at"</span>: <span class="tok-string">"2026-01-10T09:00:00.000Z"</span>
+    },
+    {
+      <span class="tok-key">"id"</span>: <span class="tok-string">"cert-iso-9001"</span>,
+      <span class="tok-key">"nom"</span>: <span class="tok-string">"ISO 9001:2015"</span>,
+      <span class="tok-key">"description"</span>: <span class="tok-string">"Management de la qualité"</span>,
+      <span class="tok-key">"delivrePar"</span>: <span class="tok-string">"AFNOR Certification"</span>,
+      <span class="tok-key">"numeroReference"</span>: <span class="tok-string">"FR-2023-ISO9001-7821"</span>,
+      <span class="tok-key">"dateObtention"</span>: <span class="tok-string">"2023-06-01"</span>,
+      <span class="tok-key">"dateExpiration"</span>: <span class="tok-string">"2026-05-31"</span>,
+      <span class="tok-key">"logo_url"</span>: <span class="tok-string">"https://back.cpupme.com/uploads/certifications/iso9001-logo.png"</span>,
+      <span class="tok-key">"document_url"</span>: <span class="tok-string">"https://back.cpupme.com/uploads/certifications/iso9001-certificat.pdf"</span>,
+      <span class="tok-key">"couleur"</span>: <span class="tok-string">"green"</span>,
+      <span class="tok-key">"badge"</span>: <span class="tok-string">"ISO Certifié"</span>,
+      <span class="tok-key">"actif"</span>: <span class="tok-bool">true</span>,
+      <span class="tok-key">"ordre"</span>: <span class="tok-num">2</span>,
+      <span class="tok-key">"created_at"</span>: <span class="tok-string">"2023-06-01T00:00:00.000Z"</span>,
+      <span class="tok-key">"updated_at"</span>: <span class="tok-string">"2025-12-01T09:00:00.000Z"</span>
+    }
+  ]
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title">Administration (routes protégées — rôle admin)</div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-url">/api/organisme/certifications</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Crée une nouvelle certification. Corps : <code>multipart/form-data</code> pour permettre l'upload simultané du logo et du document PDF.</p>
+            <div class="note note-info">
+              <div class="note-title">📎 Upload de fichiers</div>
+              — <code>logo</code> : fichier image (PNG/JPG/SVG, max 2 MB)<br>
+              — <code>document</code> : fichier PDF du certificat officiel (max 10 MB)<br>
+              Le backend stocke les fichiers et retourne les URLs publiques dans <code>logo_url</code> et <code>document_url</code>.
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-put">PUT</span>
+            <span class="endpoint-url">/api/organisme/certifications/:id</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Met à jour une certification existante. Accepte <code>multipart/form-data</code> pour remplacer logo ou document, ou <code>application/json</code> pour les champs texte uniquement.</p>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-delete">DELETE</span>
+            <span class="endpoint-url">/api/organisme/certifications/:id</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Supprime une certification et ses fichiers associés du stockage. Préférer un soft-delete via <code>actif: false</code> pour archiver sans supprimer.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Modèle de données ── -->
+      <hr class="divider">
+      <div class="schema-title">📐 Modèle de données — Certifications</div>
+      <table>
+        <thead>
+          <tr><th>Champ</th><th>Type</th><th>Obligation</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="field-name">id</td>
+            <td><span class="field-type">string (UUID)</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Identifiant unique</td>
+          </tr>
+          <tr>
+            <td class="field-name">nom</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Nom de la certification. Ex : "Qualiopi", "ISO 9001:2015"</td>
+          </tr>
+          <tr>
+            <td class="field-name">description</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Description courte de ce que représente la certification</td>
+          </tr>
+          <tr>
+            <td class="field-name">delivrePar</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Organisme certificateur. Ex : "AFNOR Certification"</td>
+          </tr>
+          <tr>
+            <td class="field-name">numeroReference</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Numéro de référence ou matricule officiel du certificat</td>
+          </tr>
+          <tr>
+            <td class="field-name">dateObtention</td>
+            <td><span class="field-type">date (YYYY-MM-DD)</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Date d'obtention initiale de la certification</td>
+          </tr>
+          <tr>
+            <td class="field-name">dateExpiration</td>
+            <td><span class="field-type">date (YYYY-MM-DD)</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Date d'expiration si applicable (null = durée illimitée)</td>
+          </tr>
+          <tr>
+            <td class="field-name">logo_url</td>
+            <td><span class="field-type">string (URL)</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>URL publique vers le logo/badge de la certification (hébergé côté backend)</td>
+          </tr>
+          <tr>
+            <td class="field-name">document_url</td>
+            <td><span class="field-type">string (URL)</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>URL publique vers le PDF du certificat officiel (téléchargeable/visualisable)</td>
+          </tr>
+          <tr>
+            <td class="field-name">couleur</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Thème de couleur UI : blue, green, orange, purple, gold</td>
+          </tr>
+          <tr>
+            <td class="field-name">badge</td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Label court du badge. Ex : "Certifié", "Agréé", "ISO Certifié"</td>
+          </tr>
+          <tr>
+            <td class="field-name">actif</td>
+            <td><span class="field-type">boolean</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Afficher ou masquer. Défaut : true</td>
+          </tr>
+          <tr>
+            <td class="field-name">ordre</td>
+            <td><span class="field-type">number</span></td>
+            <td><span class="optional-badge">optionnel</span></td>
+            <td>Ordre d'affichage dans la liste</td>
+          </tr>
+          <tr>
+            <td class="field-name">created_at / updated_at</td>
+            <td><span class="field-type">ISO 8601</span></td>
+            <td><span class="required-badge">REQUIS</span></td>
+            <td>Timestamps de création et mise à jour</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note note-ok">
+        <div class="note-title">✅ Données initiales à insérer</div>
+        4 certifications actuellement en statique frontend à migrer en base :<br>
+        <strong>Qualiopi</strong> (Ministère du Travail, 2024) · <strong>ISO 9001:2015</strong> (AFNOR, 2023) · <strong>FDFP Agréé</strong> (FDFP CI, 2020) · <strong>Datadock</strong> (OPCA, 2023)
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 3 : FINANCEMENT / FDFP
+  ════════════════════════════════════════════════════════════ -->
+  <section class="section" id="section-financement">
+    <div class="section-header">
+      <div class="section-icon icon-blue">💳</div>
+      <div class="section-header-text">
+        <h2>3. Options de Financement (FDFP &amp; autres)</h2>
+        <p>Ressource : <code>/api/entreprises/financements</code></p>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="context-box">
+        <strong>Contexte frontend :</strong> La section "Financez vos formations facilement" de la page Entreprises liste 3 modes de financement :
+        FDFP (jusque 70%), Paiement échelonné, Budget formation annuel.
+        Ces informations changent rarement mais doivent être gérables par l'admin sans recodage.
+      </div>
+
+      <span class="priority priority-medium">🟡 Priorité Moyenne</span>
+      <span class="tag tag-green">FDFP</span>
+      <span class="tag tag-blue">B2B</span>
+
+      <hr class="divider">
+
+      <div class="endpoint-card">
+        <div class="endpoint-top">
+          <span class="method-badge method-get">GET</span>
+          <span class="endpoint-url">/api/entreprises/financements</span>
+          <span class="auth-badge auth-public">🔓 Public</span>
+        </div>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">Retourne la liste des options de financement disponibles.</p>
+          <div class="schema-title">Exemple de réponse</div>
+          <pre>{
+  <span class="tok-key">"success"</span>: <span class="tok-bool">true</span>,
+  <span class="tok-key">"data"</span>: [
+    {
+      <span class="tok-key">"id"</span>: <span class="tok-string">"financement-fdfp"</span>,
+      <span class="tok-key">"titre"</span>: <span class="tok-string">"FDFP — Fonds de Développement de la Formation Professionnelle"</span>,
+      <span class="tok-key">"description"</span>: <span class="tok-string">"Jusqu'à 70% de prise en charge par le FDFP pour les formations éligibles"</span>,
+      <span class="tok-key">"type"</span>: <span class="tok-string">"fdfp"</span>,
+      <span class="tok-key">"tauxMaxPriseEnCharge"</span>: <span class="tok-num">70</span>,
+      <span class="tok-key">"eligibilite"</span>: <span class="tok-string">"Entreprises privées cotisantes au FDFP"</span>,
+      <span class="tok-key">"avantages"</span>: [
+        <span class="tok-string">"Prise en charge jusqu'à 70%"</span>,
+        <span class="tok-string">"Dossier monté par CPU Formation"</span>,
+        <span class="tok-string">"Remboursement sous 60 jours"</span>,
+        <span class="tok-string">"Toutes nos formations sont éligibles"</span>
+      ],
+      <span class="tok-key">"badgeRecommande"</span>: <span class="tok-bool">true</span>,
+      <span class="tok-key">"couleur"</span>: <span class="tok-string">"green"</span>,
+      <span class="tok-key">"icone"</span>: <span class="tok-string">"shield"</span>,
+      <span class="tok-key">"ordre"</span>: <span class="tok-num">1</span>,
+      <span class="tok-key">"actif"</span>: <span class="tok-bool">true</span>
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+
+      <div class="endpoint-card">
+        <div class="endpoint-top">
+          <span class="method-badge method-post">POST</span>
+          <span class="endpoint-url">/api/entreprises/financements</span>
+          <span class="auth-badge auth-admin">🔒 Admin</span>
+        </div>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">Ajoute une nouvelle option de financement.</p>
+        </div>
+      </div>
+
+      <div class="endpoint-card">
+        <div class="endpoint-top">
+          <span class="method-badge method-put">PUT</span>
+          <span class="endpoint-url">/api/entreprises/financements/:id</span>
+          <span class="auth-badge auth-admin">🔒 Admin</span>
+        </div>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">Modifie une option (taux, avantages, statut…).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 4 : FORMULAIRES ENTREPRISES (LEADS)
+  ════════════════════════════════════════════════════════════ -->
+  <section class="section" id="section-leads">
+    <div class="section-header">
+      <div class="section-icon icon-orange">📝</div>
+      <div class="section-header-text">
+        <h2>4. Formulaires Entreprises (Leads commerciaux)</h2>
+        <p>Ressource : <code>/api/entreprises/leads</code></p>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="context-box">
+        <strong>Contexte frontend :</strong> La page <em>/entreprises</em> dispose d'un formulaire de contact en modal.
+        Lorsqu'un utilisateur clique sur "Postuler" depuis un pack métier, le formulaire est pré-rempli
+        (<code>typebesoin = pack-metier</code> et <code>packInteresse</code>).
+        <br><br>
+        <strong>Besoin backend :</strong> Persister chaque demande, permettre un suivi commercial (nouveau, en-cours, traité, clos),
+        et offrir une interface d'exploitation côté admin (filtre, tri, changement de statut, historique).
+      </div>
+
+      <span class="priority priority-high">🔴 Priorité Haute</span>
+      <span class="tag tag-orange">Lead B2B</span>
+      <span class="tag tag-blue">Public + Admin</span>
+      <span class="tag tag-green">RGPD</span>
+
+      <hr class="divider">
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title">Soumission publique</div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-post">POST</span>
+            <span class="endpoint-url">/api/entreprises/leads</span>
+            <span class="auth-badge auth-public">🔓 Public</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Enregistre une nouvelle demande entreprise depuis le formulaire modal (devis, pack métier, accompagnement, audit, etc.).</p>
+
+            <div class="note note-info">
+              <div class="note-title">📌 Règles de validation minimales</div>
+              <code>entreprise</code>, <code>secteur</code>, <code>nom</code>, <code>fonction</code>, <code>email</code>, <code>tel</code>, <code>typebesoin</code>, <code>collaborateurs</code>, <code>delai</code>, <code>rgpd</code> sont requis.<br>
+              Si <code>typebesoin = pack-metier</code>, alors <code>packInteresse</code> devient requis.<br>
+              Le backend doit refuser toute soumission avec <code>rgpd = false</code> (HTTP 422).
+            </div>
+
+            <div class="schema-title">Exemple de payload (request body)</div>
+            <pre>{
+  <span class="tok-key">"entreprise"</span>: <span class="tok-string">"Banque Atlantique CI"</span>,
+  <span class="tok-key">"secteur"</span>: <span class="tok-string">"Banque"</span>,
+  <span class="tok-key">"nom"</span>: <span class="tok-string">"Kouame Jacques"</span>,
+  <span class="tok-key">"fonction"</span>: <span class="tok-string">"DRH"</span>,
+  <span class="tok-key">"email"</span>: <span class="tok-string">"drh@banque-atlantique.ci"</span>,
+  <span class="tok-key">"tel"</span>: <span class="tok-string">"+2250700000000"</span>,
+  <span class="tok-key">"typebesoin"</span>: <span class="tok-string">"pack-metier"</span>,
+  <span class="tok-key">"packInteresse"</span>: <span class="tok-string">"Pack Direction &amp; Management"</span>,
+  <span class="tok-key">"collaborateurs"</span>: <span class="tok-string">"11-30"</span>,
+  <span class="tok-key">"delai"</span>: <span class="tok-string">"court"</span>,
+  <span class="tok-key">"message"</span>: <span class="tok-string">"Nous souhaitons démarrer en mai."</span>,
+  <span class="tok-key">"rgpd"</span>: <span class="tok-bool">true</span>
+}</pre>
+
+            <div class="schema-title">Exemple de réponse</div>
+            <pre>{
+  <span class="tok-key">"success"</span>: <span class="tok-bool">true</span>,
+  <span class="tok-key">"message"</span>: <span class="tok-string">"Demande enregistrée avec succès"</span>,
+  <span class="tok-key">"data"</span>: {
+    <span class="tok-key">"id"</span>: <span class="tok-string">"lead_01J8FKW7P7Q3M7K4H6R1M2P9AA"</span>,
+    <span class="tok-key">"statut"</span>: <span class="tok-string">"nouveau"</span>,
+    <span class="tok-key">"source"</span>: <span class="tok-string">"page-entreprises-modal"</span>,
+    <span class="tok-key">"created_at"</span>: <span class="tok-string">"2026-04-03T11:20:00.000Z"</span>
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-title">Back-office commercial (routes protégées — rôle admin)</div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-url">/api/entreprises/leads</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Liste paginée des demandes pour le tableau de suivi commercial.</p>
+            <div class="note note-info">
+              <div class="note-title">📥 Query params recommandés</div>
+              <code>?page=1&amp;limit=20</code> — pagination<br>
+              <code>?statut=nouveau</code> — filtre statut<br>
+              <code>?typebesoin=pack-metier</code> — filtre type<br>
+              <code>?q=banque</code> — recherche texte (entreprise, nom, email)
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-get">GET</span>
+            <span class="endpoint-url">/api/entreprises/leads/:id</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Retourne le détail complet d'une demande (incluant historique statut et métadonnées techniques).</p>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-top">
+            <span class="method-badge method-patch">PATCH</span>
+            <span class="endpoint-url">/api/entreprises/leads/:id/status</span>
+            <span class="auth-badge auth-admin">🔒 Admin</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Met à jour le statut commercial de la demande (pipeline de traitement).</p>
+            <div class="schema-title">Payload status</div>
+            <pre>{
+  <span class="tok-key">"statut"</span>: <span class="tok-string">"en-cours"</span>,
+  <span class="tok-key">"noteInterne"</span>: <span class="tok-string">"Premier échange planifié avec le DRH"</span>
+}</pre>
+            <div class="note note-warn">
+              <div class="note-title">⚠️ Workflow de statut recommandé</div>
+              <code>nouveau</code> → <code>en-cours</code> → <code>traite</code> → <code>clos</code><br>
+              Conserver l'historique des changements (qui, quand, ancien/nouveau statut).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+      <div class="schema-title">📐 Modèle de données — Lead entreprise</div>
+      <table>
+        <thead>
+          <tr><th>Champ</th><th>Type</th><th>Obligation</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="field-name">id</td><td><span class="field-type">string (ULID/UUID)</span></td><td><span class="required-badge">REQUIS</span></td><td>Identifiant unique de la demande</td></tr>
+          <tr><td class="field-name">entreprise</td><td><span class="field-type">string</span></td><td><span class="required-badge">REQUIS</span></td><td>Nom de l'entreprise</td></tr>
+          <tr><td class="field-name">secteur</td><td><span class="field-type">string</span></td><td><span class="required-badge">REQUIS</span></td><td>Secteur d'activité</td></tr>
+          <tr><td class="field-name">nom</td><td><span class="field-type">string</span></td><td><span class="required-badge">REQUIS</span></td><td>Nom du contact</td></tr>
+          <tr><td class="field-name">fonction</td><td><span class="field-type">string</span></td><td><span class="required-badge">REQUIS</span></td><td>Fonction du contact (DRH, DG...)</td></tr>
+          <tr><td class="field-name">email</td><td><span class="field-type">string (email)</span></td><td><span class="required-badge">REQUIS</span></td><td>Email professionnel</td></tr>
+          <tr><td class="field-name">tel</td><td><span class="field-type">string</span></td><td><span class="required-badge">REQUIS</span></td><td>Téléphone du contact</td></tr>
+          <tr><td class="field-name">typebesoin</td><td><span class="field-type">enum</span></td><td><span class="required-badge">REQUIS</span></td><td>pack-metier, sur-mesure, accompagnement, audit, autre</td></tr>
+          <tr><td class="field-name">packInteresse</td><td><span class="field-type">string</span></td><td><span class="optional-badge">conditionnel</span></td><td>Requis si typebesoin = pack-metier</td></tr>
+          <tr><td class="field-name">collaborateurs</td><td><span class="field-type">enum</span></td><td><span class="required-badge">REQUIS</span></td><td>1-10, 11-30, 31-50, 50+</td></tr>
+          <tr><td class="field-name">delai</td><td><span class="field-type">enum</span></td><td><span class="required-badge">REQUIS</span></td><td>urgent, court, moyen, long</td></tr>
+          <tr><td class="field-name">message</td><td><span class="field-type">string</span></td><td><span class="optional-badge">optionnel</span></td><td>Message libre saisi par l'utilisateur</td></tr>
+          <tr><td class="field-name">rgpd</td><td><span class="field-type">boolean</span></td><td><span class="required-badge">REQUIS</span></td><td>Doit être true au moment de la soumission</td></tr>
+          <tr><td class="field-name">source</td><td><span class="field-type">string</span></td><td><span class="optional-badge">optionnel</span></td><td>Origine lead. Défaut: page-entreprises-modal</td></tr>
+          <tr><td class="field-name">statut</td><td><span class="field-type">enum</span></td><td><span class="required-badge">REQUIS</span></td><td>nouveau, en-cours, traite, clos</td></tr>
+          <tr><td class="field-name">created_at / updated_at</td><td><span class="field-type">ISO 8601</span></td><td><span class="required-badge">REQUIS</span></td><td>Timestamps techniques</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note note-ok">
+        <div class="note-title">✅ Exploitation métier attendue</div>
+        Dès création d'un lead, déclencher au minimum :<br>
+        1) Enregistrement base de données<br>
+        2) Notification email interne commerciale (option recommandée)<br>
+        3) Accusé de réception API immédiat pour affichage de succès côté frontend
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 5 : RÉCAPITULATIF
+  ════════════════════════════════════════════════════════════ -->
+  <section class="section" id="section-recap">
+    <div class="section-header">
+      <div class="section-icon icon-purple">📊</div>
+      <div class="section-header-text">
+        <h2>5. Récapitulatif des endpoints à créer</h2>
+        <p>Vue d'ensemble pour le planning backend</p>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Méthode</th>
+            <th>Route</th>
+            <th>Accès</th>
+            <th>Priorité</th>
+            <th>Ressource</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method-badge method-get">GET</span></td>
+            <td class="field-name">/api/entreprises/packs</td>
+            <td><span class="tag tag-green">Public</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Liste des packs métiers</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-get">GET</span></td>
+            <td class="field-name">/api/entreprises/packs/:id</td>
+            <td><span class="tag tag-green">Public</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Détail d'un pack</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-post">POST</span></td>
+            <td class="field-name">/api/entreprises/packs</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Créer un pack</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-put">PUT</span></td>
+            <td class="field-name">/api/entreprises/packs/:id</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Modifier un pack</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-delete">DELETE</span></td>
+            <td class="field-name">/api/entreprises/packs/:id</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-medium" style="display:inline;padding:2px 8px;font-size:11px;">🟡 Moyenne</span></td>
+            <td>Archiver un pack</td>
+          </tr>
+          <tr style="background:#f0fdf4">
+            <td><span class="method-badge method-get">GET</span></td>
+            <td class="field-name">/api/organisme/certifications</td>
+            <td><span class="tag tag-green">Public</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Liste certifications organisme</td>
+          </tr>
+          <tr style="background:#f0fdf4">
+            <td><span class="method-badge method-post">POST</span></td>
+            <td class="field-name">/api/organisme/certifications</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Créer + upload logo/PDF</td>
+          </tr>
+          <tr style="background:#f0fdf4">
+            <td><span class="method-badge method-put">PUT</span></td>
+            <td class="field-name">/api/organisme/certifications/:id</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Modifier + remplacer fichiers</td>
+          </tr>
+          <tr style="background:#f0fdf4">
+            <td><span class="method-badge method-delete">DELETE</span></td>
+            <td class="field-name">/api/organisme/certifications/:id</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-medium" style="display:inline;padding:2px 8px;font-size:11px;">🟡 Moyenne</span></td>
+            <td>Supprimer/archiver</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-get">GET</span></td>
+            <td class="field-name">/api/entreprises/financements</td>
+            <td><span class="tag tag-green">Public</span></td>
+            <td><span class="priority priority-medium" style="display:inline;padding:2px 8px;font-size:11px;">🟡 Moyenne</span></td>
+            <td>Options de financement</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-post">POST</span></td>
+            <td class="field-name">/api/entreprises/financements</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-low" style="display:inline;padding:2px 8px;font-size:11px;">🟢 Basse</span></td>
+            <td>Ajouter option financement</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-put">PUT</span></td>
+            <td class="field-name">/api/entreprises/financements/:id</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-low" style="display:inline;padding:2px 8px;font-size:11px;">🟢 Basse</span></td>
+            <td>Modifier option financement</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><span class="method-badge method-post">POST</span></td>
+            <td class="field-name">/api/entreprises/leads</td>
+            <td><span class="tag tag-green">Public</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Soumettre un formulaire entreprise</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><span class="method-badge method-get">GET</span></td>
+            <td class="field-name">/api/entreprises/leads</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Liste paginée des leads</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><span class="method-badge method-get">GET</span></td>
+            <td class="field-name">/api/entreprises/leads/:id</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-medium" style="display:inline;padding:2px 8px;font-size:11px;">🟡 Moyenne</span></td>
+            <td>Détail d'un lead</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><span class="method-badge method-patch">PATCH</span></td>
+            <td class="field-name">/api/entreprises/leads/:id/status</td>
+            <td><span class="tag tag-orange">Admin</span></td>
+            <td><span class="priority priority-high" style="display:inline;padding:2px 8px;font-size:11px;">🔴 Haute</span></td>
+            <td>Mettre à jour le statut commercial</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr class="divider">
+
+      <div class="note note-warn">
+        <div class="note-title">⚠️ Points d'attention pour l'implémentation</div>
+        <ul style="margin-left:16px;margin-top:6px;line-height:1.8;font-size:14px;">
+          <li><strong>Soft-delete :</strong> Préférer <code>actif: false</code> plutôt qu'une suppression définitive pour les packs et certifications.</li>
+          <li><strong>Stockage fichiers :</strong> Les uploads (logos PNG, PDFs) doivent être hébergés et accessibles via une URL publique stable (ex: S3, Cloudinary ou stockage local nginx).</li>
+          <li><strong>CORS :</strong> Les URLs de fichiers doivent être accessibles depuis <code>https://cpupme.com</code> et <code>http://localhost:3000</code> en développement.</li>
+          <li><strong>Format devise :</strong> Tous les montants sont en <strong>XOF (Franc CFA)</strong>, entiers, sans décimales.</li>
+          <li><strong>Tri par défaut :</strong> Toutes les listes sont retournées triées par <code>ordre ASC</code> puis <code>created_at ASC</code>.</li>
+          <li><strong>RGPD :</strong> Ne jamais persister un lead avec <code>rgpd = false</code>. Prévoir journalisation du consentement (timestamp + ip éventuelle selon conformité locale).</li>
+          <li><strong>Anti-spam :</strong> Ajouter une protection basique (rate limit IP/email) sur <code>POST /api/entreprises/leads</code>.</li>
+        </ul>
+      </div>
+
+      <div class="note note-ok">
+        <div class="note-title">✅ Ce qui existe déjà et fonctionne (pas à toucher)</div>
+        <code>/api/formation/formations/public</code> · <code>/api/formation/categories/public</code> · <code>/api/formation/partenaire</code> · <code>/api/formation/faqs/public</code>
+      </div>
+
+      <div class="note note-info">
+        <div class="note-title">📡 Contact Frontend</div>
+        Pour toute question sur les champs nécessaires, les maquettes ou les cas d'usage, contacter l'équipe frontend avant implémentation.
+        La priorité de livraison est : <strong>Certifications → Leads Formulaire → Packs Métiers → Financements</strong>.
+      </div>
+    </div>
+  </section>
+
+</div><!-- /wrapper -->
+
+<!-- ══════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════ -->
+<footer>
+  <div>
+    <strong>CPU Formation</strong> — Spécifications API Backend · Version 1.1 · Avril 2026
+  </div>
+  <div class="footer-tags">
+    <span class="tag tag-orange">4 nouvelles ressources</span>
+    <span class="tag tag-blue">15 endpoints</span>
+    <span class="tag tag-green">Base URL : https://back.cpupme.com</span>
+    <span class="tag tag-purple">Next.js 16 · TypeScript</span>
+  </div>
+</footer>
+
+</body>
+</html>

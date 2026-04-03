@@ -47,7 +47,12 @@ export function PageBanner({
   autoPlayInterval = 6000,
 }: PageBannerProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const totalSlides = slides.length;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (totalSlides <= 1) return;
@@ -71,7 +76,21 @@ export function PageBanner({
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900 text-white min-h-[50vh]">
+    <section
+      className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900 text-white min-h-[50vh]"
+      style={{
+        opacity: mounted ? 1 : 0,
+        transform: mounted ? "none" : "translateY(18px)",
+        transition: "opacity 0.55s ease, transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94)",
+      }}
+    >
+      <style>{`
+        @keyframes bnFadeDown { from { opacity:0; transform:translateY(-24px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes bnSlideIn  { from { opacity:0; transform:translateX(-46px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes bnFadeUp   { from { opacity:0; transform:translateY(28px);  } to { opacity:1; transform:translateY(0); } }
+        @keyframes bnSlideInR { from { opacity:0; transform:translateX(46px);  } to { opacity:1; transform:translateX(0); } }
+        @keyframes bnZoomIn   { from { opacity:0; transform:scale(0.80);       } to { opacity:1; transform:scale(1);    } }
+      `}</style>
       {/* Logo en background */}
       {showLogo && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -94,7 +113,10 @@ export function PageBanner({
       <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16 relative z-10">
         {/* Breadcrumb */}
         {breadcrumb && breadcrumb.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-6 text-sm text-slate-300">
+          <div
+            className="flex flex-wrap items-center gap-2 mb-6 text-sm text-slate-300"
+            style={{ animation: "bnFadeDown 0.5s ease-out 0ms both" }}
+          >
             {breadcrumb.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 {item.href ? (
@@ -114,28 +136,38 @@ export function PageBanner({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Contenu texte avec animation */}
-          <div key={`content-${currentSlide}`} className="animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3 leading-tight">
+          <div key={`content-${currentSlide}`}>
+            <h1
+              className="text-3xl md:text-4xl font-bold mb-3 leading-tight"
+              style={{ animation: "bnSlideIn 0.65s cubic-bezier(0.25,0.46,0.45,0.94) 80ms both" }}
+            >
               {currentData.title}
               {currentData.highlight && (
                 <span className="text-orange-400"> {currentData.highlight}</span>
               )}
             </h1>
             {currentData.subtitle && (
-              <p className="text-lg text-slate-300 mb-6 max-w-lg">
+              <p
+                className="text-lg text-slate-300 mb-6 max-w-lg"
+                style={{ animation: "bnFadeUp 0.6s ease-out 240ms both" }}
+              >
                 {currentData.subtitle}
               </p>
             )}
 
             {/* Buttons */}
             {currentData.buttons && currentData.buttons.length > 0 && (
-              <div className="flex flex-wrap gap-4">
+              <div
+                className="flex flex-wrap gap-4"
+                style={{ animation: "bnFadeUp 0.55s ease-out 380ms both" }}
+              >
                 {currentData.buttons.map((button, index) => (
                   <Button
                     key={index}
                     size="lg"
                     asChild
                     variant={button.variant}
+                    style={{ animation: `bnZoomIn 0.45s cubic-bezier(0.34,1.56,0.64,1) ${430 + index * 70}ms both` }}
                     className={
                       button.variant === "outline"
                         ? "cursor-pointer border-2 border-white bg-white text-slate-900 hover:bg-white hover:text-orange-500 font-semibold w-full sm:w-auto"
@@ -158,6 +190,7 @@ export function PageBanner({
                   <div
                     key={index}
                     className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20"
+                    style={{ animation: `bnFadeUp 0.55s ease-out ${520 + index * 80}ms both` }}
                   >
                     <div
                       className={`w-10 h-10 rounded-full bg-${badge.color}-500 flex items-center justify-center flex-shrink-0`}
@@ -216,7 +249,8 @@ export function PageBanner({
           <div className="hidden lg:block relative">
             <div
               key={`image-${currentSlide}`}
-              className="aspect-video rounded-lg overflow-hidden shadow-2xl transform rotate-2 relative h-64 animate-fade-in"
+              className="aspect-video rounded-lg overflow-hidden shadow-2xl transform rotate-2 relative h-64"
+              style={{ animation: "bnSlideInR 0.7s cubic-bezier(0.25,0.46,0.45,0.94) 180ms both" }}
             >
               <Image
                 src={currentData.image}
@@ -230,7 +264,8 @@ export function PageBanner({
             {currentData.badge && (
               <Link 
                 href={currentData.buttons?.[1]?.href || currentData.buttons?.[0]?.href || "#"}
-                className="absolute -bottom-4 -left-4 bg-slate-800 rounded-lg p-4 shadow-lg transform -rotate-3 max-w-xs border border-orange-500/30 animate-fade-in hover:scale-105 hover:border-orange-500 transition-all duration-300 cursor-pointer group"
+                className="absolute -bottom-4 -left-4 bg-slate-800 rounded-lg p-4 shadow-lg transform -rotate-3 max-w-xs border border-orange-500/30 hover:scale-105 hover:border-orange-500 transition-all duration-300 cursor-pointer group"
+                style={{ animation: "bnZoomIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 500ms both" }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">

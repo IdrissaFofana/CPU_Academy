@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -9,8 +10,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { PageBanner } from "@/components/layout/PageBanner";
-import { 
-  Building, 
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Building,
   Users, 
   TrendingUp, 
   Award, 
@@ -44,10 +46,13 @@ import {
   Quote,
   ChevronDown,
   CreditCard,
-  Wallet
+  Wallet,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/config";
 
 
 const services = [
@@ -81,7 +86,58 @@ const services = [
   }
 ];
 
-const packsMetiers = [
+type PackMetier = {
+  titre: string;
+  icon: any;
+  description: string;
+  duree: string;
+  modules: number;
+  formations: string[];
+  prix: {
+    parPersonne: number;
+    groupe8Plus?: number;
+    groupe15Plus?: number;
+  };
+  financement: {
+    fdfpEligible: boolean;
+    priseEnCharge: string;
+    resteACharge: number;
+  };
+  color: string;
+  gradient: string;
+};
+
+type ContactFormData = {
+  entreprise: string;
+  secteur: string;
+  nom: string;
+  fonction: string;
+  email: string;
+  tel: string;
+  typebesoin: string;
+  packInteresse: string;
+  collaborateurs: string;
+  delai: string;
+  message: string;
+  rgpd: boolean;
+};
+
+const initialFormData: ContactFormData = {
+  entreprise: "",
+  secteur: "",
+  nom: "",
+  fonction: "",
+  email: "",
+  tel: "",
+  typebesoin: "",
+  packInteresse: "",
+  collaborateurs: "",
+  delai: "",
+  message: "",
+  rgpd: false,
+};
+
+const packsMetiers: PackMetier[] = [
   {
     titre: "Pack Direction & Management",
     icon: Target,
@@ -391,76 +447,6 @@ const resultatsClients = [
   }
 ];
 
-// FAQ Entreprises
-const faqEntreprises = [
-  {
-    question: "Quels sont les délais pour mettre en place une formation ?",
-    reponse: "Selon l'urgence : formation express possible en 2 semaines. Standard : 4-6 semaines. Nos programmes sur mesure nécessitent 6-8 semaines de préparation."
-  },
-  {
-    question: "Comment se passe la prise en charge FDFP ?",
-    reponse: "Nous gérons l'intégralité du dossier administratif FDFP. Démarche : 1) Vous validez la formation, 2) Nous montons le dossier, 3) Soumission au FDFP, 4) Formation démarrée, 5) Remboursement sous 60-90 jours. Taux de prise en charge moyen : 60-70%."
-  },
-  {
-    question: "Les formations peuvent-elles se faire en interne (dans nos locaux) ?",
-    reponse: "Oui, nous proposons 3 modalités : 1) Intra-entreprise (dans vos locaux), 2) Inter-entreprises (dans nos centres), 3) Hybride (mix présentiel/distanciel). Le format intra est recommandé pour 8+ collaborateurs."
-  },
-  {
-    question: "Quel est le minimum de participants pour une formation sur mesure ?",
-    reponse: "Pas de minimum strict. Pour une formation intra personnalisée, nous recommandons 6-8 participants minimum pour optimiser le ROI. Pour moins de 6 personnes, nous proposons nos formations inter-entreprises."
-  },
-  {
-    question: "Proposez-vous un suivi post-formation ?",
-    reponse: "Oui ! Inclus dans tous nos packs : 1) Évaluation à chaud (fin formation), 2) Évaluation à froid (J+30 et J+90), 3) Plan d'actions personnalisé, 4) Coaching de suivi (optionnel), 5) Accès plateforme ressources pendant 6 mois."
-  },
-  {
-    question: "Comment garantissez-vous la qualité des formations ?",
-    reponse: "4 piliers qualité : 1) Formateurs certifiés avec 5+ ans d'expérience, 2) Contenus actualisés tous les 6 mois, 3) Évaluation systématique (95% satisfaction), 4) Certifications Qualiopi et ISO 9001."
-  }
-];
-
-// Ressources téléchargeables
-const ressourcesEntreprises = [
-  {
-    titre: "Catalogue Formations Entreprises 2026",
-    description: "L'intégralité de notre offre : 50+ formations, packs métiers, tarifs indicatifs",
-    format: "PDF - 42 pages",
-    taille: "5.2 MB",
-    icon: FileText,
-    color: "orange",
-    badge: "Populaire",
-    downloads: 1250
-  },
-  {
-    titre: "Guide FDFP : Financer vos formations",
-    description: "Tout savoir sur la prise en charge FDFP : démarches, taux, délais, exemples",
-    format: "PDF - 18 pages",
-    taille: "2.1 MB",
-    icon: Shield,
-    color: "green",
-    badge: "Nouveau",
-    downloads: 890
-  },
-  {
-    titre: "ROI de la formation : 10 cas d'usage",
-    description: "Exemples concrets d'entreprises qui ont transformé leurs équipes",
-    format: "PDF - 24 pages",
-    taille: "3.8 MB",
-    icon: TrendingUp,
-    color: "blue",
-    downloads: 670
-  },
-  {
-    titre: "Checklist : Réussir son plan de formation",
-    description: "Template Excel + guide étape par étape pour construire votre plan annuel",
-    format: "Excel + PDF",
-    taille: "1.5 MB",
-    icon: CheckCircle2,
-    color: "purple",
-    downloads: 540
-  }
-];
-
 // Certifications et labels
 const certificationsLabels = [
   {
@@ -487,22 +473,6 @@ const certificationsLabels = [
     delivredPar: "OPCA France",
     annee: 2023
   }
-];
-
-// Logos clients (exemples)
-const logosClients = [
-  "Banque Atlantique",
-  "Orange CI",
-  "MTN",
-  "Nestlé",
-  "Société Générale",
-  "NSIA Banque",
-  "Ecobank",
-  "Bolloré",
-  "CFAO",
-  "Unilever",
-  "Jumia",
-  "Wave"
 ];
 
 const avantages = [
@@ -538,15 +508,6 @@ const avantages = [
   }
 ];
 
-const partenaires = [
-  { nom: "Secteur Bancaire", count: "15+ banques" },
-  { nom: "Télécommunications", count: "8+ opérateurs" },
-  { nom: "Industrie", count: "50+ entreprises" },
-  { nom: "Services", count: "100+ PME" },
-  { nom: "Administration", count: "20+ institutions" },
-  { nom: "ONG & Projets", count: "30+ organisations" }
-];
-
 const criteres = [
   "Identifier précisément vos besoins en formation",
   "Définir vos objectifs de montée en compétences",
@@ -555,7 +516,285 @@ const criteres = [
   "S'engager dans un processus d'amélioration continue"
 ];
 
+type ApiPartenaire = {
+  nom: string;
+  countLabel: string;
+  countValue: number;
+  logo?: string;
+};
+
+type ApiFaqEntreprise = {
+  id: string;
+  question: string;
+  reponse: string;
+};
+
+type ApiRessourceEntreprise = {
+  id: string;
+  titre: string;
+  description: string;
+  format: string;
+  taille: string;
+  badge?: string;
+  downloads?: number;
+  url?: string;
+};
+
+function normalizeArray(payload: any): any[] {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
+  return [];
+}
+
+function parseCountLabel(raw: any): { countLabel: string; countValue: number } {
+  const numberCandidate = Number(raw?.count ?? raw?.total ?? raw?.nombre ?? raw?.nb ?? 0);
+  if (Number.isFinite(numberCandidate) && numberCandidate > 0) {
+    return { countLabel: `${numberCandidate}+`, countValue: numberCandidate };
+  }
+
+  const textCandidate =
+    raw?.countLabel || raw?.count_text || raw?.countText || raw?.label || raw?.value || "Partenaire actif";
+
+  const extracted = String(textCandidate).match(/\d+/);
+  const countValue = extracted ? Number(extracted[0]) : 0;
+
+  return {
+    countLabel: String(textCandidate),
+    countValue: Number.isFinite(countValue) ? countValue : 0,
+  };
+}
+
+function normalizePartenaires(payload: any): ApiPartenaire[] {
+  const rawItems = normalizeArray(payload);
+
+  const mapped = rawItems
+    .map((item: any) => {
+      const nom =
+        item?.nom ||
+        item?.name ||
+        item?.entreprise ||
+        item?.entreprise_nom ||
+        item?.secteur ||
+        item?.title;
+
+      if (!nom) return null;
+
+      const { countLabel, countValue } = parseCountLabel(item);
+
+      return {
+        nom: String(nom),
+        countLabel,
+        countValue,
+        logo: item?.logo || item?.logo_url || item?.logoUrl || item?.image || undefined,
+      } as ApiPartenaire;
+    })
+    .filter(Boolean) as ApiPartenaire[];
+
+  const byName = new Map<string, ApiPartenaire>();
+  mapped.forEach((item) => {
+    if (!byName.has(item.nom)) {
+      byName.set(item.nom, item);
+    }
+  });
+
+  return Array.from(byName.values());
+}
+
+function normalizeFaqEntreprises(payload: any): ApiFaqEntreprise[] {
+  const rawItems = normalizeArray(payload);
+
+  return rawItems
+    .map((item: any, index: number) => {
+      const question = item?.question || item?.titre || item?.title;
+      const reponse = item?.reponse || item?.answer || item?.description;
+      const statut = String(item?.statut || item?.status || "").toLowerCase();
+
+      if (!question || !reponse) return null;
+      if (statut && !["publie", "publié", "published", "actif", "active"].includes(statut)) {
+        return null;
+      }
+
+      return {
+        id: String(item?.id || item?._id || `faq-${index}`),
+        question: String(question),
+        reponse: String(reponse),
+      } as ApiFaqEntreprise;
+    })
+    .filter(Boolean) as ApiFaqEntreprise[];
+}
+
+function normalizeRessourcesEntreprises(payload: any): ApiRessourceEntreprise[] {
+  const rawItems = normalizeArray(payload);
+
+  return rawItems
+    .map((item: any, index: number) => {
+      const titre = item?.titre || item?.title || item?.nom || item?.name;
+      const description = item?.description || item?.resume || item?.summary || "Ressource entreprise";
+
+      if (!titre) return null;
+
+      return {
+        id: String(item?.id || item?._id || `ressource-${index}`),
+        titre: String(titre),
+        description: String(description),
+        format: String(item?.format || item?.type || "PDF"),
+        taille: String(item?.taille || item?.size || "-"),
+        badge: item?.badge ? String(item.badge) : undefined,
+        downloads: Number.isFinite(Number(item?.downloads ?? item?.telechargements))
+          ? Number(item?.downloads ?? item?.telechargements)
+          : undefined,
+        url: item?.url || item?.file_url || item?.document_url || item?.download_url || item?.lien || undefined,
+      } as ApiRessourceEntreprise;
+    })
+    .filter(Boolean) as ApiRessourceEntreprise[];
+}
+
 export default function EntreprisesPage() {
+  const [apiPartenaires, setApiPartenaires] = useState<ApiPartenaire[]>([]);
+  const [isPartenairesLoading, setIsPartenairesLoading] = useState(true);
+  const [apiFaqEntreprises, setApiFaqEntreprises] = useState<ApiFaqEntreprise[]>([]);
+  const [isFaqLoading, setIsFaqLoading] = useState(true);
+  const [apiRessourcesEntreprises, setApiRessourcesEntreprises] = useState<ApiRessourceEntreprise[]>([]);
+  const [isRessourcesLoading, setIsRessourcesLoading] = useState(true);
+  const [selectedPackIndex, setSelectedPackIndex] = useState<number | null>(null);
+  const [formData, setFormData] = useState<ContactFormData>(initialFormData);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function fetchPartenaires() {
+      setIsPartenairesLoading(true);
+      try {
+        const response = await apiClient.get('/api/formation/partenaire');
+        const normalized = normalizePartenaires(response);
+        if (!isCancelled) {
+          setApiPartenaires(normalized);
+        }
+      } catch {
+        if (!isCancelled) {
+          setApiPartenaires([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsPartenairesLoading(false);
+        }
+      }
+    }
+
+    async function fetchFaqEntreprises() {
+      setIsFaqLoading(true);
+      try {
+        const response = await apiClient.get('/api/formation/faqs/public');
+        const normalized = normalizeFaqEntreprises(response);
+        if (!isCancelled) {
+          setApiFaqEntreprises(normalized);
+        }
+      } catch {
+        if (!isCancelled) {
+          setApiFaqEntreprises([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsFaqLoading(false);
+        }
+      }
+    }
+
+    async function fetchRessourcesEntreprises() {
+      setIsRessourcesLoading(true);
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.RESSOURCES.PUBLIC);
+        const normalized = normalizeRessourcesEntreprises(response);
+        if (!isCancelled) {
+          setApiRessourcesEntreprises(normalized);
+        }
+      } catch {
+        if (!isCancelled) {
+          setApiRessourcesEntreprises([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsRessourcesLoading(false);
+        }
+      }
+    }
+
+    fetchPartenaires();
+    fetchFaqEntreprises();
+    fetchRessourcesEntreprises();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  const logosClients = useMemo(
+    () => apiPartenaires.map((partenaire) => partenaire.nom).slice(0, 12),
+    [apiPartenaires]
+  );
+
+  const partenairesCards = useMemo(
+    () => apiPartenaires.slice(0, 6),
+    [apiPartenaires]
+  );
+
+  const totalPartenaires = useMemo(() => {
+    const sum = apiPartenaires.reduce((acc, partenaire) => acc + partenaire.countValue, 0);
+    return sum > 0 ? `${sum}+` : `${apiPartenaires.length}+`;
+  }, [apiPartenaires]);
+
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isPackDetailModalOpen, setIsPackDetailModalOpen] = useState(false);
+  const selectedPack = selectedPackIndex !== null ? packsMetiers[selectedPackIndex] : null;
+  const PackDetailIcon: React.ComponentType<{ className?: string }> = selectedPack?.icon ?? Target;
+
+  const openGeneralContactModal = () => {
+    setFormData(initialFormData);
+    setSubmitStatus("idle");
+    setIsContactModalOpen(true);
+  };
+
+  const handleInputChange = (field: keyof ContactFormData, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (submitStatus !== "idle") {
+      setSubmitStatus("idle");
+    }
+  };
+
+  const handleViewPackDetails = (index: number) => {
+    setSelectedPackIndex(index);
+    setIsPackDetailModalOpen(true);
+  };
+
+  const handleApplyToPack = (pack: PackMetier) => {
+    setSelectedPackIndex(null);
+    setFormData({
+      ...initialFormData,
+      typebesoin: "pack-metier",
+      packInteresse: pack.titre,
+      message: `Nous souhaitons postuler au ${pack.titre} (${pack.duree}, ${pack.modules} modules). Merci de nous envoyer les modalités de démarrage et les options de financement adaptées.`,
+    });
+    setSubmitStatus("idle");
+    setIsContactModalOpen(true);
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!formData.rgpd) {
+      setSubmitStatus("error");
+      return;
+    }
+    setSubmitStatus("success");
+    console.log("Demande entreprise:", formData);
+    setTimeout(() => {
+      setIsContactModalOpen(false);
+      setFormData(initialFormData);
+      setSubmitStatus("idle");
+    }, 2500);
+  };
+
   return (
     <>
       <PageBanner
@@ -674,12 +913,18 @@ export default function EntreprisesPage() {
         {/* Logos Clients Section */}
         <section className="container mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12 border-b border-slate-100">
           <p className="text-center text-sm text-slate-600 mb-6 md:mb-8">
-            Plus de 200 entreprises nous font confiance
+            Plus de {totalPartenaires} entreprises nous font confiance
           </p>
           <div className="grid grid-cols-3 md:grid-cols-6 gap-6 md:gap-8 max-w-6xl mx-auto items-center">
-            {logosClients.slice(0, 12).map((client, idx) => (
+            {isPartenairesLoading && Array.from({ length: 6 }).map((_, idx) => (
+              <div key={`loading-${idx}`} className="p-4">
+                <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-slate-100 animate-pulse" />
+              </div>
+            ))}
+
+            {!isPartenairesLoading && logosClients.map((client, idx) => (
               <div
-                key={idx}
+                key={client}
                 className="flex items-center justify-center p-4 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 animate-fade-in"
                 style={{ animationDelay: `${idx * 50}ms` }}
               >
@@ -691,6 +936,12 @@ export default function EntreprisesPage() {
                 </div>
               </div>
             ))}
+
+            {!isPartenairesLoading && logosClients.length === 0 && (
+              <div className="col-span-full text-center text-sm text-slate-500 py-6">
+                Aucune entreprise partenaire disponible pour le moment.
+              </div>
+            )}
           </div>
         </section>
 
@@ -984,16 +1235,24 @@ export default function EntreprisesPage() {
                       </ul>
                     </div>
 
-                    {/* CTA Button */}
-                    <Button
-                      asChild
-                      className={`w-full cursor-pointer bg-gradient-to-r ${pack.gradient} hover:opacity-90 text-white shadow-md transition-all`}
-                    >
-                      <Link href="#contact">
+                    {/* CTA Buttons */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="cursor-pointer border-slate-300 hover:bg-slate-50"
+                        onClick={() => handleViewPackDetails(idx)}
+                      >
                         En savoir plus
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                      </Button>
+                      <Button
+                        type="button"
+                        className={`cursor-pointer bg-gradient-to-r ${pack.gradient} hover:opacity-90 text-white shadow-md transition-all`}
+                        onClick={() => handleApplyToPack(pack)}
+                      >
+                        Postuler
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               );
@@ -1004,18 +1263,16 @@ export default function EntreprisesPage() {
           <div className="text-center mt-12 px-4">
             <p className="text-slate-600 mb-4">Besoin d'un pack personnalisé ?</p>
             <Button
-              asChild
               size="lg"
               variant="outline"
               className="cursor-pointer border-2 border-orange-500 text-orange-600 hover:bg-orange-50 w-full sm:w-auto"
+              onClick={openGeneralContactModal}
             >
-              <Link href="#contact" className="flex items-center justify-center px-3 py-2 sm:px-6">
-                <Mail className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                <span className="text-xs sm:text-base leading-tight">
-                  <span className="hidden sm:inline">Contactez-nous pour un programme sur mesure</span>
-                  <span className="sm:hidden">Programme sur mesure</span>
-                </span>
-              </Link>
+              <Mail className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <span className="text-xs sm:text-base leading-tight">
+                <span className="hidden sm:inline">Contactez-nous pour un programme sur mesure</span>
+                <span className="sm:hidden">Programme sur mesure</span>
+              </span>
             </Button>
           </div>
         </section>
@@ -1086,14 +1343,12 @@ export default function EntreprisesPage() {
             <div className="text-center mt-8 md:mt-12">
               <p className="text-slate-600 mb-4">Besoin d'aide pour le financement ?</p>
               <Button
-                asChild
                 size="lg"
                 className="cursor-pointer bg-gradient-to-r from-green-500 to-green-600 hover:opacity-90 text-white shadow-lg"
+                onClick={openGeneralContactModal}
               >
-                <Link href="#contact">
-                  <Shield className="mr-2 h-5 w-5" />
-                  Télécharger le guide FDFP
-                </Link>
+                <Shield className="mr-2 h-5 w-5" />
+                Télécharger le guide FDFP
               </Button>
             </div>
           </div>
@@ -1204,28 +1459,42 @@ export default function EntreprisesPage() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-6 mb-8">
-              {partenaires.map((partenaire, idx) => (
+              {isPartenairesLoading && Array.from({ length: 3 }).map((_, idx) => (
                 <div
-                  key={idx}
+                  key={`partenaire-loading-${idx}`}
+                  className="bg-white rounded-xl p-6 text-center border border-slate-200 shadow-sm animate-pulse"
+                >
+                  <div className="h-8 w-20 mx-auto bg-slate-200 rounded mb-2" />
+                  <div className="h-4 w-28 mx-auto bg-slate-100 rounded" />
+                </div>
+              ))}
+
+              {!isPartenairesLoading && partenairesCards.map((partenaire, idx) => (
+                <div
+                  key={partenaire.nom}
                   className="bg-white rounded-xl p-6 text-center border border-slate-200 shadow-sm transition-all animate-fade-in"
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
-                  <div className="text-2xl font-bold text-orange-600 mb-1">{partenaire.count}</div>
+                  <div className="text-2xl font-bold text-orange-600 mb-1">{partenaire.countLabel}</div>
                   <div className="text-sm text-slate-600">{partenaire.nom}</div>
                 </div>
               ))}
+
+              {!isPartenairesLoading && partenairesCards.length === 0 && (
+                <div className="md:col-span-3 text-center text-sm text-slate-500 py-6">
+                  Les données partenaires sont temporairement indisponibles.
+                </div>
+              )}
             </div>
 
             <div className="text-center">
               <Button
-                asChild
                 size="lg"
                 className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white shadow-lg"
+                onClick={openGeneralContactModal}
               >
-                <Link href="#contact">
-                  <Mail className="mr-2 h-5 w-5" />
-                  Devenir partenaire
-                </Link>
+                <Mail className="mr-2 h-5 w-5" />
+                Devenir partenaire
               </Button>
             </div>
           </div>
@@ -1248,9 +1517,16 @@ export default function EntreprisesPage() {
             </div>
 
             <div className="space-y-4">
-              {faqEntreprises.map((faq, idx) => (
+              {isFaqLoading && Array.from({ length: 4 }).map((_, idx) => (
+                <div key={`faq-loading-${idx}`} className="rounded-xl md:rounded-2xl border-2 border-slate-100 bg-white p-5 md:p-6 animate-pulse">
+                  <div className="h-5 w-3/4 bg-slate-200 rounded mb-4" />
+                  <div className="h-4 w-full bg-slate-100 rounded" />
+                </div>
+              ))}
+
+              {!isFaqLoading && apiFaqEntreprises.map((faq, idx) => (
                 <details
-                  key={idx}
+                  key={faq.id}
                   className="group bg-white rounded-xl md:rounded-2xl border-2 border-slate-100 overflow-hidden transition-all animate-fade-in"
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
@@ -1267,20 +1543,24 @@ export default function EntreprisesPage() {
                   </div>
                 </details>
               ))}
+
+              {!isFaqLoading && apiFaqEntreprises.length === 0 && (
+                <div className="text-center text-sm text-slate-500 py-8 bg-white rounded-xl md:rounded-2xl border-2 border-slate-100">
+                  Impossible de charger les FAQ pour le moment.
+                </div>
+              )}
             </div>
 
             <div className="text-center mt-8">
               <p className="text-slate-600 mb-4">Vous ne trouvez pas la réponse à votre question ?</p>
               <Button
-                asChild
                 size="lg"
                 variant="outline"
                 className="cursor-pointer border-2 border-orange-500 text-orange-600 hover:bg-orange-50"
+                onClick={openGeneralContactModal}
               >
-                <Link href="#contact">
-                  <Mail className="mr-2 h-5 w-5" />
-                  Contactez-nous
-                </Link>
+                <Mail className="mr-2 h-5 w-5" />
+                Contactez-nous
               </Button>
             </div>
           </div>
@@ -1303,18 +1583,55 @@ export default function EntreprisesPage() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {ressourcesEntreprises.map((ressource, idx) => {
-                const Icon = ressource.icon;
+              {isRessourcesLoading && Array.from({ length: 4 }).map((_, idx) => (
+                <div key={`ressource-loading-${idx}`} className="bg-white rounded-2xl p-6 border-2 border-slate-100 animate-pulse">
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-slate-200" />
+                    <div className="flex-1 space-y-3">
+                      <div className="h-5 w-2/3 bg-slate-200 rounded" />
+                      <div className="h-4 w-full bg-slate-100 rounded" />
+                      <div className="h-4 w-1/2 bg-slate-100 rounded" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {!isRessourcesLoading && apiRessourcesEntreprises.map((ressource, idx) => {
+                const colorThemes = [
+                  {
+                    iconWrap: "bg-orange-100",
+                    iconColor: "text-orange-600",
+                    buttonClass: "from-orange-500 to-orange-600",
+                  },
+                  {
+                    iconWrap: "bg-green-100",
+                    iconColor: "text-green-600",
+                    buttonClass: "from-green-500 to-green-600",
+                  },
+                  {
+                    iconWrap: "bg-blue-100",
+                    iconColor: "text-blue-600",
+                    buttonClass: "from-blue-500 to-blue-600",
+                  },
+                  {
+                    iconWrap: "bg-purple-100",
+                    iconColor: "text-purple-600",
+                    buttonClass: "from-purple-500 to-purple-600",
+                  },
+                ];
+                const theme = colorThemes[idx % colorThemes.length];
+                const Icon = FileText;
+
                 return (
                   <div
-                    key={idx}
+                    key={ressource.id}
                     className="bg-white rounded-2xl p-6 border-2 border-slate-100 transition-all  animate-slide-up"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     <div className="flex items-start gap-4">
                       {/* Icône */}
-                      <div className={`w-14 h-14 flex-shrink-0 rounded-xl bg-${ressource.color}-100 flex items-center justify-center`}>
-                        <Icon className={`w-7 h-7 text-${ressource.color}-600`} />
+                      <div className={`w-14 h-14 flex-shrink-0 rounded-xl ${theme.iconWrap} flex items-center justify-center`}>
+                        <Icon className={`w-7 h-7 ${theme.iconColor}`} />
                       </div>
 
                       {/* Contenu */}
@@ -1348,14 +1665,18 @@ export default function EntreprisesPage() {
                           </div>
 
                           <Button
-                            asChild
                             size="sm"
-                            className={`cursor-pointer bg-gradient-to-r from-${ressource.color}-500 to-${ressource.color}-600 hover:opacity-90 text-white`}
+                            className={`cursor-pointer bg-gradient-to-r ${theme.buttonClass} hover:opacity-90 text-white`}
+                            onClick={() => {
+                              if (ressource.url) {
+                                window.open(ressource.url, "_blank", "noopener,noreferrer");
+                                return;
+                              }
+                              openGeneralContactModal();
+                            }}
                           >
-                            <Link href="#contact">
-                              <Download className="mr-1 h-4 w-4" />
-                              Télécharger
-                            </Link>
+                            <Download className="mr-1 h-4 w-4" />
+                            Télécharger
                           </Button>
                         </div>
                       </div>
@@ -1363,6 +1684,12 @@ export default function EntreprisesPage() {
                   </div>
                 );
               })}
+
+              {!isRessourcesLoading && apiRessourcesEntreprises.length === 0 && (
+                <div className="md:col-span-2 text-center text-sm text-slate-500 py-8 bg-white rounded-2xl border-2 border-slate-100">
+                  Aucune ressource téléchargeable disponible pour le moment.
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -1409,282 +1736,46 @@ export default function EntreprisesPage() {
           </div>
         </section>
 
-        {/* Contact/Devis Section avec formulaire */}
-        <section id="contact" className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8 md:mb-12">
-              <Badge className="mb-3 md:mb-4 bg-orange-100 text-orange-700 border-orange-200 px-3 md:px-4 py-1 text-sm">
-                <Send className="w-3 h-3 mr-1" />
-                Demande de devis
-              </Badge>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 md:mb-4">
-                Démarrons votre projet ensemble
-              </h2>
-              <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto">
-                Remplissez ce formulaire et nos experts vous répondront sous 24h ouvrées
-              </p>
-            </div>
+        {/* CTA Section - Démarrons votre projet */}
+        <section id="contact" className="container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-20">
+          <div className="max-w-4xl mx-auto">
+            <div className="relative bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 rounded-3xl p-8 md:p-12 text-white text-center shadow-2xl overflow-hidden">
+              {/* Décorations subtiles */}
+              <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full translate-y-1/3 -translate-x-1/3 pointer-events-none" />
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Colonne gauche - Formulaire */}
-              <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-xl">
-                <form className="space-y-4">
-                  {/* Informations entreprise */}
-                  <div className="space-y-4">
-                    <h3 className="font-bold text-lg text-slate-900 mb-4">Informations entreprise</h3>
-                    
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="entreprise" className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Nom de l'entreprise *
-                        </Label>
-                        <Input 
-                          id="entreprise"
-                          placeholder="Votre entreprise" 
-                          required 
-                          className="border-2 border-slate-200 focus:border-orange-500"
-                          suppressHydrationWarning
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="secteur" className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Secteur d'activité *
-                        </Label>
-                        <Input 
-                          id="secteur"
-                          placeholder="Ex: Banque, Télécom..." 
-                          required 
-                          className="border-2 border-slate-200 focus:border-orange-500"
-                          suppressHydrationWarning
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="nom" className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Votre nom *
-                        </Label>
-                        <Input 
-                          id="nom"
-                          placeholder="Nom complet" 
-                          required 
-                          className="border-2 border-slate-200 focus:border-orange-500"
-                          suppressHydrationWarning
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="fonction" className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Votre fonction *
-                        </Label>
-                        <Input 
-                          id="fonction"
-                          placeholder="Ex: DRH, Directeur..." 
-                          required 
-                          className="border-2 border-slate-200 focus:border-orange-500"
-                          suppressHydrationWarning
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="email" className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Email professionnel *
-                        </Label>
-                        <Input 
-                          id="email"
-                          type="email" 
-                          placeholder="email@entreprise.ci" 
-                          required 
-                          className="border-2 border-slate-200 focus:border-orange-500"
-                          suppressHydrationWarning
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="tel" className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Téléphone *
-                        </Label>
-                        <Input 
-                          id="tel"
-                          type="tel" 
-                          placeholder="+225 XX XX XX XX XX" 
-                          required 
-                          className="border-2 border-slate-200 focus:border-orange-500"
-                          suppressHydrationWarning
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Besoins de formation */}
-                  <div className="space-y-4 pt-4 border-t border-slate-100">
-                    <h3 className="font-bold text-lg text-slate-900 mb-4">Votre besoin de formation</h3>
-                    
-                    <div>
-                      <Label htmlFor="typebesoin" className="text-sm font-semibold text-slate-700 mb-2 block">
-                        Type de besoin *
-                      </Label>
-                      <Select>
-                        <SelectTrigger id="typebesoin" className="border-2 border-slate-200 focus:border-orange-500">
-                          <SelectValue placeholder="Sélectionnez un type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pack-metier">Pack métier existant</SelectItem>
-                          <SelectItem value="sur-mesure">Formation sur mesure</SelectItem>
-                          <SelectItem value="accompagnement">Accompagnement stratégique</SelectItem>
-                          <SelectItem value="audit">Audit & diagnostic</SelectItem>
-                          <SelectItem value="autre">Autre besoin</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="collaborateurs" className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Nombre de collaborateurs *
-                        </Label>
-                        <Select>
-                          <SelectTrigger id="collaborateurs" className="border-2 border-slate-200 focus:border-orange-500">
-                            <SelectValue placeholder="Nombre" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1-10">1 à 10</SelectItem>
-                            <SelectItem value="11-30">11 à 30</SelectItem>
-                            <SelectItem value="31-50">31 à 50</SelectItem>
-                            <SelectItem value="50+">Plus de 50</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="delai" className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Délai souhaité *
-                        </Label>
-                        <Select>
-                          <SelectTrigger id="delai" className="border-2 border-slate-200 focus:border-orange-500">
-                            <SelectValue placeholder="Délai" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="urgent">Urgent (&lt; 1 mois)</SelectItem>
-                            <SelectItem value="court">Court terme (1-3 mois)</SelectItem>
-                            <SelectItem value="moyen">Moyen terme (3-6 mois)</SelectItem>
-                            <SelectItem value="long">Programmation future (&gt; 6 mois)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="message" className="text-sm font-semibold text-slate-700 mb-2 block">
-                        Décrivez votre besoin
-                      </Label>
-                      <Textarea 
-                        id="message"
-                        placeholder="Décrivez vos objectifs, vos attentes, les compétences à développer..." 
-                        rows={4}
-                        className="border-2 border-slate-200 focus:border-orange-500"
-                      />
-                    </div>
-                  </div>
-
-                  {/* RGPD */}
-                  <div className="flex items-start gap-3 pt-4">
-                    <Checkbox id="rgpd" className="mt-1" />
-                    <Label htmlFor="rgpd" className="text-xs text-slate-600 leading-relaxed cursor-pointer">
-                      J'accepte d'être contacté par CPU Formation et j'ai lu la politique de confidentialité. 
-                      Mes données seront utilisées uniquement pour traiter ma demande. *
-                    </Label>
-                  </div>
-
-                  {/* Submit */}
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    className="w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white shadow-lg"
+              <div className="relative z-10">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 mb-6 shadow-lg">
+                  <Send className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
+                  Démarrons votre projet ensemble
+                </h2>
+                <p className="text-orange-100 mb-8 max-w-xl mx-auto text-base md:text-lg">
+                  Obtenez une proposition personnalisée adaptée à vos besoins. Nos experts vous répondent sous 24h ouvrées.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+                  <Button
+                    size="lg"
+                    className="cursor-pointer bg-white text-orange-600 hover:bg-orange-50 shadow-lg font-semibold px-8"
+                    onClick={openGeneralContactModal}
                   >
                     <Send className="mr-2 h-5 w-5" />
-                    Envoyer ma demande
+                    Demander un devis gratuit
                   </Button>
-
-                  <p className="text-xs text-center text-slate-500">
-                    ? Réponse sous 24h ouvrées • ?? Ou appelez-nous : +225 27 20 21 22 23
-                  </p>
-                </form>
-              </div>
-
-              {/* Colonne droite - Informations & Critères */}
-              <div className="space-y-6">
-                {/* Card 1 - Process simplifié */}
-                <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-xl">
-                  <Sparkles className="w-12 h-12 mb-4" />
-                  <h3 className="text-2xl font-bold mb-3">
-                    Obtenez votre devis personnalisé
-                  </h3>
-                  <p className="text-orange-100 mb-6">
-                    Notre équipe analyse votre besoin et vous propose une solution adaptée sous 24h
-                  </p>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle2 className="w-5 h-5" />
-                      </div>
-                      <span className="text-sm">Analyse gratuite de vos besoins</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle2 className="w-5 h-5" />
-                      </div>
-                      <span className="text-sm">Devis détaillé sous 24h</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle2 className="w-5 h-5" />
-                      </div>
-                      <span className="text-sm">Accompagnement FDFP offert</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle2 className="w-5 h-5" />
-                      </div>
-                      <span className="text-sm">Sans engagement</span>
-                    </div>
-                  </div>
                 </div>
-
-                {/* Card 2 - Critères */}
-                <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 border-2 border-slate-100 shadow-xl">
-                  <h3 className="font-bold text-lg text-slate-900 mb-4 flex items-center gap-2">
-                    <Target className="w-5 h-5 text-orange-600" />
-                    Pour bien démarrer
-                  </h3>
-                  <div className="space-y-3">
-                    {criteres.map((critere, idx) => (
-                      <div key={idx} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-slate-700">{critere}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Card 3 - Contact direct */}
-                <div className="bg-slate-900 rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-xl">
-                  <h3 className="font-bold text-lg mb-4">Besoin d'échanger directement ?</h3>
-                  <div className="space-y-3">
-                    <a href="tel:+22527202122 23" className="flex items-center gap-3 hover:text-orange-400 transition-colors">
-                      <Phone className="w-5 h-5 text-orange-500" />
-                      <span className="text-sm">+225 27 20 21 22 23</span>
-                    </a>
-                    <a href="mailto:entreprises@cpu-formation.ci" className="flex items-center gap-3 hover:text-orange-400 transition-colors">
-                      <Mail className="w-5 h-5 text-orange-500" />
-                      <span className="text-sm">entreprises@cpu-formation.ci</span>
-                    </a>
-                    <div className="flex items-center gap-3 text-slate-300">
-                      <Clock className="w-5 h-5 text-orange-500" />
-                      <span className="text-sm">Lun-Ven: 8h-18h, Sam: 9h-13h</span>
-                    </div>
+                <div className="grid sm:grid-cols-3 gap-3 text-sm max-w-2xl mx-auto">
+                  <a href="tel:+22527202122" className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 transition-colors rounded-xl p-3">
+                    <Phone className="w-4 h-4 flex-shrink-0" />
+                    <span>+225 27 20 21 22 23</span>
+                  </a>
+                  <a href="mailto:entreprises@cpu-formation.ci" className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 transition-colors rounded-xl p-3 min-w-0">
+                    <Mail className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">entreprises@cpu-formation.ci</span>
+                  </a>
+                  <div className="flex items-center justify-center gap-2 bg-white/10 rounded-xl p-3">
+                    <Clock className="w-4 h-4 flex-shrink-0" />
+                    <span>Lun-Sam : 8h-18h</span>
                   </div>
                 </div>
               </div>
@@ -1692,7 +1783,482 @@ export default function EntreprisesPage() {
           </div>
         </section>
       </div>
+
+      {/* ══════════════════════════════════════
+          Modal — Détail Pack Métier
+      ══════════════════════════════════════ */}
+      <Dialog
+        open={isPackDetailModalOpen}
+        onOpenChange={(open) => {
+          setIsPackDetailModalOpen(open);
+          if (!open) setSelectedPackIndex(null);
+        }}
+      >
+        <DialogContent hideClose className="max-w-xl w-full max-h-[92vh] overflow-y-auto p-0 gap-0">
+          {selectedPack && (
+            <>
+              {/* ── Header gradient pack ── */}
+              <div className={`relative p-6 md:p-8 bg-gradient-to-br ${selectedPack.gradient} overflow-hidden`}>
+                {/* Cercles décoratifs */}
+                <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full pointer-events-none" />
+                <div className="absolute -bottom-6 -left-6 w-28 h-28 bg-white/10 rounded-full pointer-events-none" />
+                <div className="absolute top-1/2 right-20 w-16 h-16 bg-white/5 rounded-full pointer-events-none" />
+
+                {/* Bouton fermer */}
+                <DialogClose className="absolute right-4 top-4 z-20 w-9 h-9 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center transition-all duration-200 hover:scale-110">
+                  <X className="w-4 h-4 text-white" />
+                </DialogClose>
+
+                <DialogHeader className="relative z-10">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/30">
+                      <PackDetailIcon className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <Badge className="mb-1.5 bg-white/25 text-white border-white/40 text-xs font-semibold">
+                        Pack métier
+                      </Badge>
+                      <DialogTitle className="text-xl font-bold text-white leading-tight">
+                        {selectedPack.titre}
+                      </DialogTitle>
+                    </div>
+                  </div>
+                  <DialogDescription className="text-white/80 text-sm leading-relaxed">
+                    {selectedPack.description}
+                  </DialogDescription>
+                </DialogHeader>
+
+                {/* ── Barre KPI ── */}
+                <div className="relative z-10 grid grid-cols-3 mt-5 bg-black/15 rounded-2xl overflow-hidden">
+                  <div className="text-center px-4 py-4">
+                    <p className="text-2xl font-bold text-white">{selectedPack.duree}</p>
+                    <p className="text-xs text-white/65 mt-0.5 uppercase tracking-wide">Durée</p>
+                  </div>
+                  <div className="text-center px-4 py-4 border-x border-white/20">
+                    <p className="text-2xl font-bold text-white">{selectedPack.modules}</p>
+                    <p className="text-xs text-white/65 mt-0.5 uppercase tracking-wide">Modules</p>
+                  </div>
+                  <div className="text-center px-4 py-4">
+                    <p className="text-2xl font-bold text-white">{(selectedPack.financement.resteACharge / 1000).toFixed(0)}k</p>
+                    <p className="text-xs text-white/65 mt-0.5 uppercase tracking-wide">FCFA/pers*</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Body ── */}
+              <div className="p-6 md:p-8 space-y-6 bg-white">
+                {/* Formations incluses */}
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center gap-1.5 bg-orange-50 text-orange-600 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide">
+                      <GraduationCap className="w-3.5 h-3.5" />
+                      Formations incluses
+                    </div>
+                    <div className="flex-1 h-px bg-slate-100" />
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {selectedPack.formations.map((formation, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-2.5 bg-slate-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all rounded-xl p-3 group cursor-default"
+                      >
+                        <div className="w-6 h-6 bg-green-100 group-hover:bg-green-200 rounded-full flex items-center justify-center flex-shrink-0 transition-colors">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                        </div>
+                        <span className="text-sm font-medium text-slate-800">{formation}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tarification */}
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center gap-1.5 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide">
+                      <CreditCard className="w-3.5 h-3.5" />
+                      Tarification
+                    </div>
+                    <div className="flex-1 h-px bg-slate-100" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center bg-slate-50 hover:bg-slate-100 transition-colors rounded-xl px-4 py-3.5">
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Users className="w-4 h-4 text-slate-400" />
+                        Par personne
+                      </div>
+                      <span className="font-bold text-slate-900">{selectedPack.prix.parPersonne.toLocaleString()} FCFA</span>
+                    </div>
+                    {selectedPack.prix.groupe8Plus && (
+                      <div className="flex justify-between items-center bg-slate-50 hover:bg-slate-100 transition-colors rounded-xl px-4 py-3.5">
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Users className="w-4 h-4 text-slate-400" />
+                          Groupe 8+
+                          <Badge variant="outline" className="text-xs border-blue-200 text-blue-600 bg-blue-50">-15%</Badge>
+                        </div>
+                        <span className="font-bold text-slate-900">{selectedPack.prix.groupe8Plus.toLocaleString()} FCFA</span>
+                      </div>
+                    )}
+                    {selectedPack.prix.groupe15Plus && (
+                      <div className="flex justify-between items-center bg-slate-50 hover:bg-slate-100 transition-colors rounded-xl px-4 py-3.5">
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Users className="w-4 h-4 text-slate-400" />
+                          Groupe 15+
+                          <Badge variant="outline" className="text-xs border-green-200 text-green-700 bg-green-50">-25%</Badge>
+                        </div>
+                        <span className="font-bold text-slate-900">{selectedPack.prix.groupe15Plus.toLocaleString()} FCFA</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* FDFP */}
+                  {selectedPack.financement.fdfpEligible && (
+                    <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4 mt-3">
+                      <div className="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Shield className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-green-800">Éligible au financement FDFP</p>
+                        <p className="text-xs text-green-600 mt-0.5">
+                          Prise en charge {selectedPack.financement.priseEnCharge} — Reste à charge :{" "}
+                          <span className="font-bold">{(selectedPack.financement.resteACharge / 1000).toFixed(0)}k FCFA/pers</span>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* CTA Postuler */}
+                <Button
+                  size="lg"
+                  className={`w-full cursor-pointer bg-gradient-to-r ${selectedPack.gradient} hover:opacity-90 text-white shadow-lg h-12 rounded-xl font-semibold transition-all hover:shadow-xl hover:scale-[1.01]`}
+                  onClick={() => {
+                    setIsPackDetailModalOpen(false);
+                    handleApplyToPack(selectedPack);
+                  }}
+                >
+                  Postuler à ce pack
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <p className="text-xs text-center text-slate-400">
+                  *Prix estimé avec prise en charge FDFP à {selectedPack.financement.priseEnCharge}
+                </p>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ══════════════════════════════════════
+          Modal — Formulaire Contact / Candidature
+      ══════════════════════════════════════ */}
+      <Dialog
+        open={isContactModalOpen}
+        onOpenChange={(open) => {
+          setIsContactModalOpen(open);
+          if (!open) {
+            setFormData(initialFormData);
+            setSubmitStatus("idle");
+          }
+        }}
+      >
+        <DialogContent hideClose className="max-w-2xl w-full max-h-[92vh] overflow-y-auto p-0 gap-0">
+          {/* ── Header ── */}
+          <div
+            className={`relative p-6 md:p-8 overflow-hidden ${
+              formData.packInteresse
+                ? "bg-gradient-to-br from-orange-500 to-orange-700"
+                : "bg-gradient-to-br from-slate-800 to-slate-900"
+            }`}
+          >
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full pointer-events-none" />
+            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/5 rounded-full pointer-events-none" />
+
+            {/* Bouton fermer */}
+            <DialogClose className="absolute right-4 top-4 z-20 w-9 h-9 rounded-full bg-white/15 hover:bg-white/30 flex items-center justify-center transition-all duration-200 hover:scale-110">
+              <X className="w-4 h-4 text-white" />
+            </DialogClose>
+
+            <DialogHeader className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 bg-white/15 rounded-xl flex items-center justify-center ring-2 ring-white/20">
+                  <Send className="w-5 h-5 text-white" />
+                </div>
+                {formData.packInteresse && (
+                  <Badge className="bg-white/20 text-white border-white/35 text-xs font-semibold">
+                    <Briefcase className="w-3 h-3 mr-1.5" />
+                    {formData.packInteresse}
+                  </Badge>
+                )}
+              </div>
+              <DialogTitle className="text-xl md:text-2xl font-bold text-white leading-tight">
+                {formData.packInteresse ? "Postuler à ce pack métier" : "Démarrons votre projet ensemble"}
+              </DialogTitle>
+              <DialogDescription className="text-white/75 mt-2 text-sm leading-relaxed">
+                Nos experts vous répondront sous 24h ouvrées avec une proposition personnalisée
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          {/* ── Corps du formulaire ── */}
+          <div className="p-6 md:p-8 bg-white">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+
+              {/* ─── Section Entreprise ─── */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 bg-orange-50 text-orange-600 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide flex-shrink-0">
+                    <Building className="w-3.5 h-3.5" />
+                    Votre entreprise
+                  </div>
+                  <div className="flex-1 h-px bg-slate-100" />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-entreprise" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Nom de l'entreprise *
+                    </Label>
+                    <Input
+                      id="m-entreprise"
+                      placeholder="Votre entreprise"
+                      required
+                      value={formData.entreprise}
+                      onChange={(e) => handleInputChange("entreprise", e.target.value)}
+                      className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all placeholder:text-slate-400 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-secteur" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Secteur d'activité *
+                    </Label>
+                    <Input
+                      id="m-secteur"
+                      placeholder="Ex: Banque, Télécom..."
+                      required
+                      value={formData.secteur}
+                      onChange={(e) => handleInputChange("secteur", e.target.value)}
+                      className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all placeholder:text-slate-400 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-nom" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Votre nom *
+                    </Label>
+                    <Input
+                      id="m-nom"
+                      placeholder="Nom complet"
+                      required
+                      value={formData.nom}
+                      onChange={(e) => handleInputChange("nom", e.target.value)}
+                      className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all placeholder:text-slate-400 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-fonction" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Votre fonction *
+                    </Label>
+                    <Input
+                      id="m-fonction"
+                      placeholder="Ex: DRH, Directeur..."
+                      required
+                      value={formData.fonction}
+                      onChange={(e) => handleInputChange("fonction", e.target.value)}
+                      className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all placeholder:text-slate-400 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-email" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Email professionnel *
+                    </Label>
+                    <Input
+                      id="m-email"
+                      type="email"
+                      placeholder="email@entreprise.ci"
+                      required
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all placeholder:text-slate-400 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-tel" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Téléphone *
+                    </Label>
+                    <Input
+                      id="m-tel"
+                      type="tel"
+                      placeholder="+225 XX XX XX XX XX"
+                      required
+                      value={formData.tel}
+                      onChange={(e) => handleInputChange("tel", e.target.value)}
+                      className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all placeholder:text-slate-400 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ─── Section Besoin ─── */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide flex-shrink-0">
+                    <Target className="w-3.5 h-3.5" />
+                    Votre besoin
+                  </div>
+                  <div className="flex-1 h-px bg-slate-100" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="m-typebesoin" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Type de besoin *
+                  </Label>
+                  <Select value={formData.typebesoin} onValueChange={(value) => handleInputChange("typebesoin", value)}>
+                    <SelectTrigger
+                      id="m-typebesoin"
+                      className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm"
+                    >
+                      <SelectValue placeholder="Sélectionnez un type" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-0 shadow-xl">
+                      <SelectItem value="pack-metier">Pack métier existant</SelectItem>
+                      <SelectItem value="sur-mesure">Formation sur mesure</SelectItem>
+                      <SelectItem value="accompagnement">Accompagnement stratégique</SelectItem>
+                      <SelectItem value="audit">Audit & diagnostic</SelectItem>
+                      <SelectItem value="autre">Autre besoin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formData.typebesoin === "pack-metier" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-pack" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Pack sélectionné
+                    </Label>
+                    <Input
+                      id="m-pack"
+                      value={formData.packInteresse}
+                      onChange={(e) => handleInputChange("packInteresse", e.target.value)}
+                      placeholder="Ex: Pack Direction & Management"
+                      className="h-11 rounded-xl border-2 border-orange-200 bg-orange-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all text-sm font-medium"
+                    />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-collaborateurs" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Collaborateurs *
+                    </Label>
+                    <Select value={formData.collaborateurs} onValueChange={(value) => handleInputChange("collaborateurs", value)}>
+                      <SelectTrigger
+                        id="m-collaborateurs"
+                        className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm"
+                      >
+                        <SelectValue placeholder="Nombre" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-0 shadow-xl">
+                        <SelectItem value="1-10">1 à 10</SelectItem>
+                        <SelectItem value="11-30">11 à 30</SelectItem>
+                        <SelectItem value="31-50">31 à 50</SelectItem>
+                        <SelectItem value="50+">Plus de 50</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="m-delai" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Délai souhaité *
+                    </Label>
+                    <Select value={formData.delai} onValueChange={(value) => handleInputChange("delai", value)}>
+                      <SelectTrigger
+                        id="m-delai"
+                        className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm"
+                      >
+                        <SelectValue placeholder="Délai" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-0 shadow-xl">
+                        <SelectItem value="urgent">Urgent (&lt; 1 mois)</SelectItem>
+                        <SelectItem value="court">Court terme (1-3 mois)</SelectItem>
+                        <SelectItem value="moyen">Moyen terme (3-6 mois)</SelectItem>
+                        <SelectItem value="long">Programmation future (&gt; 6 mois)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="m-message" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Décrivez votre besoin
+                  </Label>
+                  <Textarea
+                    id="m-message"
+                    placeholder="Décrivez vos objectifs, vos attentes, les compétences à développer..."
+                    rows={4}
+                    value={formData.message}
+                    onChange={(e) => handleInputChange("message", e.target.value)}
+                    className="rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all resize-none placeholder:text-slate-400 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* ─── RGPD ─── */}
+              <div className="flex items-start gap-3 bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <Checkbox
+                  id="m-rgpd"
+                  className="mt-0.5 border-2 border-slate-300 data-[state=checked]:border-orange-500 data-[state=checked]:bg-orange-500"
+                  checked={formData.rgpd}
+                  onCheckedChange={(checked) => handleInputChange("rgpd", checked === true)}
+                />
+                <Label htmlFor="m-rgpd" className="text-xs text-slate-600 leading-relaxed cursor-pointer">
+                  J'accepte d'être contacté par CPU Formation et j'ai lu la politique de confidentialité.
+                  Mes données seront utilisées uniquement pour traiter ma demande. *
+                </Label>
+              </div>
+
+              {/* ─── Feedback états ─── */}
+              {submitStatus === "error" && (
+                <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl p-4 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <XCircle className="w-4 h-4 text-red-600" />
+                  </div>
+                  <p className="text-sm text-red-700">Veuillez accepter la politique de confidentialité pour envoyer votre demande.</p>
+                </div>
+              )}
+
+              {submitStatus === "success" && (
+                <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-green-800">Demande envoyée avec succès !</p>
+                    <p className="text-xs text-green-600 mt-0.5">Notre équipe vous recontactera sous 24h ouvrées.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* ─── Bouton Submit ─── */}
+              <Button
+                type="submit"
+                size="lg"
+                disabled={submitStatus === "success"}
+                className="w-full cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl disabled:opacity-60 h-12 rounded-xl font-semibold transition-all hover:scale-[1.01]"
+              >
+                <Send className="mr-2 h-5 w-5" />
+                {submitStatus === "success" ? "Demande envoyée !" : "Envoyer ma demande"}
+              </Button>
+
+              <p className="text-xs text-center text-slate-400">
+                Réponse sous 24h ouvrées · Appelez-nous : +225 27 20 21 22 23
+              </p>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
-
