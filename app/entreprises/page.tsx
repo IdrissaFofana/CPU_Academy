@@ -293,7 +293,7 @@ const packsMetiers: PackMetier[] = [
 // Témoignages clients
 const temoignages = [
   {
-    entreprise: "Banque Atlantique CI",
+    entreprise: "Nova Finance CI",
     secteur: "Secteur bancaire",
     responsable: "Kouamé Jacques",
     poste: "DRH",
@@ -304,7 +304,7 @@ const temoignages = [
     programmes: ["Pack Commercial", "Leadership", "Digital Banking"]
   },
   {
-    entreprise: "Nestlé Côte d'Ivoire",
+    entreprise: "AgriSaveurs Côte d'Ivoire",
     secteur: "Industrie agroalimentaire",
     responsable: "Aminata Traoré",
     poste: "Directrice Formation",
@@ -315,7 +315,7 @@ const temoignages = [
     programmes: ["Pack Qualité ISO", "Management", "Lean Manufacturing"]
   },
   {
-    entreprise: "Jumia CI",
+    entreprise: "MarketLink CI",
     secteur: "E-commerce",
     responsable: "David Mendy",
     poste: "CEO",

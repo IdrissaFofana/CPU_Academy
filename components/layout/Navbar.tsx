@@ -521,16 +521,36 @@ const NavLink = ({ href, children, icon }: { href: string; children: React.React
   return (
     <Link
       href={href}
-      className={`px-2.5 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-200 group relative ${
+      className={`px-2.5 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-300 group relative overflow-hidden ${
         isActive 
           ? "text-cpu-orange bg-orange-50" 
-          : "text-gray-700 hover:text-cpu-orange hover:bg-gray-50"
+          : "text-gray-700 hover:text-cpu-orange"
       }`}
     >
-      {icon}
-      {children}
+      {/* Animated background glow on hover */}
+      {!isActive && (
+        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      )}
+      
+      {/* Icon animation */}
+      <span className={`inline-flex transition-all duration-300 ${icon ? 'mr-1' : ''} ${!isActive ? 'group-hover:-translate-y-0.5' : ''}`}>
+        {icon}
+      </span>
+      
+      {/* Text */}
+      <span className="relative z-10">{children}</span>
+      
+      {/* Animated underline */}
       {isActive && (
         <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cpu-orange rounded-full" />
+      )}
+      
+      {/* Hover underline animation */}
+      {!isActive && (
+        <>
+          <span className="absolute bottom-0.5 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent to-cpu-orange rounded-full group-hover:w-full transition-all duration-500" />
+          <span className="absolute bottom-0.5 right-0 w-0 h-0.5 bg-gradient-to-l from-transparent to-cpu-orange rounded-full group-hover:w-full transition-all duration-500 group-hover:delay-200" />
+        </>
       )}
     </Link>
   );
@@ -564,14 +584,39 @@ const NavLinkWithDropdown = ({
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className={`px-2.5 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-200 group ${
+        <button className={`px-2.5 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-300 group relative overflow-hidden ${
           isActive 
             ? "text-cpu-orange bg-orange-50" 
-            : "text-gray-700 hover:text-cpu-orange hover:bg-gray-50"
+            : "text-gray-700 hover:text-cpu-orange"
         }`}>
-          {icon}
-          {title}
-          <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+          {/* Animated background glow on hover */}
+          {!isActive && (
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          )}
+          
+          {/* Icon animation */}
+          <span className={`inline-flex transition-all duration-300 ${icon ? 'mr-1' : ''} ${!isActive ? 'group-hover:-translate-y-0.5' : ''}`}>
+            {icon}
+          </span>
+          
+          {/* Title */}
+          <span className="relative z-10">{title}</span>
+          
+          {/* Animated chevron */}
+          <ChevronDown className={`w-3 h-3 ml-1 transition-all duration-300 relative z-10 ${isOpen ? "rotate-180" : "group-hover:translate-y-0.5"}`} />
+          
+          {/* Hover underline animation */}
+          {!isActive && (
+            <>
+              <span className="absolute bottom-0.5 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent to-cpu-orange rounded-full group-hover:w-full transition-all duration-500" />
+              <span className="absolute bottom-0.5 right-0 w-0 h-0.5 bg-gradient-to-l from-transparent to-cpu-orange rounded-full group-hover:w-full transition-all duration-500 group-hover:delay-200" />
+            </>
+          )}
+          
+          {/* Active indicator */}
+          {isActive && (
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cpu-orange rounded-full" />
+          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
@@ -652,20 +697,33 @@ const MobileNavLink = ({ href, children, icon }: { href: string; children: React
   return (
     <Link
       href={href}
-      className={`block px-3 py-3 text-base font-medium rounded-lg flex items-center transition-all duration-200 ${
+      className={`block px-3 py-3 text-base font-medium rounded-lg flex items-center transition-all duration-300 group relative overflow-hidden ${
         isActive 
           ? "text-cpu-orange bg-orange-50 font-semibold" 
           : "text-gray-700 hover:text-cpu-orange hover:bg-gray-50"
       }`}
     >
-      <span className={`flex items-center justify-center w-10 h-10 rounded-lg mr-3 transition-colors duration-200 ${
+      {/* Animated glow background */}
+      {!isActive && (
+        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      )}
+      
+      {/* Icon container with animation */}
+      <span className={`flex items-center justify-center w-10 h-10 rounded-lg mr-3 transition-all duration-300 relative z-10 flex-shrink-0 ${
         isActive 
           ? "bg-cpu-orange/10 text-cpu-orange" 
-          : "bg-gray-100 text-gray-600"
+          : "bg-gray-100 text-gray-600 group-hover:bg-orange-100 group-hover:text-cpu-orange group-hover:-translate-y-1"
       }`}>
         {icon}
       </span>
-      {children}
+      
+      {/* Text with animation */}
+      <span className="relative z-10 transition-all duration-300 group-hover:translate-x-1">{children}</span>
+      
+      {/* Animated right accent line */}
+      {!isActive && (
+        <span className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-6 border-r-2 border-cpu-orange/0 group-hover:border-cpu-orange/100 transition-all duration-300" />
+      )}
     </Link>
   );
 };

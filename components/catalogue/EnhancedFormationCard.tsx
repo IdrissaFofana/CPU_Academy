@@ -172,7 +172,9 @@ export function EnhancedFormationCard({
         <div className="pt-2 flex justify-between items-center mt-auto">
           <div className="flex flex-col">
             <span className="text-lg font-bold text-cpu-orange">
-              {formation.gratuit ? "Gratuit" : `${formation.prixPublic || 0}€`}
+              {formation.gratuit
+                ? "Gratuit"
+                : `${new Intl.NumberFormat("fr-FR").format(formation.prixMembre || formation.prixPublic || 0)} FCFA`}
             </span>
           </div>
           <Button 

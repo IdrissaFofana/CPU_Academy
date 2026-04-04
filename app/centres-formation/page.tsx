@@ -13,6 +13,9 @@ import {
   ArrowRight,
   Building2,
   Search,
+  SlidersHorizontal,
+  RotateCcw,
+  Navigation,
 } from "lucide-react";
 import Link from "next/link";
 import { centreFormationService } from "@/lib/api/services";
@@ -31,20 +34,6 @@ type CentreCardData = {
   };
   displayOrder?: number;
 };
-
-// Palette de gradients — varie par index
-const CARD_GRADIENTS = [
-  "from-orange-500 via-amber-500 to-yellow-400",
-  "from-blue-600 via-indigo-500 to-violet-500",
-  "from-emerald-500 via-teal-500 to-cyan-500",
-  "from-rose-500 via-pink-500 to-fuchsia-500",
-  "from-violet-600 via-purple-500 to-indigo-500",
-  "from-amber-600 via-orange-500 to-red-500",
-  "from-cyan-500 via-sky-500 to-blue-500",
-  "from-green-500 via-emerald-600 to-teal-600",
-];
-
-const getGradient = (index: number) => CARD_GRADIENTS[index % CARD_GRADIENTS.length];
 
 const getInitials = (nom: string) =>
   nom
@@ -69,6 +58,17 @@ const mapApiToCard = (centre: CentreFormationApi): CentreCardData => {
     },
     displayOrder: centre.display_order,
   };
+};
+
+const getGoogleMapsUrl = (centre: CentreCardData) => {
+  const queryParts = [
+    centre.nom,
+    centre.adresse !== "Adresse non renseignée" ? centre.adresse : "",
+    centre.ville !== "Ville non renseignée" ? centre.ville : "",
+    "Côte d'Ivoire",
+  ].filter(Boolean);
+
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts.join(", "))}`;
 };
 
 export default function CentresFormationPage() {
@@ -116,6 +116,12 @@ export default function CentresFormationPage() {
   }, []);
 
   const regions = useMemo(() => ["all", ...new Set(centres.map((c) => c.region))], [centres]);
+
+  const regionCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    centres.forEach((c) => { counts[c.region] = (counts[c.region] || 0) + 1; });
+    return counts;
+  }, [centres]);
 
   const filteredCentres = centres.filter((centre) => {
     const matchRegion = selectedRegion === "all" || centre.region === selectedRegion;
@@ -189,54 +195,95 @@ export default function CentresFormationPage() {
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-10" id="centres">
 
             {/* ── Sidebar ── */}
-            <aside className="w-full lg:w-60 flex-shrink-0">
-              <div className="sticky top-24 space-y-6">
-                {/* Search */}
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">
-                    Recherche
-                  </label>
-                  <SearchBar
-                    value={searchTerm}
-                    onChange={setSearchTerm}
-                    placeholder="Nom, ville…"
-                    size="md"
-                  />
-                </div>
+            <aside className="w-full lg:w-72 flex-shrink-0">
+              <div className="sticky top-24">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden">
 
-                {/* Region filter */}
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">
-                    Ville / Région
-                  </label>
-                  <div className="space-y-1">
-                    {regions.map((region) => (
+                  {/* Sidebar header */}
+                  <div className="bg-slate-900 px-5 py-4 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-cpu-orange/20 flex items-center justify-center">
+                      <SlidersHorizontal className="w-4 h-4 text-cpu-orange" />
+                    </div>
+                    <span className="font-bold text-white text-sm tracking-wide">Filtres</span>
+                    {(searchTerm !== "" || selectedRegion !== "all") && (
                       <button
-                        key={region}
-                        onClick={() => setSelectedRegion(region)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                          selectedRegion === region
-                            ? "bg-cpu-orange text-white shadow-sm"
-                            : "text-slate-600 hover:bg-slate-100"
-                        }`}
+                        onClick={() => { setSearchTerm(""); setSelectedRegion("all"); }}
+                        className="ml-auto flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
                       >
-                        {region === "all" ? "Tous les centres" : region}
+                        <RotateCcw className="w-3 h-3" />
+                        Réinitialiser
                       </button>
-                    ))}
+                    )}
+                  </div>
+
+                  <div className="p-5 space-y-5">
+                    {/* Search */}
+                    <div>
+                      <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
+                        <Search className="w-3.5 h-3.5" />
+                        Recherche
+                      </label>
+                      <SearchBar
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder="Nom, ville, adresse…"
+                        size="md"
+                      />
+                    </div>
+
+                    <div className="h-px bg-slate-100" />
+
+                    {/* Region filter */}
+                    <div>
+                      <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
+                        <MapPin className="w-3.5 h-3.5" />
+                        Ville / Région
+                      </label>
+                      <div className="space-y-1">
+                        {regions.map((region) => {
+                          const count = region === "all" ? centres.length : (regionCounts[region] || 0);
+                          return (
+                            <button
+                              key={region}
+                              onClick={() => setSelectedRegion(region)}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                                selectedRegion === region
+                                  ? "bg-cpu-orange text-white shadow-md shadow-orange-200"
+                                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                              }`}
+                            >
+                              <span>{region === "all" ? "Tous les centres" : region}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+                                selectedRegion === region
+                                  ? "bg-white/25 text-white"
+                                  : "bg-slate-100 text-slate-500"
+                              }`}>
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-slate-100" />
+
+                    {/* Stats */}
+                    {!isLoading && (
+                      <div className="rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 px-4 py-4 text-center">
+                        <p className="text-3xl font-extrabold text-white leading-none">
+                          {filteredCentres.length}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          centre{filteredCentres.length > 1 ? "s" : ""} trouvé{filteredCentres.length > 1 ? "s" : ""}
+                        </p>
+                        {filteredCentres.length !== centres.length && (
+                          <p className="text-xs text-cpu-orange mt-1">sur {centres.length} au total</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Stats chip */}
-                {!isLoading && (
-                  <div className="rounded-xl bg-orange-50 border border-orange-100 px-4 py-3 text-center">
-                    <p className="text-2xl font-extrabold text-cpu-orange leading-none">
-                      {filteredCentres.length}
-                    </p>
-                    <p className="text-xs text-orange-700 mt-0.5">
-                      centre{filteredCentres.length > 1 ? "s" : ""} disponible{filteredCentres.length > 1 ? "s" : ""}
-                    </p>
-                  </div>
-                )}
               </div>
             </aside>
 
@@ -272,35 +319,36 @@ export default function CentresFormationPage() {
                   {/* ── Grid ── */}
                   <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredCentres.map((centre, idx) => {
-                      const gradient = getGradient(idx);
                       const initials = getInitials(centre.nom);
                       const delay = `${Math.min(idx * 0.07, 0.6)}s`;
 
                       return (
                         <article
                           key={centre.id}
-                          className="group relative flex flex-col rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
+                          className="group relative flex flex-col rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
                           style={{ animationDelay: delay }}
                         >
-                          {/* ── Gradient header ── */}
-                          <div className={`relative h-36 bg-gradient-to-br ${gradient} flex items-center justify-center overflow-hidden`}>
+                          {/* ── Card header ── */}
+                          <div className="relative h-36 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 flex items-center justify-center overflow-hidden rounded-t-2xl">
+                            {/* Orange accent stripe */}
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-cpu-orange" />
                             {/* Decorative circles */}
-                            <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10" />
-                            <div className="absolute -bottom-8 -left-4 w-24 h-24 rounded-full bg-white/10" />
-                            <div className="absolute bottom-2 right-4 w-10 h-10 rounded-full bg-white/10" />
+                            <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/5" />
+                            <div className="absolute -bottom-8 -left-4 w-24 h-24 rounded-full bg-white/5" />
+                            <div className="absolute bottom-2 right-4 w-10 h-10 rounded-full bg-cpu-orange/10" />
 
                             {/* Initials medallion */}
                             <div className="relative z-10 flex flex-col items-center gap-1">
-                              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-lg">
-                                <span className="text-white font-extrabold text-2xl tracking-tight leading-none select-none">
-                                  {initials || <Building2 className="w-8 h-8 text-white" />}
+                              <div className="w-16 h-16 rounded-2xl bg-cpu-orange/15 border border-cpu-orange/40 flex items-center justify-center shadow-lg">
+                                <span className="text-cpu-orange font-extrabold text-2xl tracking-tight leading-none select-none">
+                                  {initials || <Building2 className="w-8 h-8 text-cpu-orange" />}
                                 </span>
                               </div>
                             </div>
 
                             {/* City badge */}
-                            <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/25 backdrop-blur-sm rounded-full px-2.5 py-1">
-                              <MapPin className="w-3 h-3 text-white/90 flex-shrink-0" />
+                            <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-white/10 backdrop-blur-sm rounded-full px-2.5 py-1 border border-white/10">
+                              <MapPin className="w-3 h-3 text-cpu-orange flex-shrink-0" />
                               <span className="text-white text-xs font-semibold truncate max-w-[120px]">
                                 {centre.ville}
                               </span>
@@ -308,8 +356,8 @@ export default function CentresFormationPage() {
 
                             {/* Order badge */}
                             {typeof centre.displayOrder === "number" && centre.displayOrder > 0 && (
-                              <div className="absolute top-3 right-3 bg-black/20 backdrop-blur-sm rounded-full w-7 h-7 flex items-center justify-center">
-                                <span className="text-white text-xs font-bold">{centre.displayOrder}</span>
+                              <div className="absolute top-5 right-3 bg-cpu-orange/20 border border-cpu-orange/30 rounded-full w-7 h-7 flex items-center justify-center">
+                                <span className="text-cpu-orange text-xs font-bold">{centre.displayOrder}</span>
                               </div>
                             )}
                           </div>
@@ -367,13 +415,22 @@ export default function CentresFormationPage() {
                             )}
 
                             {/* CTA */}
-                            <div className="mt-auto pt-2">
-                              <Link href={`/catalogue?region=${encodeURIComponent(centre.ville)}`} className="block">
-                                <Button className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white rounded-xl text-sm font-semibold group/btn">
+                            <div className="mt-auto pt-2 grid grid-cols-[minmax(0,1fr)_2.5rem] gap-2 items-center">
+                              <Link href={`/catalogue?region=${encodeURIComponent(centre.ville)}`} className="min-w-0">
+                                <Button className="w-full min-w-0 bg-cpu-orange hover:bg-cpu-orange/90 text-white rounded-xl text-sm font-semibold group/btn">
                                   Voir les formations
                                   <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                                 </Button>
                               </Link>
+                              <a
+                                href={getGoogleMapsUrl(centre)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Voir sur Google Maps"
+                                className="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-cpu-orange hover:text-cpu-orange flex items-center justify-center transition-all duration-150 text-slate-500 shadow-sm"
+                              >
+                                <Navigation className="w-4 h-4" />
+                              </a>
                             </div>
                           </div>
                         </article>
@@ -403,25 +460,36 @@ export default function CentresFormationPage() {
               )}
 
               {/* ── CTA Banner ── */}
-              <div className="mt-14 relative overflow-hidden rounded-2xl bg-gradient-to-r from-cpu-orange via-orange-500 to-amber-500 p-10 text-center text-white shadow-xl">
-                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
-                <h2 className="text-2xl md:text-3xl font-extrabold mb-3 relative">
-                  Vous ne trouvez pas de centre près de chez vous ?
-                </h2>
-                <p className="text-orange-100 text-base md:text-lg mb-7 max-w-xl mx-auto relative">
-                  Nos formations en ligne sont accessibles partout, à tout moment, avec des experts de haut niveau.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center relative">
-                  <Link href="/catalogue">
-                    <Button className="bg-white text-cpu-orange hover:bg-orange-50 font-bold px-6">
-                      Explorer les formations en ligne
-                    </Button>
-                  </Link>
-                  <Link href="/support">
-                    <Button variant="outline" className="border-white text-white hover:bg-white/10 font-bold px-6">
-                      Nous contacter
-                    </Button>
-                  </Link>
+              <div className="mt-14 relative overflow-hidden rounded-2xl bg-slate-900 p-10 text-center text-white shadow-xl border border-slate-800">
+                {/* Glow decorations */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-56 bg-cpu-orange/20 rounded-full blur-3xl" />
+                  <div className="absolute bottom-0 left-0 w-56 h-36 bg-cpu-orange/10 rounded-full blur-2xl" />
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-cpu-orange/5 rounded-full blur-2xl" />
+                </div>
+                <div className="relative">
+                  <div className="inline-flex items-center gap-2 bg-cpu-orange/15 border border-cpu-orange/30 text-cpu-orange text-xs font-bold px-3 py-1.5 rounded-full mb-5 uppercase tracking-wider">
+                    <MapPin className="w-3 h-3" />
+                    Formation à distance
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-extrabold mb-3">
+                    Vous ne trouvez pas de centre près de chez vous ?
+                  </h2>
+                  <p className="text-slate-400 text-base md:text-lg mb-7 max-w-xl mx-auto">
+                    Nos formations en ligne sont accessibles partout, à tout moment, avec des experts de haut niveau.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link href="/catalogue">
+                      <Button className="bg-cpu-orange hover:bg-cpu-orange/90 text-white font-bold px-6">
+                        Explorer les formations en ligne
+                      </Button>
+                    </Link>
+                    <Link href="/support">
+                      <Button variant="outline" className="border-white text-slate-900 hover:bg-slate-100 font-bold px-6">
+                        Nous contacter
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

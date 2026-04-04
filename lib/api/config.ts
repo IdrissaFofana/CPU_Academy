@@ -92,6 +92,33 @@ export const API_ENDPOINTS = {
     PUBLIC: '/api/formation/ressources',
     BY_ID: (id: string) => `/api/formation/ressources/${id}`,
   },
+
+  // Promotions
+  PROMOTIONS: {
+    BASE: '/api/formation/promotions',
+    PUBLIC: '/api/formation/promotions',
+    BY_ID: (id: string) => `/api/formation/promotions/${id}`,
+  },
+
+  // Blog
+  BLOG: {
+    POSTS: '/api/formation/blog/posts',
+    POSTS_PUBLIC: '/api/formation/blog/posts/public',
+    POST_BY_SLUG: (slug: string) => `/api/formation/blog/posts/slug/${slug}`,
+    POST_BY_ID: (id: string) => `/api/formation/blog/posts/${id}`,
+    MEDIA: '/api/formation/blog/media',
+    MEDIA_BY_ID: (id: string) => `/api/formation/blog/media/${id}`,
+    CATEGORIES: '/api/formation/blog/categories',
+    TAGS: '/api/formation/blog/tags',
+    AUTHORS: '/api/formation/blog/authors',
+    COMMENTS: '/api/formation/blog/comments',
+    COMMENTS_BY_POST: (postId: string) => `/api/formation/blog/comments/post/${postId}`,
+  },
+
+  CERTIFICATIONS: {
+    TYPES: '/api/formation/types-certifications',
+    VERIFY_BY_CODE: (code: string) => `/api/formation/certificats/verify/${code}`,
+  },
   
   // Enrollments
   ENROLLMENTS: {

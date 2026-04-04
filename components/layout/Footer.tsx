@@ -87,12 +87,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/about#equipe" className="text-slate-400 hover:text-cpu-orange transition-colors">
+                <Link href="/about?tab=equipe" className="text-slate-400 hover:text-cpu-orange transition-colors">
                   Notre équipe
                 </Link>
               </li>
               <li>
-                <Link href="/about#partenaires" className="text-slate-400 hover:text-cpu-orange transition-colors">
+                <Link href="/about?tab=partenaires" className="text-slate-400 hover:text-cpu-orange transition-colors">
                   Nos partenaires
                 </Link>
               </li>

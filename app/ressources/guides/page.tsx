@@ -264,14 +264,10 @@ export default function GuidesPage() {
           </div>
 
           {/* Stats rapides */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12 max-w-4xl mx-auto">
             <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md">
               <div className="text-3xl font-bold text-orange-600 mb-1">{ressources.length}</div>
               <div className="text-sm text-slate-600">Ressources</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md">
-              <div className="text-3xl font-bold text-green-600 mb-1">API</div>
-              <div className="text-sm text-slate-600">Source de données</div>
             </div>
             <div className="bg-white rounded-xl p-6 text-center border-2 border-slate-100 shadow-md">
               <div className="text-3xl font-bold text-blue-600 mb-1">

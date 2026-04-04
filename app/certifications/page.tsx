@@ -6,12 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { SearchBar } from "@/components/ui/search-bar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Award, CheckCircle2, Clock, Users, TrendingUp, Shield, BookOpen, Send, FileCheck, Star, ArrowRight, Download, Sparkles, FileText, Wallet, ShoppingBag, Factory, Search, Grid3x3, List, LayoutGrid, Calendar, MapPin, CreditCard, Banknote, Briefcase, Quote } from "lucide-react";
+import { Award, CheckCircle2, Clock, Users, TrendingUp, Shield, BookOpen, Send, FileCheck, Star, ArrowRight, Download, Sparkles, FileText, Wallet, ShoppingBag, Factory, Search, Grid3x3, List, LayoutGrid, Calendar, MapPin, CreditCard, Banknote, Briefcase, Quote, SlidersHorizontal, RotateCcw, Tag, BarChart3 } from "lucide-react";
+import { useMemo } from "react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/config";
 
 type Certification = {
-  id: number;
+  id: string | number;
   title: string;
   category: string;
   niveau: string;
@@ -20,30 +23,101 @@ type Certification = {
   color: string;
   gradient: string;
   bgLight: string;
-  borderColor: string;
   textColor: string;
   description: string;
   competences: string[];
-  prerequis: string;
   validite: string;
-  // Nouvelles données
-  prochaineSessions: {
-    date: string;
-    placesRestantes: number;
-    placesTotal: number;
-    deadlineInscription: string;
-    mode: string;
-    lieu: string;
-  };
-  prix: {
-    public: number;
-    entreprise: number;
-    paiementFois3: boolean;
-    eligibleFDFP: boolean;
+};
+
+type VerifyResponse = {
+  valid: boolean;
+  certification?: {
+    id?: string;
+    code?: string;
+    typeCertification?: {
+      nom?: string;
+      code?: string;
+      niveau?: string;
+    };
+    formation?: {
+      title?: string;
+    };
+    dateExpiration?: string | null;
+    dateDelivrance?: string | null;
+    tauxReussite?: string | number;
   };
 };
 
-const certifications: Certification[] = [
+const CERTIFICATION_STYLES = [
+  { color: "orange", gradient: "from-orange-500 to-orange-600", bgLight: "bg-orange-50", borderColor: "border-orange-200", textColor: "text-orange-600" },
+  { color: "indigo", gradient: "from-indigo-500 to-indigo-600", bgLight: "bg-indigo-50", borderColor: "border-indigo-200", textColor: "text-indigo-600" },
+  { color: "green", gradient: "from-green-500 to-green-600", bgLight: "bg-green-50", borderColor: "border-green-200", textColor: "text-green-600" },
+  { color: "purple", gradient: "from-purple-500 to-purple-600", bgLight: "bg-purple-50", borderColor: "border-purple-200", textColor: "text-purple-600" },
+  { color: "cyan", gradient: "from-cyan-500 to-cyan-600", bgLight: "bg-cyan-50", borderColor: "border-cyan-200", textColor: "text-cyan-600" },
+  { color: "blue", gradient: "from-blue-500 to-blue-600", bgLight: "bg-blue-50", borderColor: "border-blue-200", textColor: "text-blue-600" },
+] as const;
+
+function normalizeArray(payload: any): any[] {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
+  return [];
+}
+
+function normalizeTypesCertifications(payload: any): Certification[] {
+  const rawItems = normalizeArray(payload);
+
+  return rawItems
+    .map((item: any, index: number) => {
+      const title = item?.nom || item?.title || item?.name;
+      if (!title) return null;
+
+      const style = CERTIFICATION_STYLES[index % CERTIFICATION_STYLES.length];
+      const category = item?.categorie || item?.category || item?.domaine || "Général";
+      const level = item?.niveau || item?.level || "Professionnel";
+      const modules = Number(item?.modules || item?.nombreModules || item?.nbModules || 0);
+      const competences = Array.isArray(item?.competences)
+        ? item.competences.map((c: any) => String(c))
+        : Array.isArray(item?.competencesCles)
+          ? item.competencesCles.map((c: any) => String(c))
+          : [];
+
+      return {
+        id: String(item?.id || item?.code || `type-certification-${index}`),
+        title: String(title),
+        category: String(category),
+        niveau: String(level),
+        duree: String(item?.duree || (item?.dureeHeures ? `${item.dureeHeures}h` : "")),
+        modules: Number.isFinite(modules) && modules > 0 ? modules : 0,
+        color: style.color,
+        gradient: style.gradient,
+        bgLight: style.bgLight,
+        textColor: style.textColor,
+        description: String(item?.description || "Certification professionnelle"),
+        competences,
+        validite: item?.dureeValidite ? `${item.dureeValidite} mois` : "",
+      } as Certification;
+    })
+    .filter(Boolean) as Certification[];
+}
+
+function normalizeVerifyResponse(payload: any): VerifyResponse {
+  const source = payload?.data || payload;
+  return {
+    valid: Boolean(source?.valid),
+    certification: source?.certification,
+  };
+}
+
+function formatApiDate(value: unknown): string {
+  if (!value) return "Non renseignée";
+  if (typeof value !== "string") return "Non renseignée";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString("fr-FR");
+}
+
+const fallbackCertifications: Certification[] = [
   {
     id: 1,
     title: "Certification Entrepreneur PME",
@@ -54,26 +128,10 @@ const certifications: Certification[] = [
     color: "orange",
     gradient: "from-orange-500 to-orange-600",
     bgLight: "bg-orange-50",
-    borderColor: "border-orange-200",
     textColor: "text-orange-600",
     description: "Validez vos compétences en création et gestion d'entreprise. Cette certification atteste de votre maîtrise des fondamentaux entrepreneuriaux.",
     competences: ["Business Plan", "Gestion financière", "Marketing", "Management", "Juridique"],
-    prerequis: "Aucun prérequis",
     validite: "3 ans",
-    prochaineSessions: {
-      date: "15 Mars 2026",
-      placesRestantes: 17,
-      placesTotal: 30,
-      deadlineInscription: "10 Mars 2026",
-      mode: "Hybride",
-      lieu: "Abidjan - Plateau"
-    },
-    prix: {
-      public: 450000,
-      entreprise: 382500,
-      paiementFois3: true,
-      eligibleFDFP: true
-    }
   },
   {
     id: 2,
@@ -85,26 +143,10 @@ const certifications: Certification[] = [
     color: "indigo",
     gradient: "from-indigo-500 to-indigo-600",
     bgLight: "bg-indigo-50",
-    borderColor: "border-indigo-200",
     textColor: "text-indigo-600",
     description: "Devenez expert en réponse aux appels d'offres publics et privés. Certification reconnue par les institutions publiques.",
     competences: ["Analyse AO", "Rédaction technique", "Chiffrage", "Conformité", "Négociation"],
-    prerequis: "Expérience professionnelle recommandée",
     validite: "2 ans",
-    prochaineSessions: {
-      date: "22 Mars 2026",
-      placesRestantes: 23,
-      placesTotal: 30,
-      deadlineInscription: "18 Mars 2026",
-      mode: "Présentiel",
-      lieu: "Abidjan - Cocody"
-    },
-    prix: {
-      public: 380000,
-      entreprise: 323000,
-      paiementFois3: true,
-      eligibleFDFP: true
-    }
   },
   {
     id: 3,
@@ -116,26 +158,10 @@ const certifications: Certification[] = [
     color: "green",
     gradient: "from-green-500 to-green-600",
     bgLight: "bg-green-50",
-    borderColor: "border-green-200",
     textColor: "text-green-600",
     description: "Maîtrisez les stratégies de vente en ligne et de gestion de marketplace. Certification adaptée au marché africain.",
     competences: ["Boutique en ligne", "Marketing digital", "Logistique", "SEO", "Analytics"],
-    prerequis: "Connaissances de base en informatique",
     validite: "2 ans",
-    prochaineSessions: {
-      date: "5 Avril 2026",
-      placesRestantes: 12,
-      placesTotal: 25,
-      deadlineInscription: "1 Avril 2026",
-      mode: "100% en ligne",
-      lieu: "Formation à distance"
-    },
-    prix: {
-      public: 420000,
-      entreprise: 357000,
-      paiementFois3: true,
-      eligibleFDFP: false
-    }
   },
   {
     id: 4,
@@ -147,26 +173,10 @@ const certifications: Certification[] = [
     color: "purple",
     gradient: "from-purple-500 to-purple-600",
     bgLight: "bg-purple-50",
-    borderColor: "border-purple-200",
     textColor: "text-purple-600",
     description: "Expertise en montage de dossiers de financement et relations bancaires. Augmentez votre bancabilité.",
     competences: ["Business plan financier", "Analyse financière", "Négociation", "Levée de fonds", "Garanties"],
-    prerequis: "Formation en gestion recommandée",
     validite: "3 ans",
-    prochaineSessions: {
-      date: "12 Avril 2026",
-      placesRestantes: 8,
-      placesTotal: 20,
-      deadlineInscription: "8 Avril 2026",
-      mode: "Hybride",
-      lieu: "Abidjan - Plateau"
-    },
-    prix: {
-      public: 350000,
-      entreprise: 297500,
-      paiementFois3: true,
-      eligibleFDFP: true
-    }
   },
   {
     id: 5,
@@ -178,26 +188,10 @@ const certifications: Certification[] = [
     color: "cyan",
     gradient: "from-cyan-500 to-cyan-600",
     bgLight: "bg-cyan-50",
-    borderColor: "border-cyan-200",
     textColor: "text-cyan-600",
     description: "Maîtrisez les normes de qualité et préparez votre entreprise à la certification ISO. Parcours complet avec audit.",
     competences: ["Normes ISO", "HACCP", "Documentation", "Audit", "Amélioration continue"],
-    prerequis: "Responsable production ou qualité",
     validite: "3 ans",
-    prochaineSessions: {
-      date: "20 Avril 2026",
-      placesRestantes: 15,
-      placesTotal: 25,
-      deadlineInscription: "15 Avril 2026",
-      mode: "Présentiel",
-      lieu: "Abidjan - Zone industrielle"
-    },
-    prix: {
-      public: 480000,
-      entreprise: 408000,
-      paiementFois3: true,
-      eligibleFDFP: true
-    }
   },
   {
     id: 6,
@@ -209,27 +203,11 @@ const certifications: Certification[] = [
     color: "blue",
     gradient: "from-blue-500 to-blue-600",
     bgLight: "bg-blue-50",
-    borderColor: "border-blue-200",
     textColor: "text-blue-600",
     description: "Développez vos compétences en leadership et management d'équipe. Certification pour managers et futurs dirigeants.",
     competences: ["Leadership", "Gestion d'équipe", "Communication", "Motivation", "Performance"],
-    prerequis: "Expérience en management",
     validite: "2 ans",
-    prochaineSessions: {
-      date: "28 Avril 2026",
-      placesRestantes: 20,
-      placesTotal: 30,
-      deadlineInscription: "24 Avril 2026",
-      mode: "Hybride",
-      lieu: "Abidjan - Marcory"
-    },
-    prix: {
-      public: 320000,
-      entreprise: 272000,
-      paiementFois3: true,
-      eligibleFDFP: true
-    }
-  }
+  },
 ];
 
 const avantages = [
@@ -282,128 +260,72 @@ type ViewMode = "grid" | "list" | "compact";
 
 // Composant pour la grille de certifications
 function CertificationsGrid({ certifications, viewMode }: { certifications: Certification[]; viewMode: ViewMode }) {
-  
+
   if (viewMode === "list") {
     return (
-      <div className="space-y-4 md:space-y-6">
+      <div className="space-y-4">
         {certifications.map((cert, idx) => (
-          <Card
+          <div
             key={cert.id}
-            className="group transition-all duration-300 overflow-hidden"
-            style={{ animationDelay: `${idx * 100}ms` }}
+            className="group flex overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300"
+            style={{ animationDelay: `${idx * 0.06}s` }}
           >
-            <div className="flex flex-col md:flex-row">
-              {/* Left: Icon & Badge */}
-              <div className={`md:w-44 lg:w-48 flex-shrink-0 bg-gradient-to-br ${cert.gradient} p-6 flex flex-col items-center justify-center text-center`}>
-                <Award className="w-16 h-16 text-white mb-3" />
-                <Badge className="bg-white/20 text-white border-0 backdrop-blur-sm">
-                  {cert.category}
-                </Badge>
+            {/* Accent bar */}
+            <div className={`w-1.5 flex-shrink-0 bg-gradient-to-b ${cert.gradient}`} />
+            {/* Icon column */}
+            <div className={`w-20 flex-shrink-0 ${cert.bgLight} flex flex-col items-center justify-center py-5 gap-2`}>
+              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${cert.gradient} flex items-center justify-center shadow`}>
+                <Award className="w-5 h-5 text-white" />
               </div>
-
-              {/* Right: Content */}
-              <div className="flex-1 p-5 md:p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl md:text-2xl font-bold text-slate-900">{cert.title}</h3>
-                  <Badge className={`${cert.bgLight} ${cert.textColor} border-0 font-medium`}>
-                    {cert.niveau}
-                  </Badge>
+              <span className={`text-xs font-bold ${cert.textColor} text-center px-1 leading-tight`}>{cert.niveau}</span>
+            </div>
+            {/* Content */}
+            <div className="flex-1 p-4 md:p-5 flex flex-col md:flex-row gap-4 min-w-0">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-cpu-orange transition-colors">{cert.title}</h3>
+                  <Badge className={`${cert.bgLight} ${cert.textColor} border-0 whitespace-nowrap flex-shrink-0 text-xs`}>{cert.category}</Badge>
                 </div>
-
-                <p className="text-slate-600 mb-4">{cert.description}</p>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <span>{cert.duree}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <BookOpen className="w-4 h-4 text-gray-500" />
-                    <span>{cert.modules} modules</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Shield className="w-4 h-4 text-gray-500" />
-                    <span>Validité: {cert.validite}</span>
-                  </div>
+                <p className="text-sm text-slate-600 mb-3 line-clamp-2">{cert.description}</p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {cert.validite && (
+                    <span className="flex items-center gap-1 text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">
+                      <Shield className="w-3 h-3" /> {cert.validite}
+                    </span>
+                  )}
+                  {cert.duree && (
+                    <span className="flex items-center gap-1 text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">
+                      <Clock className="w-3 h-3" /> {cert.duree}
+                    </span>
+                  )}
+                  {cert.modules > 0 && (
+                    <span className="flex items-center gap-1 text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">
+                      <BookOpen className="w-3 h-3" /> {cert.modules} modules
+                    </span>
+                  )}
                 </div>
-
-                {/* Session Info */}
-                <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-lg md:rounded-xl p-3 md:p-4 mb-4">
-                  <p className="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-cpu-orange" />
-                    Prochaine session
-                  </p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="flex items-start gap-2">
-                      <Calendar className="w-4 h-4 text-cpu-orange flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-xs text-slate-500">Date</p>
-                        <p className="text-sm font-semibold">{cert.prochaineSessions.date}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Users className="w-4 h-4 text-cpu-orange flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-xs text-slate-500">Places</p>
-                        <p className="text-sm font-semibold">{cert.prochaineSessions.placesRestantes}/{cert.prochaineSessions.placesTotal}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-cpu-orange flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-xs text-slate-500">Mode</p>
-                        <p className="text-sm font-semibold">{cert.prochaineSessions.mode}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Banknote className="w-4 h-4 text-cpu-orange flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-xs text-slate-500">Prix</p>
-                        <p className="text-sm font-semibold">{cert.prix.public.toLocaleString('fr-FR')} FCFA</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    {cert.prix.paiementFois3 && (
-                      <Badge variant="outline" className="text-xs bg-green-50 border-green-200 text-green-700">
-                        <CreditCard className="w-3 h-3 mr-1" />
-                        Paiement 3× disponible
-                      </Badge>
-                    )}
-                    {cert.prix.eligibleFDFP && (
-                      <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
-                        Éligible FDFP
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                {/* Competences */}
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-gray-700 mb-2">Compétences validées:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {cert.competences.slice(0, 5).map((comp, i) => (
-                      <Badge key={i} variant="outline" className={`text-xs ${cert.bgLight} ${cert.textColor}`}>
-                        <CheckCircle2 className="w-3 h-3 mr-1" />
-                        {comp}
+                {cert.competences.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {cert.competences.slice(0, 4).map((comp, i) => (
+                      <Badge key={i} variant="outline" className={`text-xs ${cert.bgLight} ${cert.textColor} border-0`}>
+                        <CheckCircle2 className="w-3 h-3 mr-1" />{comp}
                       </Badge>
                     ))}
+                    {cert.competences.length > 4 && (
+                      <Badge variant="outline" className="text-xs text-slate-500">+{cert.competences.length - 4}</Badge>
+                    )}
                   </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button asChild className={`flex-1 bg-gradient-to-r ${cert.gradient} text-white`}>
-                    <Link href={`/catalogue?certification=${cert.id}`}>
-                      Voir la formation
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <FileText className="w-4 h-4" />
-                  </Button>
-                </div>
+                )}
+              </div>
+              <div className="flex items-center md:items-end">
+                <Button asChild className={`bg-gradient-to-r ${cert.gradient} text-white text-sm`}>
+                  <Link href={`/inscription?certification=${cert.id}`}>
+                    S&apos;inscrire <ArrowRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </Button>
               </div>
             </div>
-          </Card>
+          </div>
         ))}
       </div>
     );
@@ -411,51 +333,29 @@ function CertificationsGrid({ certifications, viewMode }: { certifications: Cert
 
   if (viewMode === "compact") {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         {certifications.map((cert) => (
-          <Card key={cert.id} className="group transition-all p-3 md:p-4">
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${cert.gradient} flex items-center justify-center flex-shrink-0`}>
-                <Award className="w-5 h-5 text-white" />
+          <div key={cert.id} className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md overflow-hidden transition-all flex flex-col">
+            <div className={`h-1.5 bg-gradient-to-r ${cert.gradient}`} />
+            <div className="p-3 flex-1 flex flex-col">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${cert.gradient} flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                  <Award className="w-4 h-4 text-white" />
+                </div>
+                <Badge className={`${cert.bgLight} ${cert.textColor} border-0 text-xs`}>{cert.category}</Badge>
               </div>
-              <Badge className={`${cert.bgLight} ${cert.textColor} border-0 text-xs`}>
-                {cert.category}
-              </Badge>
+              <h3 className="font-bold text-sm mb-1 line-clamp-2 text-slate-900 group-hover:text-cpu-orange transition-colors">{cert.title}</h3>
+              <p className={`text-xs font-semibold ${cert.textColor} mb-1`}>{cert.niveau}</p>
+              {cert.validite && (
+                <p className="text-xs text-slate-500 mb-3 flex items-center gap-1">
+                  <Shield className="w-3 h-3" /> {cert.validite}
+                </p>
+              )}
+              <Button asChild size="sm" className={`mt-auto w-full bg-gradient-to-r ${cert.gradient} text-white text-xs`}>
+                <Link href={`/inscription?certification=${cert.id}`}>S&apos;inscrire</Link>
+              </Button>
             </div>
-            <h3 className="font-bold text-sm mb-2 line-clamp-2">{cert.title}</h3>
-            <div className="flex items-center justify-between text-xs text-gray-600 mb-3">
-              <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {cert.duree}
-              </span>
-              <span className="flex items-center gap-1">
-                <BookOpen className="w-3 h-3" />
-                {cert.modules}
-              </span>
-            </div>
-            
-            {/* Session info compact */}
-            <div className="bg-slate-50 rounded-lg p-2 mb-3 space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs">
-                <Calendar className="w-3 h-3 text-cpu-orange flex-shrink-0" />
-                <span className="text-slate-700">{cert.prochaineSessions.date}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs">
-                <Users className="w-3 h-3 text-cpu-orange flex-shrink-0" />
-                <span className="text-slate-700">{cert.prochaineSessions.placesRestantes}/{cert.prochaineSessions.placesTotal} places</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-cpu-orange">
-                <Banknote className="w-3 h-3 flex-shrink-0" />
-                <span>{cert.prix.public.toLocaleString('fr-FR')} F</span>
-              </div>
-            </div>
-
-            <Button asChild size="sm" className={`w-full bg-gradient-to-r ${cert.gradient} text-white text-xs`}>
-              <Link href={`/catalogue?certification=${cert.id}`}>
-                Découvrir
-              </Link>
-            </Button>
-          </Card>
+          </div>
         ))}
       </div>
     );
@@ -463,139 +363,79 @@ function CertificationsGrid({ certifications, viewMode }: { certifications: Cert
 
   // Mode Grid (par défaut)
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {certifications.map((cert, idx) => (
         <div
           key={cert.id}
-          className="group bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-md transition-all duration-300 animate-slide-up overflow-hidden flex flex-col"
-          style={{ animationDelay: `${idx * 100}ms` }}
+          className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 animate-slide-up overflow-hidden flex flex-col"
+          style={{ animationDelay: `${Math.min(idx * 0.07, 0.5)}s` }}
         >
-          {/* Icon & Category Badge */}
-          <div className="p-5 md:p-6 pb-3 md:pb-4 flex-grow">
+          {/* Top accent bar */}
+          <div className={`h-1.5 bg-gradient-to-r ${cert.gradient}`} />
+
+          <div className="p-5 md:p-6 flex-1 flex flex-col">
+            {/* Header row: icon + category */}
             <div className="flex items-start justify-between mb-4">
-              <div className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${cert.gradient} shadow-lg`}>
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cert.gradient} flex items-center justify-center shadow-md`}>
                 <Award className="w-7 h-7 text-white" />
               </div>
-              <Badge className={`${cert.bgLight} ${cert.textColor} border-0 font-medium`}>
+              <Badge className={`${cert.bgLight} ${cert.textColor} border-0 font-semibold`}>
                 {cert.category}
               </Badge>
             </div>
 
-            <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:${cert.textColor} transition-colors">
+            {/* Title */}
+            <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-cpu-orange transition-colors leading-snug">
               {cert.title}
             </h3>
 
-            <div className="flex items-center gap-3 text-sm text-slate-600 mb-4">
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
-                {cert.duree}
+            {/* Meta pills */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${cert.bgLight} ${cert.textColor}`}>
+                {cert.niveau}
               </span>
-              <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-              <span className="flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4" />
-                {cert.modules} modules
-              </span>
+              {cert.validite && (
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                  <Shield className="w-3 h-3" /> {cert.validite}
+                </span>
+              )}
+              {cert.duree && (
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                  <Clock className="w-3 h-3" /> {cert.duree}
+                </span>
+              )}
             </div>
 
-            <p className="text-slate-600 text-sm leading-relaxed mb-4">
+            {/* Description */}
+            <p className="text-sm text-slate-600 leading-relaxed line-clamp-3 mb-4">
               {cert.description}
             </p>
 
-            {/* Info Pills */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className={`px-3 py-1.5 rounded-full ${cert.bgLight} ${cert.textColor} text-xs font-semibold`}>
-                {cert.niveau}
-              </div>
-              <div className="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
-                Validité: {cert.validite}
-              </div>
-            </div>
-
-            {/* Session Info Card */}
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-lg md:rounded-xl p-3 md:p-4 mb-4 border border-slate-200">
-              <p className="text-xs font-bold text-slate-700 mb-3 flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-cpu-orange" />
-                Prochaine session
-              </p>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-600">Date de démarrage</span>
-                  <span className="text-sm font-semibold text-slate-900">{cert.prochaineSessions.date}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-600">Places disponibles</span>
-                  <span className="text-sm font-semibold text-slate-900">
-                    {cert.prochaineSessions.placesRestantes}/{cert.prochaineSessions.placesTotal}
-                    <span className="text-xs text-slate-500 ml-1">
-                      ({Math.round((cert.prochaineSessions.placesRestantes / cert.prochaineSessions.placesTotal) * 100)}%)
-                    </span>
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-600">Mode</span>
-                  <span className="text-sm font-semibold text-slate-900">{cert.prochaineSessions.mode}</span>
-                </div>
-                <div className="pt-2 border-t border-slate-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-600">Prix public</span>
-                    <span className="text-lg font-bold text-cpu-orange">{cert.prix.public.toLocaleString('fr-FR')} F</span>
-                  </div>
-                  {cert.prix.entreprise < cert.prix.public && (
-                    <p className="text-xs text-green-600 mt-1">Prix entreprise: {cert.prix.entreprise.toLocaleString('fr-FR')} F (dès 5 pers.)</p>
-                  )}
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {cert.prix.paiementFois3 && (
-                  <Badge variant="outline" className="text-xs bg-green-50 border-green-200 text-green-700">
-                    <CreditCard className="w-3 h-3 mr-1" />
-                    3× sans frais
-                  </Badge>
-                )}
-                {cert.prix.eligibleFDFP && (
-                  <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
-                    FDFP
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Footer - Actions */}
-          <div className="p-5 md:p-6 pt-0 mt-auto border-t border-slate-100">
-            <div className="mb-4">
-              <p className="text-xs font-bold text-slate-900 mb-2">Compétences validées:</p>
-              <div className="flex flex-wrap gap-2">
+            {/* Competences */}
+            {cert.competences.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-4">
                 {cert.competences.slice(0, 3).map((comp, i) => (
-                  <Badge key={i} variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-700">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                    {comp}
+                  <Badge key={i} variant="outline" className={`text-xs ${cert.bgLight} ${cert.textColor} border-0`}>
+                    <CheckCircle2 className="w-3 h-3 mr-1" />{comp}
                   </Badge>
                 ))}
                 {cert.competences.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs text-slate-500">
                     +{cert.competences.length - 3}
                   </Badge>
                 )}
               </div>
-            </div>
+            )}
 
-            <div className="flex gap-3">
+            {/* CTA */}
+            <div className="mt-auto pt-4 border-t border-slate-100">
               <Button
                 asChild
-                className={`flex-1 cursor-pointer bg-gradient-to-r ${cert.gradient} hover:opacity-90 text-white`}
+                className={`w-full bg-gradient-to-r ${cert.gradient} hover:opacity-90 text-white font-semibold group/btn`}
               >
-                <Link href={`/catalogue?certification=${cert.id}`}>
-                  Voir la formation
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="cursor-pointer"
-              >
-                <Link href={`/certifications/${cert.id}`}>
-                  <FileText className="h-4 w-4" />
+                <Link href={`/inscription?certification=${cert.id}`}>
+                  S&apos;inscrire à cette certification
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                 </Link>
               </Button>
             </div>
@@ -611,9 +451,70 @@ export default function CertificationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterLevel, setFilterLevel] = useState("all");
+  const [certificationsData, setCertificationsData] = useState<Certification[]>(fallbackCertifications);
+  const [isCertificationsLoading, setIsCertificationsLoading] = useState(true);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verifyResult, setVerifyResult] = useState<VerifyResponse | null>(null);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function fetchTypesCertifications() {
+      setIsCertificationsLoading(true);
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.CERTIFICATIONS.TYPES);
+        const normalized = normalizeTypesCertifications(response);
+
+        if (!isCancelled && normalized.length > 0) {
+          setCertificationsData(normalized);
+        }
+      } catch {
+        if (!isCancelled) {
+          setCertificationsData(fallbackCertifications);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsCertificationsLoading(false);
+        }
+      }
+    }
+
+    fetchTypesCertifications();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  const categories = useMemo(
+    () => Array.from(new Set(certificationsData.map((cert) => cert.category))).sort(),
+    [certificationsData]
+  );
+  const levelOptions = useMemo(
+    () => Array.from(new Set(certificationsData.map((cert) => cert.niveau))).sort(),
+    [certificationsData]
+  );
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    certificationsData.forEach((cert) => {
+      counts[cert.category] = (counts[cert.category] || 0) + 1;
+    });
+    return counts;
+  }, [certificationsData]);
+
+  const levelCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    certificationsData.forEach((cert) => {
+      counts[cert.niveau] = (counts[cert.niveau] || 0) + 1;
+    });
+    return counts;
+  }, [certificationsData]);
 
   // Filtrage des certifications
-  const filteredCertifications = certifications.filter((cert) => {
+  const filteredCertifications = certificationsData.filter((cert) => {
     const matchSearch = searchTerm === "" ||
       cert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cert.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -625,6 +526,42 @@ export default function CertificationsPage() {
 
     return matchSearch && matchCategory && matchLevel;
   });
+
+  const handleVerifyCertificate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const code = verificationCode.trim();
+    if (!code) {
+      setVerifyResult(null);
+      setVerifyError("Veuillez entrer un code de certificat.");
+      return;
+    }
+
+    setIsVerifying(true);
+    setVerifyError(null);
+    setVerifyResult(null);
+
+    try {
+      const response = await apiClient.get(
+        API_ENDPOINTS.CERTIFICATIONS.VERIFY_BY_CODE(encodeURIComponent(code))
+      );
+      const normalized = normalizeVerifyResponse(response);
+
+      if (normalized.valid) {
+        setVerifyResult(normalized);
+      } else {
+        setVerifyError("Certificat invalide ou introuvable.");
+      }
+    } catch (error: any) {
+      const apiMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Impossible de vérifier ce certificat pour le moment.";
+      setVerifyError(String(apiMessage));
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   return (
     <>
@@ -794,117 +731,219 @@ export default function CertificationsPage() {
           {/* Layout avec Sidebar */}
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-7xl mx-auto">
             {/* Sidebar - Filtres */}
-            <aside className="w-full lg:w-64 flex-shrink-0">
-              <Card className="p-6 sticky top-24">
-                <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-cpu-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                  </svg>
-                  Filtres
-                </h3>
+            <aside className="w-full lg:w-72 flex-shrink-0">
+              <div className="sticky top-24">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden">
 
-                {/* Filtre Catégorie */}
-                <div className="mb-6">
-                  <label className="text-sm font-semibold text-slate-700 mb-3 block">Catégorie</label>
-                  <Select value={filterCategory} onValueChange={setFilterCategory}>
-                    <SelectTrigger className="w-full border-2 border-slate-200 focus:border-cpu-orange">
-                      <SelectValue placeholder="Catégorie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes les catégories</SelectItem>
-                      <SelectItem value="Entrepreneuriat">Entrepreneuriat</SelectItem>
-                      <SelectItem value="Appels d'offres">Appels d'offres</SelectItem>
-                      <SelectItem value="Digital">Digital</SelectItem>
-                      <SelectItem value="Finance">Finance</SelectItem>
-                      <SelectItem value="Production">Production</SelectItem>
-                      <SelectItem value="Leadership">Leadership</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Filtre Niveau */}
-                <div className="mb-6">
-                  <label className="text-sm font-semibold text-slate-700 mb-3 block">Niveau</label>
-                  <div className="space-y-2">
-                    {["all", "Fondamental", "Professionnel", "Expert"].map((level) => (
+                  {/* Header */}
+                  <div className="bg-slate-900 px-5 py-4 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-cpu-orange/20 flex items-center justify-center">
+                      <SlidersHorizontal className="w-4 h-4 text-cpu-orange" />
+                    </div>
+                    <span className="font-bold text-white text-sm tracking-wide">Filtres</span>
+                    {(filterCategory !== "all" || filterLevel !== "all") && (
                       <button
-                        key={level}
-                        onClick={() => setFilterLevel(level)}
-                        className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${
-                          filterLevel === level
-                            ? "bg-cpu-orange text-white shadow-md"
-                            : "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                        }`}
+                        onClick={() => { setFilterCategory("all"); setFilterLevel("all"); }}
+                        className="ml-auto flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
                       >
-                        {level === "all" ? "Tous les niveaux" : level}
+                        <RotateCcw className="w-3 h-3" />
+                        Réinitialiser
                       </button>
-                    ))}
+                    )}
                   </div>
-                </div>
 
-                {/* Bouton Réinitialiser */}
-                {(filterCategory !== "all" || filterLevel !== "all") && (
-                  <Button
-                    variant="outline"
-                    className="w-full border-2 border-slate-200 hover:bg-slate-50"
-                    onClick={() => {
-                      setFilterCategory("all");
-                      setFilterLevel("all");
-                    }}
-                  >
-                    Réinitialiser les filtres
-                  </Button>
-                )}
-              </Card>
-            </aside>
+                  <div className="p-5 space-y-5">
 
-            {/* Contenu Principal */}
-            <div className="flex-1">
-              {/* Search and View Toggle */}
-              <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
-                <div className="flex-1 max-w-md">
-                  <SearchBar 
-                    value={searchTerm}
-                    onChange={setSearchTerm}
-                    placeholder="Rechercher une certification..."
-                    size="md"
-                  />
-                </div>
-                <div className="flex items-center gap-4">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold text-gray-900">{filteredCertifications.length}</span> {filteredCertifications.length > 1 ? 'certifications' : 'certification'}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={viewMode === "grid" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setViewMode("grid")}
-                      className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
-                    >
-                      <Grid3x3 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === "list" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setViewMode("list")}
-                      className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
-                    >
-                      <List className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === "compact" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setViewMode("compact")}
-                      className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                    </Button>
+                    {/* Search */}
+                    <div>
+                      <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
+                        <Search className="w-3.5 h-3.5" />
+                        Recherche
+                      </label>
+                      <SearchBar
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        placeholder="Nom, compétence…"
+                        size="md"
+                      />
+                    </div>
+
+                    <div className="h-px bg-slate-100" />
+
+                    {/* Filtre Catégorie */}
+                    <div>
+                      <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
+                        <Tag className="w-3.5 h-3.5" />
+                        Catégorie
+                      </label>
+                      <div className="space-y-1">
+                        {["all", ...categories].map((category) => {
+                          const count = category === "all"
+                            ? certificationsData.length
+                            : (categoryCounts[category] || 0);
+                          return (
+                            <button
+                              key={category}
+                              onClick={() => setFilterCategory(category)}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                                filterCategory === category
+                                  ? "bg-cpu-orange text-white shadow-md shadow-orange-200"
+                                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                              }`}
+                            >
+                              <span>{category === "all" ? "Toutes les catégories" : category}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+                                filterCategory === category
+                                  ? "bg-white/25 text-white"
+                                  : "bg-slate-100 text-slate-500"
+                              }`}>
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-slate-100" />
+
+                    {/* Filtre Niveau */}
+                    <div>
+                      <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
+                        <BarChart3 className="w-3.5 h-3.5" />
+                        Niveau
+                      </label>
+                      <div className="space-y-1">
+                        {["all", ...levelOptions].map((level) => {
+                          const count = level === "all"
+                            ? certificationsData.length
+                            : (levelCounts[level] || 0);
+                          return (
+                            <button
+                              key={level}
+                              onClick={() => setFilterLevel(level)}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                                filterLevel === level
+                                  ? "bg-cpu-orange text-white shadow-md shadow-orange-200"
+                                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                              }`}
+                            >
+                              <span>{level === "all" ? "Tous les niveaux" : level}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+                                filterLevel === level
+                                  ? "bg-white/25 text-white"
+                                  : "bg-slate-100 text-slate-500"
+                              }`}>
+                                {count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-slate-100" />
+
+                    {/* Stats */}
+                    <div className="rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 px-4 py-4 text-center">
+                      <p className="text-3xl font-extrabold text-white leading-none">
+                        {isCertificationsLoading ? "…" : filteredCertifications.length}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        certification{filteredCertifications.length > 1 ? "s" : ""} trouvée{filteredCertifications.length > 1 ? "s" : ""}
+                      </p>
+                      {!isCertificationsLoading && filteredCertifications.length !== certificationsData.length && (
+                        <p className="text-xs text-cpu-orange mt-1">sur {certificationsData.length} au total</p>
+                      )}
+                    </div>
+
                   </div>
                 </div>
               </div>
+            </aside>
 
-              {/* Grid des certifications */}
-              <CertificationsGrid certifications={filteredCertifications} viewMode={viewMode} />
+            {/* Contenu Principal */}
+            <div className="flex-1 min-w-0">
+              {/* Count + View Toggle */}
+              <div className="flex items-center justify-between gap-4 mb-6">
+                <p className="text-sm text-slate-600">
+                  {isCertificationsLoading ? (
+                    <span className="inline-block w-24 h-4 bg-slate-200 rounded animate-pulse" />
+                  ) : (
+                    <>
+                      <span className="font-bold text-slate-900">{filteredCertifications.length}</span>{" "}
+                      certification{filteredCertifications.length > 1 ? "s" : ""}
+                    </>
+                  )}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}
+                  >
+                    <Grid3x3 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "compact" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("compact")}
+                    className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Skeleton de chargement */}
+              {isCertificationsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <div
+                      key={`skeleton-cert-${idx}`}
+                      className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col animate-pulse"
+                    >
+                      <div className="h-1.5 bg-slate-200" />
+                      <div className="p-5 md:p-6 flex-1 flex flex-col">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="w-14 h-14 rounded-2xl bg-slate-200" />
+                          <div className="w-20 h-6 rounded-full bg-slate-100" />
+                        </div>
+                        <div className="h-5 w-4/5 bg-slate-200 rounded-lg mb-3" />
+                        <div className="flex gap-2 mb-4">
+                          <div className="h-6 w-20 rounded-full bg-slate-100" />
+                          <div className="h-6 w-16 rounded-full bg-slate-100" />
+                          <div className="h-6 w-14 rounded-full bg-slate-100" />
+                        </div>
+                        <div className="space-y-2 mb-4">
+                          <div className="h-3.5 bg-slate-100 rounded-lg" />
+                          <div className="h-3.5 w-5/6 bg-slate-100 rounded-lg" />
+                          <div className="h-3.5 w-4/6 bg-slate-100 rounded-lg" />
+                        </div>
+                        <div className="flex gap-1.5 mb-4">
+                          <div className="h-6 w-20 rounded-full bg-slate-100" />
+                          <div className="h-6 w-24 rounded-full bg-slate-100" />
+                          <div className="h-6 w-8 rounded-full bg-slate-100" />
+                        </div>
+                        <div className="mt-auto pt-4 border-t border-slate-100">
+                          <div className="h-10 bg-slate-200 rounded-xl" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <CertificationsGrid certifications={filteredCertifications} viewMode={viewMode} />
+              )}
             </div>
           </div>
         </section>
@@ -1063,19 +1102,58 @@ export default function CertificationsPage() {
                 </p>
               </div>
 
-              <div className="flex flex-col md:flex-row gap-3 md:gap-4 mb-3 md:mb-4">
+              <form onSubmit={handleVerifyCertificate} className="flex flex-col md:flex-row gap-3 md:gap-4 mb-3 md:mb-4">
                 <input
                   type="text"
-                  placeholder="Ex: CPU-CERT-2024-XXXXX"
+                  value={verificationCode}
+                  onChange={(event) => setVerificationCode(event.target.value)}
+                  placeholder="Ex: CERT-NESTJS-PRO"
                   className="flex-1 px-4 md:px-6 py-3 md:py-4 rounded-lg md:rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:outline-none text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
                 />
                 <Button
-                  className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl shadow-lg transition-all text-sm md:text-base"
+                  type="submit"
+                  disabled={isVerifying}
+                  className="cursor-pointer bg-gradient-to-r from-orange-500 to-orange-600 hover:opacity-90 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl shadow-lg transition-all text-sm md:text-base disabled:opacity-70"
                 >
                   <Search className="mr-2 h-5 w-5" />
-                  Vérifier
+                  {isVerifying ? "Vérification..." : "Vérifier"}
                 </Button>
-              </div>
+              </form>
+
+              {verifyError && (
+                <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                  {verifyError}
+                </div>
+              )}
+
+              {verifyResult?.valid && verifyResult.certification && (
+                <div className="mb-4 rounded-xl border border-green-200 bg-green-50 p-4 md:p-5">
+                  <div className="flex items-center gap-2 text-green-700 font-semibold mb-3">
+                    <CheckCircle2 className="w-5 h-5" />
+                    Certificat valide
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <p className="text-slate-700">
+                      <span className="font-semibold">Code :</span> {verifyResult.certification.code || "-"}
+                    </p>
+                    <p className="text-slate-700">
+                      <span className="font-semibold">Type :</span> {verifyResult.certification.typeCertification?.nom || "-"}
+                    </p>
+                    <p className="text-slate-700">
+                      <span className="font-semibold">Niveau :</span> {verifyResult.certification.typeCertification?.niveau || "-"}
+                    </p>
+                    <p className="text-slate-700">
+                      <span className="font-semibold">Formation :</span> {verifyResult.certification.formation?.title || "-"}
+                    </p>
+                    <p className="text-slate-700">
+                      <span className="font-semibold">Date de délivrance :</span> {formatApiDate(verifyResult.certification.dateDelivrance)}
+                    </p>
+                    <p className="text-slate-700">
+                      <span className="font-semibold">Date d'expiration :</span> {formatApiDate(verifyResult.certification.dateExpiration)}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <p className="text-sm text-slate-500 text-center">
                 Le numéro de certificat se trouve en bas à droite du document

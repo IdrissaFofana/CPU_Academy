@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import type { Metadata } from "next";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { resolveBlogMediaUrl, useBlog, useBlogMediaMap } from "@/hooks/useBlog";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { PageBanner } from "@/components/layout/PageBanner";
 import {
   Calendar,
   Clock,
@@ -14,122 +13,65 @@ import {
   Search,
   TrendingUp,
   BookOpen,
-  Lightbulb,
-  Award,
   ArrowRight,
   Tag,
   Eye,
   MessageCircle,
-  ChevronRight,
-  Filter,
-  Sparkles,
+  Mail,
+  X,
+  PenLine,
+  Layers,
 } from "lucide-react";
 import Link from "next/link";
 
 export default function BlogPage() {
+  const { posts: apiPosts, loading, error } = useBlog();
+  const mediaById = useBlogMediaMap();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const categories = [
-    { id: "all", label: "Tous", count: 24 },
-    { id: "entrepreneuriat", label: "Entrepreneuriat", count: 8 },
-    { id: "formation", label: "Formation", count: 6 },
-    { id: "success-stories", label: "Success Stories", count: 5 },
-    { id: "tech", label: "Tech & Innovation", count: 5 },
-  ];
+  // Transform API posts to match UI structure
+  const articles = useMemo(() => apiPosts.map((post) => ({
+    id: post.id,
+    titre: post.title,
+    slug: post.slug,
+    extrait: post.excerpt || post.content.substring(0, 150) + "...",
+    categorie: post.categories[0]?.slug || "general",
+    auteur: post.author?.name || "Inconnu",
+    auteurBio: post.author?.bio || "",
+    datePublication: post.publishedAt ? new Date(post.publishedAt).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }) : new Date(post.createdAt).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }),
+    tempsLecture: post.readingTime || Math.ceil(post.content.split(/\s+/).length / 200),
+    imageUrl: resolveBlogMediaUrl(post.featuredImage, mediaById),
+    vues: 0,
+    commentaires: 0,
+    featured: post.isFeatured || false,
+  })), [apiPosts, mediaById]);
 
-  const articles = [
-    {
-      id: 1,
-      titre: "10 compétences clés pour réussir en 2026",
-      slug: "10-competences-cles-2026",
-      extrait:
-        "Découvrez les compétences les plus recherchées par les employeurs en 2026 et comment les développer avec CPU Formation.",
-      image: "/blog/competences-2026.jpg",
-      categorie: "formation",
-      auteur: "Dr. Kouamé Yao",
-      datePublication: "05 Feb 2026",
-      tempsLecture: 8,
-      vues: 1250,
-      commentaires: 34,
-      featured: true,
-    },
-    {
-      id: 2,
-      titre: "Comment Amani a transformé son entreprise grâce à la formation",
-      slug: "success-story-amani",
-      extrait:
-        "L'histoire inspirante d'Amani qui a suivi nos formations en gestion et a triplé son chiffre d'affaires en 12 mois.",
-      image: "/blog/success-amani.jpg",
-      categorie: "success-stories",
-      auteur: "Mme Adjoua Koffi",
-      datePublication: "02 Feb 2026",
-      tempsLecture: 6,
-      vues: 2180,
-      commentaires: 56,
-      featured: true,
-    },
-    {
-      id: 3,
-      titre: "L'IA dans l'éducation: opportunités pour l'Afrique",
-      slug: "ia-education-afrique",
-      extrait:
-        "L'intelligence artificielle révolutionne l'apprentissage. Découvrez comment CPU Formation intègre ces technologies.",
-      image: "/blog/ia-education.jpg",
-      categorie: "tech",
-      auteur: "M. Diabaté Ibrahim",
-      datePublication: "30 Jan 2026",
-      tempsLecture: 10,
-      vues: 980,
-      commentaires: 28,
-      featured: true,
-    },
-    {
-      id: 4,
-      titre: "Financer sa formation: guide complet des aides disponibles",
-      slug: "financer-formation",
-      extrait:
-        "Un guide pratique pour trouver des financements pour votre formation professionnelle en Côte d'Ivoire.",
-      image: "/blog/financement.jpg",
-      categorie: "formation",
-      auteur: "M. Konan Parfait",
-      datePublication: "28 Jan 2026",
-      tempsLecture: 7,
-      vues: 1540,
-      commentaires: 42,
-      featured: false,
-    },
-    {
-      id: 5,
-      titre: "5 erreurs à éviter quand on lance son entreprise",
-      slug: "erreurs-lancement-entreprise",
-      extrait:
-        "Les pièges les plus courants rencontrés par les entrepreneurs débutants et comment les éviter.",
-      image: "/blog/erreurs-entrepreneur.jpg",
-      categorie: "entrepreneuriat",
-      auteur: "Dr. Kouamé Yao",
-      datePublication: "25 Jan 2026",
-      tempsLecture: 5,
-      vues: 3200,
-      commentaires: 78,
-      featured: false,
-    },
-    {
-      id: 6,
-      titre: "La révolution du e-learning en Côte d'Ivoire",
-      slug: "revolution-elearning-ci",
-      extrait:
-        "Comment la formation en ligne transforme le paysage éducatif ivoirien et ouvre de nouvelles opportunités.",
-      image: "/blog/elearning-ci.jpg",
-      categorie: "tech",
-      auteur: "Mme Adjoua Koffi",
-      datePublication: "22 Jan 2026",
-      tempsLecture: 9,
-      vues: 1680,
-      commentaires: 45,
-      featured: false,
-    },
-  ];
+  // Build categories dynamically from posts
+  const dynamicCategories = useMemo(() => {
+    const catMap = new Map<string, number>();
+    articles.forEach((a) => {
+      const count = (catMap.get(a.categorie) || 0) + 1;
+      catMap.set(a.categorie, count);
+    });
+    const cats = [
+      { id: "all", label: "Tous les articles", count: articles.length },
+      ...Array.from(catMap).map(([slug, count]) => ({
+        id: slug,
+        label: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " "),
+        count,
+      })),
+    ];
+    return cats;
+  }, [articles]);
 
   // Séparer l'article hero (premier featured) des autres
   const heroArticle = articles.find((a) => a.featured);
@@ -148,452 +90,465 @@ export default function BlogPage() {
 
   // Tags populaires
   const popularTags = useMemo(() => [
-    "Formation professionnelle",
+    "Gestion d'entreprise",
     "Entrepreneuriat",
     "Digital",
     "Leadership",
-    "Innovation",
+    "Financement",
     "Success Stories",
+    "E-learning",
+    "RH & Management",
   ], []);
 
   // Articles populaires (par nombre de vues)
   const popularArticles = useMemo(() => 
     [...articles].sort((a, b) => b.vues - a.vues).slice(0, 3),
-    []
+    [articles]
   );
 
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <PageBanner
-        breadcrumb={[
-          { label: "Accueil", href: "/" },
-          { label: "Blog & Actualités" }
-        ]}
-        slides={[
-          {
-            image: "/images/default-formation.jpg",
-            title: "Blog & Actualités",
-            subtitle: "Conseils d'experts, actualités et success stories pour booster votre carrière",
-            buttons: [
-              { label: "Découvrir", href: "#contenu", icon: <BookOpen className="h-5 w-5" /> }
-            ]
-          }
-        ]}
-      />
+  // Scroll reveal refs
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const newsletterRef = useRef<HTMLElement>(null);
+  const [cardsVisible, setCardsVisible] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [newsletterVisible, setNewsletterVisible] = useState(false);
 
-      <div id="contenu" className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Article - Article principal en vedette */}
-        {heroArticle && !searchTerm && selectedCategory === "all" && (
-          <div className="mb-16 animate-fade-in-up">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="bg-cpu-orange p-3 rounded-xl shadow-lg">
-                <Sparkles className="w-7 h-7 text-white" />
+  useEffect(() => {
+    const obs: IntersectionObserver[] = [];
+    const watch = (el: HTMLElement | null, setter: (v: boolean) => void) => {
+      if (!el) return;
+      const o = new IntersectionObserver(
+        ([e]) => { if (e.isIntersecting) { setter(true); o.disconnect(); } },
+        { threshold: 0.08 }
+      );
+      o.observe(el);
+      obs.push(o);
+    };
+    watch(cardsRef.current, setCardsVisible);
+    watch(sidebarRef.current, setSidebarVisible);
+    watch(newsletterRef.current, setNewsletterVisible);
+    return () => obs.forEach((o) => o.disconnect());
+  }, []);
+
+  // Re-trigger card animation on filter change
+  useEffect(() => {
+    setCardsVisible(false);
+    const t = setTimeout(() => {
+      if (cardsRef.current) {
+        const rect = cardsRef.current.getBoundingClientRect();
+        if (rect.top < window.innerHeight) setCardsVisible(true);
+      }
+    }, 50);
+    return () => clearTimeout(t);
+  }, [searchTerm, selectedCategory]);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+
+      {/* ── Hero header ─────────────────────────────────────────────────────── */}
+      <div className="bg-white border-b border-gray-200 animate-fade-in">
+        <div className="container mx-auto px-4 lg:px-8 py-12">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+            <div className="max-w-xl animate-fade-in-up">
+              <div className="flex items-center gap-2 mb-4">
+                <PenLine className="w-4 h-4 text-[#F17425]" />
+                <span className="text-xs font-bold uppercase tracking-widest text-[#F17425]">
+                  Blog CPU Formation
+                </span>
               </div>
-              <h2 className="text-4xl font-bold text-slate-900">
+              <h1 className="text-4xl lg:text-5xl font-bold text-[#212121] leading-tight mb-4">
+                Des articles écrits par des experts terrain
+              </h1>
+              <p className="text-base text-gray-500 leading-relaxed">
+                Guides pratiques, témoignages, analyses et conseils rédigés par nos formateurs et nos apprenants pour vous aider à progresser.
+              </p>
+            </div>
+
+            {/* Statistiques blog */}
+            <div className="flex items-center gap-6 lg:gap-8 shrink-0">
+              <div className="text-center animate-fade-in-up animation-delay-200">
+                <div className="text-2xl font-black text-[#212121]">{articles.length}</div>
+                <div className="text-xs text-gray-400 mt-0.5 font-medium">Articles</div>
+              </div>
+              <div className="w-px h-10 bg-gray-200 animate-fade-in animation-delay-300" />
+              <div className="text-center animate-fade-in-up animation-delay-300">
+                <div className="text-2xl font-black text-[#212121]">
+                  {new Set(articles.map((a) => a.auteur)).size}
+                </div>
+                <div className="text-xs text-gray-400 mt-0.5 font-medium">Auteurs</div>
+              </div>
+              <div className="w-px h-10 bg-gray-200 animate-fade-in animation-delay-400" />
+              <div className="text-center animate-fade-in-up animation-delay-400">
+                <div className="text-2xl font-black text-[#212121]">
+                  {dynamicCategories.length - 1}
+                </div>
+                <div className="text-xs text-gray-400 mt-0.5 font-medium">Thématiques</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 lg:px-8 py-10">
+
+        {/* ── Article à la une ──────────────────────────────────────────────── */}
+        {heroArticle && !searchTerm && selectedCategory === "all" && (
+          <section className="mb-14 animate-fade-in-up animation-delay-200">
+            <div className="flex items-center gap-3 mb-5">
+              <span className="w-5 h-0.5 bg-[#F17425] rounded-full" />
+              <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400">
                 Article à la une
               </h2>
             </div>
-
-            <Card className="overflow-hidden border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 group">
-              <div className="grid lg:grid-cols-2 gap-0">
-                {/* Image */}
-                <div className="relative h-[400px] lg:h-full bg-orange-100 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <BookOpen className="w-32 h-32 text-cpu-orange/30" />
-                  </div>
-                  <div className="absolute inset-0 bg-black/30" />
-                  
-                  {/* Badge catégorie */}
-                  <Badge className="absolute top-6 left-6 bg-cpu-orange text-white border-0 text-sm px-4 py-2 shadow-lg">
-                    <Tag className="w-4 h-4 mr-2" />
-                    {categories.find((c) => c.id === heroArticle.categorie)?.label}
-                  </Badge>
-
-                  {/* Stats */}
-                  <div className="absolute bottom-6 left-6 flex items-center gap-4 text-white">
-                    <span className="flex items-center gap-1 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">
-                      <Eye className="w-4 h-4" />
-                      {heroArticle.vues.toLocaleString()}
+            <Link href={`/blog/${heroArticle.slug}`} className="group block">
+              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-[#F17425] hover:shadow-xl transition-all duration-300">
+                <div className="grid lg:grid-cols-2">
+                  {/* Illustration zone */}
+                  <div className="relative h-64 lg:h-auto bg-[#F17425]/5 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-100 min-h-[280px]">
+                    {heroArticle.imageUrl ? (
+                      <img
+                        src={heroArticle.imageUrl}
+                        alt={heroArticle.titre}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <BookOpen className="w-20 h-20 text-[#F17425]/20" />
+                    )}
+                    <span className="absolute top-5 left-5 bg-[#F17425] text-white text-[11px] font-bold px-3 py-1 rounded-full tracking-wide">
+                      {dynamicCategories.find((c) => c.id === heroArticle.categorie)?.label || heroArticle.categorie}
                     </span>
-                    <span className="flex items-center gap-1 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">
-                      <MessageCircle className="w-4 h-4" />
-                      {heroArticle.commentaires}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Contenu */}
-                <div className="p-8 lg:p-12 flex flex-col justify-center bg-white">
-                  <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
-                    <span className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      {heroArticle.auteur}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      {heroArticle.datePublication}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      {heroArticle.tempsLecture} min
-                    </span>
+                    <div className="absolute bottom-5 left-5 flex items-center gap-2">
+                      <span className="flex items-center gap-1 bg-white border border-gray-200 text-gray-500 text-xs px-2.5 py-1 rounded-full">
+                        <Eye className="w-3 h-3" />
+                        {heroArticle.vues.toLocaleString()}
+                      </span>
+                      <span className="flex items-center gap-1 bg-white border border-gray-200 text-gray-500 text-xs px-2.5 py-1 rounded-full">
+                        <MessageCircle className="w-3 h-3" />
+                        {heroArticle.commentaires} commentaires
+                      </span>
+                    </div>
                   </div>
 
-                  <h3 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 group-hover:text-cpu-orange transition-colors leading-tight">
-                    {heroArticle.titre}
-                  </h3>
-                  
-                  <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                    {heroArticle.extrait}
-                  </p>
+                  {/* Content */}
+                  <div className="p-8 lg:p-12 flex flex-col justify-center">
+                    {/* Author line */}
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-8 h-8 rounded-full bg-[#F17425]/10 flex items-center justify-center shrink-0">
+                        <User className="w-4 h-4 text-[#F17425]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[#212121]">{heroArticle.auteur}</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                          <Calendar className="w-3 h-3" />
+                          {heroArticle.datePublication}
+                          <span className="text-gray-300">·</span>
+                          <Clock className="w-3 h-3" />
+                          {heroArticle.tempsLecture} min de lecture
+                        </div>
+                      </div>
+                    </div>
 
-                  <Button 
-                    size="lg" 
-                    className="bg-cpu-orange hover:bg-orange-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 group w-full sm:w-auto"
-                    asChild
-                  >
-                    <Link href={`/blog/${heroArticle.slug}`}>
+                    <h3 className="text-2xl lg:text-3xl font-bold text-[#212121] mb-4 leading-snug group-hover:text-[#F17425] transition-colors duration-200">
+                      {heroArticle.titre}
+                    </h3>
+
+                    <p className="text-gray-500 leading-relaxed mb-8 text-sm">
+                      {heroArticle.extrait}
+                    </p>
+
+                    <div className="flex items-center gap-2 text-[#F17425] font-semibold text-sm">
                       Lire l'article complet
-                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </Card>
-          </div>
+            </Link>
+          </section>
         )}
 
-        {/* Recherche et filtres */}
-        <div className="mb-12 animate-fade-in-up animation-delay-100">
-          <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-slate-100">
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* Recherche */}
-              <div className="flex-1">
-                <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Rechercher un article
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <Input
-                    type="text"
-                    placeholder="Tapez un mot-clé..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 py-6 text-base border-2 border-slate-200 focus:border-cpu-orange rounded-xl"
-                    suppressHydrationWarning
-                  />
-                </div>
-              </div>
-
-              {/* Filtres catégories */}
-              <div className="lg:w-1/3">
-                <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Catégorie
-                </label>
-                <div className="relative">
-                  <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 z-10" />
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full pl-12 pr-4 py-6 text-base border-2 border-slate-200 focus:border-cpu-orange rounded-xl bg-white appearance-none cursor-pointer hover:border-slate-300 transition-colors"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.label} ({cat.count})
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 rotate-90 pointer-events-none" />
-                </div>
-              </div>
+        {/* ── Recherche + filtres catégories ───────────────────────────────── */}
+        <section className="mb-10 animate-fade-in animation-delay-300">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            {/* Recherche */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Rechercher un article..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2.5 border-gray-200 focus:border-[#F17425] rounded-xl text-sm"
+                suppressHydrationWarning
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
 
-            {/* Tags actifs */}
-            {(searchTerm || selectedCategory !== "all") && (
-              <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-slate-100">
-                <span className="text-sm text-slate-600 font-medium">Filtres actifs:</span>
-                {searchTerm && (
-                  <Badge variant="secondary" className="flex items-center gap-2 px-3 py-1">
-                    <Search className="w-3 h-3" />
-                    {searchTerm}
-                    <button 
-                      onClick={() => setSearchTerm("")}
-                      className="hover:text-red-600 transition-colors ml-1"
-                    >
-                      ×
-                    </button>
-                  </Badge>
-                )}
-                {selectedCategory !== "all" && (
-                  <Badge variant="secondary" className="flex items-center gap-2 px-3 py-1">
-                    <Tag className="w-3 h-3" />
-                    {categories.find(c => c.id === selectedCategory)?.label}
-                    <button 
-                      onClick={() => setSelectedCategory("all")}
-                      className="hover:text-red-600 transition-colors ml-1"
-                    >
-                      ×
-                    </button>
-                  </Badge>
-                )}
-              </div>
-            )}
+            {/* Catégories en pills */}
+            <div className="flex flex-wrap gap-2">
+              {dynamicCategories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 ${
+                    selectedCategory === cat.id
+                      ? "bg-[#F17425] text-white border-[#F17425]"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-[#F17425] hover:text-[#F17425]"
+                  }`}
+                >
+                  {cat.label}
+                  <span className={`ml-1.5 ${selectedCategory === cat.id ? "opacity-75" : "text-gray-400"}`}>
+                    {cat.count}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Contenu principal avec sidebar */}
-        <div className="grid lg:grid-cols-[1fr_350px] gap-12">
+        {/* ── Grille principale + sidebar ──────────────────────────────────── */}
+        <div className="grid lg:grid-cols-[1fr_300px] gap-10">
+
           {/* Articles */}
-          <div className="animate-fade-in-up animation-delay-200">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold text-slate-900">
-                {searchTerm ? "Résultats de recherche" : "Derniers articles"}
-              </h2>
-              <span className="text-slate-500 font-medium">
-                {filteredArticles.length} article{filteredArticles.length > 1 ? "s" : ""}
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <span className="w-5 h-0.5 bg-[#F17425] rounded-full" />
+                <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                  {searchTerm || selectedCategory !== "all"
+                    ? "Résultats"
+                    : "Tous les articles"}
+                </h2>
+              </div>
+              <span className="text-xs text-gray-400 font-medium">
+                {filteredArticles.length} article{filteredArticles.length !== 1 ? "s" : ""}
               </span>
             </div>
 
             {filteredArticles.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-8">
+              <div ref={cardsRef} className="grid sm:grid-cols-2 gap-6">
                 {filteredArticles.map((article, index) => (
-                  <Card
-                    key={article.id}
-                    className="group overflow-hidden border-2 border-slate-100 hover:border-cpu-orange hover:shadow-xl transition-all duration-500 animate-fade-in-up"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    {/* Image */}
-                    <Link href={`/blog/${article.slug}`} className="block relative h-56 bg-slate-100 overflow-hidden">
-                      <div className="absolute inset-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <BookOpen className="w-20 h-20 text-slate-300" />
-                      </div>
-                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      
-                      <Badge className="absolute top-4 left-4 bg-white/95 text-slate-700 border-0 backdrop-blur-sm shadow-md">
-                        {categories.find((c) => c.id === article.categorie)?.label}
-                      </Badge>
-                    </Link>
-
-                    {/* Contenu */}
-                    <div className="p-6">
-                      <Link href={`/blog/${article.slug}`}>
-                        <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-cpu-orange transition-colors leading-snug">
-                          {article.titre}
-                        </h3>
-                      </Link>
-                      
-                      <p className="text-slate-600 mb-4 line-clamp-2 text-sm leading-relaxed">
-                        {article.extrait}
-                      </p>
-
-                      {/* Meta info */}
-                      <div className="flex items-center gap-3 text-xs text-slate-500 mb-4 pb-4 border-b border-slate-100">
-                        <span className="flex items-center gap-1">
-                          <User className="w-3 h-3" />
-                          {article.auteur.split(' ').slice(-2).join(' ')}
-                        </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {article.datePublication}
-                        </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {article.tempsLecture} min
-                        </span>
-                      </div>
-
-                      {/* Footer avec stats */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-xs text-slate-500">
-                          <span className="flex items-center gap-1">
-                            <Eye className="w-4 h-4" />
-                            {article.vues.toLocaleString()}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MessageCircle className="w-4 h-4" />
-                            {article.commentaires}
-                          </span>
-                        </div>
-
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="text-cpu-orange hover:bg-cpu-orange hover:text-white"
-                          asChild
-                        >
-                          <Link href={`/blog/${article.slug}`}>
-                            Lire
-                            <ArrowRight className="w-4 h-4 ml-1" />
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card className="p-16 text-center border-2 border-slate-100 animate-fade-in">
-                <Search className="w-20 h-20 text-slate-300 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">Aucun article trouvé</h3>
-                <p className="text-slate-600 mb-8 max-w-md mx-auto">
-                  Nous n'avons pas trouvé d'articles correspondant à vos critères. Essayez avec d'autres mots-clés ou explorez toutes les catégories.
-                </p>
-                <Button
-                  onClick={() => {
-                    setSearchTerm("");
-                    setSelectedCategory("all");
-                  }}
-                  className="bg-cpu-orange hover:bg-orange-600 text-white"
-                >
-                  Réinitialiser les filtres
-                </Button>
-              </Card>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <aside className="space-y-8 animate-fade-in-up animation-delay-300">
-            {/* Catégories */}
-            <Card className="p-6 border-2 border-slate-100 shadow-lg sticky top-24">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-blue-500 p-2 rounded-lg">
-                  <Tag className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900">Catégories</h3>
-              </div>
-              
-              <div className="space-y-2">
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
-                      selectedCategory === cat.id
-                        ? "bg-cpu-orange text-white shadow-md"
-                        : "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                    }`}
-                  >
-                    <span className="font-medium">{cat.label}</span>
-                    <Badge 
-                      className={`${
-                        selectedCategory === cat.id 
-                          ? "bg-white/20 text-white" 
-                          : "bg-slate-200 text-slate-700"
-                      } border-0`}
-                    >
-                      {cat.count}
-                    </Badge>
-                  </button>
-                ))}
-              </div>
-            </Card>
-
-            {/* Articles populaires */}
-            <Card className="p-6 border-2 border-slate-100 shadow-lg">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-purple-500 p-2 rounded-lg">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900">Populaires</h3>
-              </div>
-              
-              <div className="space-y-4">
-                {popularArticles.map((article, index) => (
-                  <Link 
+                  <Link
                     key={article.id}
                     href={`/blog/${article.slug}`}
-                    className="group block"
+                    className={`group block transition-all duration-300 ${cardsVisible ? 'animate-fade-in-up' : 'opacity-0'}`}
+                    style={cardsVisible ? { animationDelay: `${index * 80}ms`, animationFillMode: 'both' } : undefined}
                   >
-                    <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-20 h-20 bg-orange-100 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                        <span className="text-2xl font-bold text-cpu-orange">{index + 1}</span>
+                    <article className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-[#F17425] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
+                      {/* Illustration */}
+                      <div className="h-40 bg-gray-50 flex items-center justify-center border-b border-gray-100">
+                        {article.imageUrl ? (
+                          <img
+                            src={article.imageUrl}
+                            alt={article.titre}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <BookOpen className="w-10 h-10 text-gray-200 group-hover:text-[#F17425]/25 transition-colors duration-300" />
+                        )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-sm text-slate-900 line-clamp-2 group-hover:text-cpu-orange transition-colors mb-1">
+
+                      {/* Content */}
+                      <div className="p-5 flex flex-col flex-1">
+                        {/* Category + reading time */}
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[11px] font-bold uppercase tracking-wide text-[#F17425]">
+                            {article.categorie}
+                          </span>
+                          <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                            <Clock className="w-3 h-3" />
+                            {article.tempsLecture} min
+                          </span>
+                        </div>
+
+                        <h3 className="text-base font-bold text-[#212121] leading-snug mb-2 line-clamp-2 group-hover:text-[#F17425] transition-colors duration-200">
                           {article.titre}
-                        </h4>
-                        <div className="flex items-center gap-2 text-xs text-slate-500">
-                          <Eye className="w-3 h-3" />
-                          {article.vues.toLocaleString()} vues
+                        </h3>
+
+                        <p className="text-sm text-gray-500 leading-relaxed mb-5 line-clamp-2 flex-1">
+                          {article.extrait}
+                        </p>
+
+                        {/* Author + stats */}
+                        <div className="flex items-center justify-between border-t border-gray-100 pt-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                              <User className="w-3 h-3 text-gray-400" />
+                            </div>
+                            <span className="text-xs text-gray-500 font-medium truncate max-w-[100px]">
+                              {article.auteur}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-gray-400">
+                            <span className="flex items-center gap-1">
+                              <Eye className="w-3 h-3" />
+                              {article.vues.toLocaleString()}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageCircle className="w-3 h-3" />
+                              {article.commentaires}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    {index < popularArticles.length - 1 && (
-                      <div className="border-b border-slate-100 mt-4" />
-                    )}
+                    </article>
                   </Link>
                 ))}
               </div>
-            </Card>
-
-            {/* Tags populaires */}
-            <Card className="p-6 border-2 border-slate-100 shadow-lg">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-green-500 p-2 rounded-lg">
-                  <Lightbulb className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900">Tags</h3>
+            ) : loading ? (
+              <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center">
+                <div className="w-12 h-12 border-4 border-gray-200 border-t-[#F17425] rounded-full animate-spin mx-auto" />
+                <p className="text-sm text-gray-500 mt-4">Chargement des articles...</p>
               </div>
-              
-              <div className="flex flex-wrap gap-2">
-                {popularTags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="outline"
-                    className="cursor-pointer hover:bg-cpu-orange hover:text-white hover:border-cpu-orange transition-all duration-200 px-3 py-1"
+            ) : error ? (
+              <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center">
+                <Search className="w-12 h-12 text-red-200 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-[#212121] mb-2">Erreur de chargement</h3>
+                <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">{error}</p>
+              </div>
+            ) : (
+              <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center">
+                <Search className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-[#212121] mb-2">Aucun article trouvé</h3>
+                <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
+                  Essayez d'autres mots-clés ou explorez toutes les catégories.
+                </p>
+                <Button
+                  size="sm"
+                  onClick={() => { setSearchTerm(""); setSelectedCategory("all"); }}
+                  className="bg-[#F17425] hover:bg-[#d9651f] text-white"
+                >
+                  Réinitialiser les filtres
+                </Button>
+              </div>
+            )}
+          </section>
+
+          {/* ── Sidebar ────────────────────────────────────────────────────── */}
+          <aside ref={sidebarRef} className={`space-y-6 transition-all duration-700 ${sidebarVisible ? 'animate-fade-in-up' : 'opacity-0 translate-x-4'}`}>
+
+            {/* Catégories rapides */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-5">
+                <Layers className="w-4 h-4 text-[#F17425]" />
+                <h3 className="text-sm font-bold text-[#212121] uppercase tracking-wide">Thématiques</h3>
+              </div>
+              <div className="space-y-1.5">
+                {dynamicCategories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      selectedCategory === cat.id
+                        ? "bg-[#F17425] text-white"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-[#F17425]"
+                    }`}
                   >
-                    {tag}
-                  </Badge>
+                    <span>{cat.label}</span>
+                    <span className={`text-xs font-bold ${selectedCategory === cat.id ? "text-white/70" : "text-gray-400"}`}>
+                      {cat.count}
+                    </span>
+                  </button>
                 ))}
               </div>
-            </Card>
+            </div>
+
+            {/* Articles populaires */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-5">
+                <TrendingUp className="w-4 h-4 text-[#26A65B]" />
+                <h3 className="text-sm font-bold text-[#212121] uppercase tracking-wide">Articles populaires</h3>
+              </div>
+              <div className="space-y-5">
+                {popularArticles.map((article, index) => (
+                  <Link
+                    key={article.id}
+                    href={`/blog/${article.slug}`}
+                    className="group flex items-start gap-3"
+                  >
+                    <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-black text-gray-400 group-hover:bg-[#F17425] group-hover:text-white transition-all duration-200">
+                      {index + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[#212121] line-clamp-2 group-hover:text-[#F17425] transition-colors duration-200 leading-snug mb-1">
+                        {article.titre}
+                      </p>
+                      <div className="flex items-center gap-1 text-xs text-gray-400">
+                        <Eye className="w-3 h-3" />
+                        {article.vues.toLocaleString()} vues
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-5">
+                <Tag className="w-4 h-4 text-gray-400" />
+                <h3 className="text-sm font-bold text-[#212121] uppercase tracking-wide">Tags populaires</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {popularTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs font-medium text-gray-600 border border-gray-200 bg-gray-50 px-2.5 py-1 rounded-full hover:border-[#F17425] hover:text-[#F17425] cursor-default transition-colors duration-200"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
           </aside>
         </div>
 
-        {/* Newsletter CTA */}
-        <Card className="mt-16 p-12 lg:p-16 bg-cpu-orange text-white border-0 shadow-2xl animate-fade-in-up animation-delay-400 overflow-hidden relative">
-          {/* Background pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/3 translate-y-1/3" />
-          </div>
-
-          <div className="max-w-3xl mx-auto text-center relative z-10">
-            <div className="inline-flex p-4 rounded-2xl bg-white/10 backdrop-blur-sm mb-6 shadow-xl">
-              <Award className="w-12 h-12" />
+        {/* ── Newsletter ───────────────────────────────────────────────────── */}
+        <section ref={newsletterRef} className={`mt-16 bg-white border border-gray-200 rounded-2xl p-10 lg:p-14 transition-all duration-700 ${newsletterVisible ? 'animate-fade-in-up' : 'opacity-0 translate-y-6'}`}>
+          <div className="max-w-xl mx-auto text-center">
+            <div className="w-12 h-12 bg-[#F17425]/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <Mail className="w-6 h-6 text-[#F17425]" />
             </div>
-            
-            <h2 className="text-4xl lg:text-5xl font-bold mb-4">
-              Restez informé·e des dernières actualités
+            <h2 className="text-2xl font-bold text-[#212121] mb-3">
+              Recevez nos nouveaux articles
             </h2>
-            
-            <p className="text-xl text-orange-100 mb-8 leading-relaxed">
-              Recevez nos meilleurs articles, conseils d'experts et offres exclusives directement dans votre boîte mail chaque semaine
+            <p className="text-gray-500 mb-8 leading-relaxed">
+              Chaque semaine, nos formateurs publient un nouvel article. Recevez-les directement dans votre boîte mail — sans pub, sans bruit.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="flex flex-col sm:flex-row gap-3"
+            >
               <Input
                 type="email"
-                placeholder="Entrez votre email..."
-                className="flex-1 py-7 px-6 text-lg bg-white text-slate-900 border-0 rounded-xl shadow-xl placeholder:text-slate-400"
+                placeholder="votre@email.com"
+                className="flex-1 border-gray-200 focus:border-[#F17425] rounded-xl py-2.5"
                 suppressHydrationWarning
               />
-              <Button 
-                size="lg"
-                className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-7 text-lg whitespace-nowrap rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
+              <Button
+                type="submit"
+                className="bg-[#F17425] hover:bg-[#d9651f] text-white font-semibold px-6 rounded-xl whitespace-nowrap"
               >
                 S'abonner
-                <ArrowRight className="w-6 h-6 ml-2" />
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </div>
-            
-            <p className="text-sm text-orange-100 mt-4">
-              🔒 Vos données sont protégées. Désabonnement en un clic.
+            </form>
+            <p className="text-xs text-gray-400 mt-4">
+              Vos données sont protégées. Désabonnement possible à tout moment.
             </p>
           </div>
-        </Card>
+        </section>
+
       </div>
     </div>
   );

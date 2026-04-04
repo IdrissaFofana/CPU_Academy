@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useSimpleAuth } from "@/contexts/SimpleAuthContext";
 
 interface Command {
   id: string;
@@ -28,6 +29,7 @@ interface Command {
   icon: React.ReactNode;
   action: () => void;
   keywords?: string[];
+  requiresAuth?: boolean;
 }
 
 interface CommandPaletteProps {
@@ -40,6 +42,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { isAuthenticated: isLoggedIn, isReady } = useSimpleAuth();
 
   const commands: Command[] = [
     {
@@ -140,6 +143,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         onClose();
       },
       keywords: ["dashboard", "tableau de bord", "espace"],
+      requiresAuth: true,
     },
     {
       id: "profil",
@@ -151,6 +155,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         onClose();
       },
       keywords: ["profil", "compte", "paramètres"],
+      requiresAuth: true,
     },
     {
       id: "aide",
@@ -166,6 +171,10 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   ];
 
   const filteredCommands = commands.filter((command) => {
+    if (command.requiresAuth && !(isReady && isLoggedIn)) {
+      return false;
+    }
+
     const searchTerm = query.toLowerCase();
     return (
       command.label.toLowerCase().includes(searchTerm) ||
