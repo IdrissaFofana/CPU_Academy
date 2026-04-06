@@ -30,9 +30,9 @@ const stats = [
 
 export function StatsSection() {
   return (
-    <section className="py-10 md:py-16 bg-white">
+    <section className="py-8 md:py-16 bg-white">
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((stat, index) => (
             <Card key={index} className={`text-center animate-scale-in animation-delay-${(index + 1) * 100}`}>
               <CardContent className="pt-6">
@@ -41,7 +41,7 @@ export function StatsSection() {
                     <stat.icon className="h-8 w-8" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold mb-2">{stat.value}</div>
+                <div className="text-2xl sm:text-3xl font-bold mb-2">{stat.value}</div>
                 <div className="text-slate-600">{stat.label}</div>
               </CardContent>
             </Card>

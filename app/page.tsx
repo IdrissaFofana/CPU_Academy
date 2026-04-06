@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     description: "350+ formations professionnelles pour entrepreneurs et salariés. Certifications reconnues, experts locaux, accompagnement personnalisé.",
     images: [
       {
-        url: "/images/cpu-formation-og.jpg",
-        width: 1200,
-        height: 630,
+        url: "/images/cpu-logo.png",
+        width: 512,
+        height: 200,
         alt: "CPU Formation - Formation professionnelle en Côte d'Ivoire"
       }
     ]
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CPU Formation - Formations pour PME Ivoiriennes",
     description: "350+ formations certifiantes | Experts du secteur | Accompagnement personnalisé",
-    images: ["/images/cpu-formation-og.jpg"]
+    images: ["/images/cpu-logo.png"]
   },
   alternates: {
     canonical: "https://cpu-formation.ci"

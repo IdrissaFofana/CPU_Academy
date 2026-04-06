@@ -126,18 +126,18 @@ export function Hero() {
       
       {/* Overlay gradient pour lisibilité du texte */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/30 to-orange-900/50" />
-      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 relative z-10">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-10 md:py-14 lg:py-16 xl:py-24 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Contenu texte avec animation */}
           <div key={`content-${currentSlide}`} className="animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
               {currentData.title} <span className="text-orange-400">{currentData.highlight}</span>
             </h1>
-            <p className="text-xl text-slate-300 mb-8 max-w-lg">
+            <p className="text-base sm:text-lg md:text-xl text-slate-300 mb-5 sm:mb-8 max-w-lg">
               {currentData.description}
             </p>
             
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
               <Button 
                 size="lg" 
                 asChild 
@@ -158,10 +158,10 @@ export function Hero() {
             </div>
             
             {/* Badges de confiance dynamiques */}
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="mt-5 sm:mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3 gap-2 sm:gap-3">
               {currentData.trustBadges.map((badge, index) => (
-                <div key={index} className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20">
-                  <div className={`w-10 h-10 rounded-full bg-${badge.color}-500 flex items-center justify-center flex-shrink-0`}>
+                <div key={index} className="flex items-center gap-2 sm:gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3 border border-white/20">
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-${badge.color}-500 flex items-center justify-center flex-shrink-0`}>
                     {badge.icon === "check" && (
                       <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -214,7 +214,7 @@ export function Hero() {
         </div>
 
         {/* Navigation Controls */}
-        <div className="mt-12 flex justify-center items-center gap-4 relative z-30">
+        <div className="mt-8 lg:mt-10 flex justify-center items-center gap-4 relative z-30">
           {/* Arrow Left */}
           <button
             onClick={prevSlide}

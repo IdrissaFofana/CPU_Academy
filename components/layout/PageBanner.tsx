@@ -138,7 +138,7 @@ export function PageBanner({
           {/* Contenu texte avec animation */}
           <div key={`content-${currentSlide}`}>
             <h1
-              className="text-3xl md:text-4xl font-bold mb-3 leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 leading-tight"
               style={{ animation: "bnSlideIn 0.65s cubic-bezier(0.25,0.46,0.45,0.94) 80ms both" }}
             >
               {currentData.title}
@@ -185,15 +185,15 @@ export function PageBanner({
 
             {/* Badges de confiance dynamiques */}
             {currentData.trustBadges && currentData.trustBadges.length > 0 && (
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                 {currentData.trustBadges.map((badge, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20"
+                    className="flex items-center gap-2 sm:gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3 border border-white/20"
                     style={{ animation: `bnFadeUp 0.55s ease-out ${520 + index * 80}ms both` }}
                   >
                     <div
-                      className={`w-10 h-10 rounded-full bg-${badge.color}-500 flex items-center justify-center flex-shrink-0`}
+                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-${badge.color}-500 flex items-center justify-center flex-shrink-0`}
                     >
                       {badge.icon === "check" && (
                         <svg
@@ -330,14 +330,16 @@ export function PageBanner({
       </div>
 
       {/* Vague décorative */}
-      <div className="absolute bottom-0 left-0 right-0">
+      <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none">
         <svg
           viewBox="0 0 1440 120"
-          fill="none"
+          preserveAspectRatio="none"
+          width="100%"
+          height="40"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
+              d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
             fill="white"
           />
         </svg>

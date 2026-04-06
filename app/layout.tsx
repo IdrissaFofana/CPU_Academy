@@ -10,8 +10,10 @@ import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { CartProvider } from "@/contexts/CartContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { SimpleAuthProvider } from "@/contexts/SimpleAuthContext";
+import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import { NavigationProgress } from "@/components/layout/NavigationProgress";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { CookieBanner } from "@/components/layout/CookieBanner";
 
 // Configuration des polices Google Fonts
 const inter = Inter({ 
@@ -40,6 +42,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} ${montserrat.variable}`}>
       <body className="font-sans antialiased bg-white text-gray-900">
+        <CookieConsentProvider>
         <SimpleAuthProvider>
           <NotificationProvider>
             <CartProvider>
@@ -47,7 +50,7 @@ export default function RootLayout({
               <ScrollProgress />
               <AnnouncementBar />
               <Navbar />
-              <main className="min-h-screen pb-16 lg:pb-0">
+              <main className="min-h-screen pb-16 md:pb-0">
                 <PageTransition>
                   {children}
                 </PageTransition>
@@ -55,9 +58,11 @@ export default function RootLayout({
               <Footer />
               <StickyCTA />
               <BottomNavigation />
+              <CookieBanner />
             </CartProvider>
           </NotificationProvider>
         </SimpleAuthProvider>
+        </CookieConsentProvider>
       </body>
     </html>
   );

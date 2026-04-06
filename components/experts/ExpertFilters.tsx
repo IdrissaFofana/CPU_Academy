@@ -70,7 +70,7 @@ export function ExpertFilters({
   };
 
   return (
-    <Card className="p-6 border-2 sticky top-24 overflow-y-auto max-h-[calc(100vh-7rem)]">
+    <Card className="p-6 border-2">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">

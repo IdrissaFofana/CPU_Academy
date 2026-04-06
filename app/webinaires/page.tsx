@@ -267,10 +267,10 @@ export default function WebinairesPage() {
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20" id="webinaires">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 lg:py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-6 sm:py-8 lg:py-12">
 
           {/* Search bar */}
-          <div className="mb-6 grid gap-4 lg:grid-cols-3">
+          <div className="mb-6 flex flex-col sm:grid sm:gap-4 sm:grid-cols-3 gap-3">
             <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Rechercher un webinaire..." className="lg:col-span-2" />
             <div className="rounded-xl border bg-white px-4 py-2 text-sm text-slate-600 flex items-center">
               <span className="font-semibold text-slate-900">{filteredWebinaires.length}</span>&nbsp;résultat(s)
@@ -308,8 +308,8 @@ export default function WebinairesPage() {
             <div className="flex-1 min-w-0">
               {/* Toolbar */}
               <div className="mb-6 flex items-center justify-between">
-                <p className="text-sm text-slate-600">Affichage</p>
-                <div className="flex items-center gap-2">
+                <p className="text-sm text-slate-600 hidden sm:block">Affichage</p>
+                <div className="flex items-center gap-2 ml-auto">
                   <Button variant={viewMode === "grid" ? "default" : "outline"} size="sm" onClick={() => setViewMode("grid")} className={viewMode === "grid" ? "bg-cpu-orange text-white" : ""}><Grid3x3 className="w-4 h-4" /></Button>
                   <Button variant={viewMode === "list" ? "default" : "outline"} size="sm" onClick={() => setViewMode("list")} className={viewMode === "list" ? "bg-cpu-orange text-white" : ""}><List className="w-4 h-4" /></Button>
                   <Button variant={viewMode === "compact" ? "default" : "outline"} size="sm" onClick={() => setViewMode("compact")} className={viewMode === "compact" ? "bg-cpu-orange text-white" : ""}><LayoutGrid className="w-4 h-4" /></Button>
@@ -374,13 +374,13 @@ export default function WebinairesPage() {
                       <Card key={webinaire.id} className={`border-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                         webinaire.statut === "live" ? "border-red-500 shadow-red-100" : "border-slate-200 hover:border-cpu-orange"
                       } ${isListMode ? "flex flex-row p-0 overflow-hidden" : "p-4"}`}>
-                        <div className={`relative rounded-lg overflow-hidden ${isListMode ? "h-full w-56 flex-shrink-0" : isCompactMode ? "h-28 mb-3" : "h-40 mb-4"}`}>
+                        <div className={`relative rounded-lg overflow-hidden ${isListMode ? "h-full w-32 sm:w-56 flex-shrink-0" : isCompactMode ? "h-24 sm:h-28 mb-3" : "h-36 sm:h-40 mb-4"}`}>
                           <img src={webinaire.thumbnail} alt={webinaire.titre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                           <div className="absolute top-3 right-3">{statusBadge(webinaire.statut)}</div>
                         </div>
                         <div className={isListMode ? "p-4 flex-1" : ""}>
                           <Badge className="bg-slate-100 text-slate-700 border-0 mb-2 text-xs">{webinaire.themes[0]}</Badge>
-                          <h3 className={`${isCompactMode ? "text-base" : "text-xl"} font-bold text-slate-900 mb-1 line-clamp-2`}>{webinaire.titre}</h3>
+                        <h3 className={`${isCompactMode ? "text-sm" : "text-base sm:text-lg"} font-bold text-slate-900 mb-1 line-clamp-2`}>{webinaire.titre}</h3>
                           {!isCompactMode && <p className="text-sm text-slate-600 line-clamp-2 mb-3">{webinaire.description}</p>}
                           <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-4">
                             <div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-cpu-orange" /><span className="truncate">{formatWebinaireDate(webinaire.date, false)}</span></div>
@@ -425,8 +425,8 @@ export default function WebinairesPage() {
               )}
 
               {!isLoading && !error && filteredWebinaires.length === 0 && (
-                <div className="text-center py-16">
-                  <Video className="w-14 h-14 text-slate-300 mx-auto mb-3" />
+                <div className="text-center py-10 sm:py-16">
+                  <Video className="w-12 h-12 sm:w-14 sm:h-14 text-slate-300 mx-auto mb-3" />
                   <p className="text-slate-500 text-lg font-medium">Aucun webinaire ne correspond aux filtres.</p>
                   <Button variant="outline" className="mt-4" onClick={reinitialiserFiltres}>Réinitialiser les filtres</Button>
                 </div>

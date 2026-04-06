@@ -345,7 +345,7 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
       )}
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
           {/* Search Bar and Stats */}
           <div className="mb-8 animate-fade-in-up">
             {/* Search Bar with Autocomplete */}
@@ -369,13 +369,13 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
           {!lockedModalite && (
             <div className="mb-8 animate-fade-in-up animation-delay-100">
               {/* Titre de section */}
-              <div className="flex items-center gap-2 mb-4 justify-end">
+              <div className="flex items-center gap-2 mb-3 justify-between sm:justify-end">
                 <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Format de formation</span>
                 <Layers className="w-4 h-4 text-slate-400" />
               </div>
 
-              {/* Tabs scrollables */}
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide justify-end">
+              {/* Tabs — grille 2×2 sur mobile, 4 colonnes sur sm+ => toujours 1 seule ligne */}
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2 xl:gap-3">
                 {FORMAT_TABS.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = format === tab.value;
@@ -389,8 +389,8 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
                       key={tab.value}
                       onClick={() => { setFormat(tab.value); setCurrentPage(1); }}
                       className={`
-                        group relative flex-shrink-0 flex flex-col items-center gap-1.5
-                        px-5 py-3.5 rounded-2xl border-2 transition-all duration-250
+                        group relative w-full flex flex-col items-center gap-1
+                        px-2 py-2.5 sm:px-3 sm:py-2.5 xl:px-5 xl:py-3.5 rounded-xl xl:rounded-2xl border-2 transition-all duration-250
                         cursor-pointer select-none
                         ${isActive
                           ? `${tab.activeBg} ${tab.activeText} border-transparent shadow-lg shadow-black/10 scale-[1.03]`
@@ -419,8 +419,8 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
                           {count}
                         </span>
                       </div>
-                      {/* Description (visible uniquement md+) */}
-                      <span className={`hidden md:block text-[11px] leading-tight ${
+                      {/* Description (visible uniquement xl+) */}
+                      <span className={`hidden xl:block text-[11px] leading-tight ${
                         isActive ? "text-white/80" : "text-slate-400"
                       }`}>
                         {tab.description}
@@ -436,8 +436,8 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
             </div>
           )}
 
-          {/* Mobile Filter Button */}
-          <div className="md:hidden mb-6">
+          {/* Mobile Filter Button — visible jusqu'à xl (tablettes incluses) */}
+          <div className="xl:hidden mb-6">
             <Button
               onClick={() => setIsDrawerOpen(true)}
               className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white h-12 text-base font-semibold shadow-lg"
@@ -452,9 +452,9 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
             </Button>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Desktop Sidebar Filters */}
-            <aside className="hidden md:block md:w-80 flex-shrink-0 animate-slide-right">
+          <div className="flex flex-col xl:flex-row gap-8">
+            {/* Desktop Sidebar Filters — visible seulement xl+ */}
+            <aside className="hidden xl:block xl:w-80 flex-shrink-0 animate-slide-right">
               <div className="sticky top-24">
                 <CatalogueFilters
                   objectifOptions={objectifOptions}
@@ -590,10 +590,10 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
               {/* Formations Grid/List/Compact with Pagination */}
               {formationsFiltrees.length > 0 ? (
                 <>
-                  <div className={(viewMode === "grid" 
-                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+                  <div className={(viewMode === "grid"
+                      ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
                       : viewMode === "compact"
-                      ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"
+                      ? "grid grid-cols-1 min-[380px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4"
                       : "flex flex-col gap-4")}>
                     {formationsPage.map((formation, index) => {
                       const renderKey = `${formation.id || formation.slug || "formation"}-${startIndex + index}`;
@@ -617,15 +617,15 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
 
                   {/* Pagination Controls */}
                   {totalPages > 1 && (
-                    <div className="mt-12 flex items-center justify-center gap-4">
+                    <div className="mt-6 sm:mt-12 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
                       <Button
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
                         variant="outline"
-                        className="gap-2"
+                        className="gap-1 sm:gap-2 text-sm"
                       >
                         <ChevronLeft className="w-4 h-4" />
-                        Précédent
+                        <span className="hidden sm:inline">Précédent</span>
                       </Button>
 
                       <div className="flex items-center gap-2">
@@ -662,20 +662,20 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
                       <Button
                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
-                        className="gap-2 bg-cpu-orange hover:bg-cpu-orange/90 text-white"
+                        className="gap-1 sm:gap-2 bg-cpu-orange hover:bg-cpu-orange/90 text-white text-sm"
                       >
-                        Suivant
+                        <span className="hidden sm:inline">Suivant</span>
                         <ChevronRight className="w-4 h-4" />
                       </Button>
 
-                      <span className="ml-4 text-sm text-gray-600">
-                        Page {currentPage} sur {totalPages}
+                      <span className="ml-2 sm:ml-4 text-sm text-gray-600">
+                        {currentPage}/{totalPages}
                       </span>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="bg-white rounded-2xl p-12 text-center border-2 border-slate-100 animate-scale-in">
+                <div className="bg-white rounded-2xl p-6 sm:p-12 text-center border-2 border-slate-100 animate-scale-in">
                   <div className="mb-6 animate-float">
                     <Search className="h-20 w-20 text-slate-300 mx-auto" />
                   </div>
@@ -691,21 +691,21 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
               )}
 
               {/* CTA Formation sur mesure */}
-              <div className="mt-12 relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl animate-fade-in-up animation-delay-400 transition-all duration-500">
+              <div className="mt-8 sm:mt-12 relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl animate-fade-in-up animation-delay-400 transition-all duration-500">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:40px_40px]" />
                 <div className="absolute top-0 right-0 w-72 h-72 bg-cpu-orange/20 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-72 h-72 bg-cpu-green/20 rounded-full blur-3xl" />
                 
-                <div className="relative text-center px-8 py-12 md:py-16 max-w-4xl mx-auto">
+                <div className="relative text-center px-4 sm:px-8 py-8 sm:py-12 md:py-16 max-w-4xl mx-auto">
                   <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cpu-orange to-orange-600 rounded-2xl mb-6 shadow-lg shadow-orange-500/20 animate-float">
                     <Award className="w-10 h-10 text-white" />
                   </div>
                   
-                  <h3 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-white">
                     Besoin d&apos;une formation sur mesure ?
                   </h3>
                   
-                  <p className="text-slate-300 mb-8 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                  <p className="text-slate-300 mb-6 sm:mb-8 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
                     CPU Formation propose également des formations personnalisées pour les entreprises et organisations.
                   </p>
                   
@@ -734,7 +734,7 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
                     </Button>
                   </div>
                   
-                  <div className="mt-10 pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-white/10 grid grid-cols-3 gap-4 sm:gap-6">
                     <div className="text-center">
                       <div className="text-cpu-orange font-bold text-2xl mb-1">100%</div>
                       <div className="text-slate-400 text-sm">Personnalisable</div>
@@ -760,14 +760,14 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 xl:hidden animate-fade-in"
             onClick={() => setIsDrawerOpen(false)}
             aria-hidden="true"
           />
           
           {/* Drawer */}
           <div 
-            className="fixed inset-y-0 right-0 w-full max-w-md bg-white z-50 md:hidden shadow-2xl animate-slide-left"
+            className="fixed inset-y-0 right-0 w-full max-w-md bg-white z-50 xl:hidden shadow-2xl animate-slide-left"
             role="dialog"
             aria-modal="true"
             aria-labelledby="drawer-title"

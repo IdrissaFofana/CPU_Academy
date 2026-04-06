@@ -189,19 +189,19 @@ export function CalendarSection() {
       : sessions.filter((s) => s.category === selectedCategory);
 
   return (
-    <section id="calendrier" className="py-12 md:py-20 bg-slate-50">
+    <section id="calendrier" className="py-10 md:py-16 bg-slate-50">
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
 
         {/* ── Header ── */}
-        <div className="text-center mb-16 animate-slide-down">
+        <div className="text-center mb-10 lg:mb-16 animate-slide-down">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border-2 border-cpu-orange/40 mb-6 animate-fade-in shadow-sm">
             <Calendar className="w-4 h-4 text-cpu-orange" />
             <span className="text-sm font-medium text-slate-900">Prochains webinaires</span>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-slate-900">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6 text-slate-900">
             Calendrier des <span className="font-extrabold text-cpu-orange">webinaires</span>
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
             Consultez les prochaines sessions live et inscrivez-vous dès maintenant
           </p>
         </div>
@@ -290,15 +290,15 @@ export function CalendarSection() {
                 {filteredSessions.map((session, index) => (
                   <div
                     key={session.id}
-                    className="group bg-white rounded-2xl p-8 border border-slate-200
+                    className="group bg-white rounded-2xl p-6 lg:p-8 border border-slate-200
                       hover:border-cpu-orange/30 hover:shadow-lg
                       hover:-translate-y-1 transition-all duration-500 animate-slide-up"
                     style={{ animationDelay: `${(index + 2) * 100}ms` }}
                   >
                     {/* Header */}
-                    <div className="flex items-start justify-between mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
                       <div className="flex-1 pr-4">
-                        <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-cpu-orange transition-colors leading-snug">
+                        <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 group-hover:text-cpu-orange transition-colors leading-snug">
                           {session.title}
                         </h3>
                         <div className="flex flex-wrap gap-2">
@@ -317,7 +317,7 @@ export function CalendarSection() {
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <div className="text-2xl font-bold text-cpu-orange">{session.price}</div>
+                        <div className="text-xl sm:text-2xl font-bold text-cpu-orange">{session.price}</div>
                         {!session.price.includes("Gratuit") && (
                           <div className="text-xs text-slate-500">TTC</div>
                         )}

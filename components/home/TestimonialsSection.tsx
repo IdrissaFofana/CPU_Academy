@@ -169,14 +169,14 @@ export function TestimonialsSection() {
   }, [isPaused, prefersReducedMotion]);
 
   return (
-    <section id="temoignages" className="py-12 md:py-20 bg-white relative overflow-hidden">
+      <section id="temoignages" className="py-10 md:py-16 bg-white relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-cpu-green/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-cpu-orange/5 rounded-full blur-3xl" />
       
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl relative">
         {/* Header */}
-        <div className="text-center mb-16 animate-slide-down">
+          <div className="text-center mb-10 lg:mb-16 animate-slide-down">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border-2 border-cpu-orange/40 mb-6 animate-fade-in shadow-sm">
             <svg className="w-4 h-4 text-cpu-orange" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
@@ -185,10 +185,10 @@ export function TestimonialsSection() {
             <span className="text-sm font-medium text-slate-900">Témoignages</span>
           </div>
           
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-slate-900">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6 text-slate-900">
             Ce que disent nos <span className="font-extrabold text-cpu-orange">apprenants</span>
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
             Découvrez les témoignages de professionnels qui ont transformé leur carrière et leur entreprise grâce à nos formations
           </p>
         </div>
@@ -198,10 +198,10 @@ export function TestimonialsSection() {
           {/* Navigation Buttons */}
           <button
             onClick={scrollToPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 
               bg-white text-slate-900
               w-12 h-12 rounded-full shadow-lg
-              flex items-center justify-center transition-all duration-300
+              items-center justify-center transition-all duration-300
               border-2 border-slate-200
               group"
             aria-label="Témoignage précédent"
@@ -211,10 +211,10 @@ export function TestimonialsSection() {
 
           <button
             onClick={scrollToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 
               bg-white text-slate-900
               w-12 h-12 rounded-full shadow-lg
-              flex items-center justify-center transition-all duration-300
+              items-center justify-center transition-all duration-300
               border-2 border-slate-200
               group"
             aria-label="Témoignage suivant"
@@ -222,22 +222,22 @@ export function TestimonialsSection() {
             <ChevronRight className="w-6 h-6" />
           </button>
 
-          {/* Gradient overlays */}
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+          {/* Gradient overlays — hidden on mobile to avoid masking the only visible card */}
+          <div className="hidden sm:block absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
           
           <div 
             ref={scrollRef}
-            className="flex gap-6 overflow-x-hidden pb-4"
+            className="flex gap-4 sm:gap-6 overflow-x-auto sm:overflow-x-hidden pb-4 snap-x snap-mandatory sm:snap-none"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {allTestimonials.map((testimonial, index) => (
               <div
                 key={`${testimonial.id}-${index}`}
-                className="group bg-white rounded-2xl p-8 border border-slate-200 
-                  hover:border-cpu-orange-orange/10
-                   transition-all duration-500 cursor-pointer
-                  flex-shrink-0 w-[400px]"
+                className="group bg-white rounded-2xl p-5 sm:p-8 border border-slate-200 
+                  hover:border-cpu-orange/20
+                  transition-all duration-500 cursor-pointer
+                  flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[400px] snap-start"
               >
                 {/* Header with avatar */}
                 <div className="flex items-center gap-4 mb-6">

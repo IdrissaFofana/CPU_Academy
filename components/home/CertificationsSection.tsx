@@ -11,36 +11,36 @@ export function CertificationsSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   return (
-    <section id="certifications" className="py-12 md:py-20 bg-gradient-to-br from-white via-orange-50/20 to-white relative overflow-hidden">
+    <section id="certifications" className="py-10 md:py-16 xl:py-20 bg-gradient-to-br from-white via-orange-50/20 to-white relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-cpu-orange/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cpu-green/10 rounded-full blur-3xl" />
       
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl relative">
         {/* Header */}
-        <div className="text-center mb-16 animate-slide-down">
+        <div className="text-center mb-10 lg:mb-16 animate-slide-down">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cpu-orange/10 to-cpu-green/10 rounded-full border-2 border-cpu-orange/40 mb-6 animate-fade-in shadow-sm">
             <Trophy className="w-4 h-4 text-cpu-orange" />
             <span className="text-sm font-medium text-slate-900">Certifications professionnelles</span>
           </div>
           
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-slate-900">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6 text-slate-900">
             Certifications <span className="font-extrabold bg-gradient-to-r from-orange-600 via-orange-500 to-green-600 bg-clip-text text-transparent">reconnues</span>
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
             Valorisez vos compétences avec des certifications officielles reconnues par les entreprises 
             et validées à l'échelle nationale
           </p>
         </div>
 
         {/* Certifications Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-16">
           {certifications.map((cert, index) => (
             <div
               key={cert.id}
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
-              className={`group relative bg-white rounded-2xl p-6 border border-slate-200 
+              className={`group relative bg-white rounded-2xl p-5 lg:p-6 border border-slate-200 
                 hover:border-cpu-orange-orange/20
                 hover:-translate-y-2 transition-all duration-500 cursor-pointer
                 animate-scale-in animation-delay-${(index + 1) * 100}`}
@@ -112,7 +112,7 @@ export function CertificationsSection() {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-12 lg:p-16 
+        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 lg:p-10 xl:p-16 
           text-white text-center relative overflow-hidden animate-fade-in animation-delay-500">
           {/* Background pattern */}
           <div className="absolute inset-0 opacity-10">
@@ -127,7 +127,7 @@ export function CertificationsSection() {
               <span className="text-sm font-medium">Certification officielle</span>
             </div>
 
-            <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+            <h3 className="text-2xl lg:text-3xl xl:text-4xl font-bold mb-4">
               Prêt à obtenir votre certification ?
             </h3>
             <p className="text-lg text-orange-200 max-w-2xl mx-auto">
@@ -159,17 +159,17 @@ export function CertificationsSection() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-8 border-t border-white/20">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto pt-6 sm:pt-8 border-t border-white/20">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">5,000+</div>
+                <div className="text-xl sm:text-3xl font-bold text-white mb-1">5,000+</div>
                 <div className="text-sm text-orange-200">Certifiés</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">95%</div>
+                <div className="text-xl sm:text-3xl font-bold text-white mb-1">95%</div>
                 <div className="text-sm text-orange-200">Satisfaction</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">100%</div>
+                <div className="text-xl sm:text-3xl font-bold text-white mb-1">100%</div>
                 <div className="text-sm text-orange-200">Reconnu</div>
               </div>
             </div>

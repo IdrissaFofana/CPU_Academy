@@ -1174,20 +1174,22 @@ export default function CertificationsPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto">
               {avantages.map((avantage, idx) => {
                 const Icon = avantage.icon;
                 return (
                   <div
                     key={idx}
-                    className="text-center group animate-fade-in"
+                    className="flex sm:flex-col items-start sm:items-center gap-4 sm:gap-0 text-left sm:text-center group animate-fade-in"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
-                    <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-white/10 text-white mb-3 md:mb-4 group-hover:scale-110 group-hover:bg-white/20 transition-all">
+                    <div className="flex-shrink-0 inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-white/10 text-white sm:mb-3 md:mb-4 group-hover:scale-110 group-hover:bg-white/20 transition-all">
                       <Icon className="w-6 h-6 md:w-8 md:h-8" />
                     </div>
-                    <h3 className="text-base md:text-lg font-bold mb-1 md:mb-2">{avantage.title}</h3>
-                    <p className="text-xs md:text-sm text-slate-300">{avantage.description}</p>
+                    <div className="min-w-0">
+                      <h3 className="text-base md:text-lg font-bold mb-1 md:mb-2 leading-snug">{avantage.title}</h3>
+                      <p className="text-xs md:text-sm text-slate-300">{avantage.description}</p>
+                    </div>
                   </div>
                 );
               })}

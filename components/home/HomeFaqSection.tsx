@@ -14,10 +14,10 @@ export function HomeFaqSection() {
   const toggle = (id: string) => setOpenId(openId === id ? null : id);
 
   return (
-    <section className="py-16 md:py-24 bg-slate-50">
+    <section className="py-10 md:py-16 bg-slate-50">
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="bg-cpu-orange p-2.5 rounded-xl">
@@ -27,7 +27,7 @@ export function HomeFaqSection() {
                 Questions fréquentes
               </span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
               Tout ce que vous devez savoir
             </h2>
             <p className="mt-3 text-slate-600 max-w-xl">

@@ -27,22 +27,22 @@ export function AboutSection() {
   ];
 
   return (
-    <section id="a-propos" className="py-12 md:py-20 bg-slate-50 relative overflow-hidden">
+    <section id="a-propos" className="py-10 md:py-16 xl:py-20 bg-slate-50 relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-cpu-orange/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-cpu-green/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16 items-center">
           {/* Contenu texte */}
-          <div className="space-y-8 animate-slide-right">
+          <div className="space-y-5 sm:space-y-8 animate-slide-right">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border border-cpu-orange/20 animate-fade-in">
               <CheckCircle2 className="w-4 h-4 text-cpu-orange" />
               <span className="text-sm font-medium text-slate-700">Académie certifiée</span>
             </div>
 
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-900 leading-tight">
               L'académie de formation de référence en Côte d'Ivoire
             </h2>
             
@@ -57,16 +57,16 @@ export function AboutSection() {
             </div>
 
             {/* Grille des caractéristiques améliorée */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 pt-4 sm:pt-6">
               {features.map((feature, index) => (
                 <div 
                   key={index}
-                  className={`group flex items-start gap-4 p-5 bg-white rounded-xl border border-slate-200 
+                  className={`group flex items-start gap-3 p-3 sm:p-5 bg-white rounded-xl border border-slate-200 
                     hover:border-cpu-orange-orange/10 
                     transition-all duration-300 cursor-pointer
                     animate-fade-in animation-delay-${(index + 1) * 100}`}
                 >
-                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-cpu-orange 
+                  <div className="flex-shrink-0 w-9 h-9 sm:w-12 sm:h-12 rounded-lg bg-cpu-orange 
                     flex items-center justify-center text-white
                     group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                     {feature.icon}
@@ -104,7 +104,7 @@ export function AboutSection() {
             <div className="absolute -inset-4 bg-gradient-to-r from-cpu-orange/20 to-cpu-green/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             <div className="relative rounded-2xl overflow-hidden shadow-2xl ring-1 ring-slate-200 transition-all duration-500">
-              <div className="relative h-[550px]">
+              <div className="relative h-[320px] lg:h-[420px] xl:h-[550px]">
                 <img 
                   src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop"
                   alt="Formation professionnelle"
@@ -118,8 +118,8 @@ export function AboutSection() {
               </div>
             </div>
             
-            {/* Badge certifications amélioré */}
-            <div className="absolute bottom-8 right-8 bg-white rounded-2xl shadow-2xl p-5 
+            {/* Floating badges — hidden on small mobile, visible on sm+ */}
+            <div className="hidden sm:block absolute bottom-8 right-8 bg-white rounded-2xl shadow-2xl p-4 sm:p-5 
               hover:scale-105 transition-all duration-300 cursor-pointer
               animate-scale-in animation-delay-400
               border border-slate-100">
@@ -139,8 +139,8 @@ export function AboutSection() {
               </div>
             </div>
 
-            {/* Statistique flottante */}
-            <div className="absolute top-8 left-8 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl px-5 py-3
+            {/* Statistique flottante — hidden on mobile */}
+            <div className="hidden sm:block absolute top-8 left-8 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl px-5 py-3
               hover:scale-105 transition-transform duration-300
               animate-fade-in animation-delay-300">
               <div className="flex items-center gap-3">

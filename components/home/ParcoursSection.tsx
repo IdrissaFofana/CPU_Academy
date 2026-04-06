@@ -18,12 +18,12 @@ export function ParcoursSection() {
   }, [formations]);
 
   return (
-    <section id="formations" className="py-12 md:py-20 bg-gray-50">
+    <section id="formations" className="py-10 md:py-16 bg-gray-50">
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
         <div className="flex items-center justify-between mb-8 animate-slide-down">
           <div>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-2">Formations en tendance</h2>
-            <p className="text-base text-gray-600 max-w-3xl">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">Formations en tendance</h2>
+            <p className="text-sm sm:text-base text-gray-600 max-w-3xl">
               Découvrez nos formations les plus populaires, conçues pour répondre aux besoins du marché ivoirien et aux secteurs en forte demande.
             </p>
           </div>

@@ -84,7 +84,7 @@ export function EnhancedFormationCard({
       )}
 
       {/* Image - Hover animation */}
-      <div className="relative h-48 overflow-hidden bg-gray-200">
+      <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-200">
         {imageSrc ? (
           <Image
             src={imageSrc}
@@ -118,7 +118,7 @@ export function EnhancedFormationCard({
       </div>
 
       {/* Content - Visual hierarchy */}
-      <div className="p-4 flex flex-col gap-3 flex-1">
+      <div className="p-3 sm:p-4 flex flex-col gap-2.5 sm:gap-3 flex-1 min-w-0">
         {/* Provider + Verification */}
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <BookOpen className="w-3 h-3" />
@@ -127,7 +127,7 @@ export function EnhancedFormationCard({
         </div>
 
         {/* Title - Prominent */}
-        <h3 className="font-bold text-lg line-clamp-2 hover:text-cpu-orange transition-colors">
+        <h3 className="font-bold text-sm sm:text-base lg:text-lg line-clamp-2 hover:text-cpu-orange transition-colors break-words">
           {formation.titre}
         </h3>
 
@@ -135,7 +135,7 @@ export function EnhancedFormationCard({
         <div className="flex items-center gap-2">
           <div className="flex gap-0.5">
             {Array(5).fill(0).map((_, i) => (
-              <span key={i} className={i < Math.floor(formation.notesMoyenne || 0) ? "text-amber-500 text-lg" : "text-gray-300 text-lg"}>
+              <span key={i} className={i < Math.floor(formation.notesMoyenne || 0) ? "text-amber-500 text-base" : "text-gray-300 text-base"}>
                 ★
               </span>
             ))}
@@ -169,9 +169,9 @@ export function EnhancedFormationCard({
         )}
 
         {/* Price + CTA */}
-        <div className="pt-2 flex justify-between items-center mt-auto">
-          <div className="flex flex-col">
-            <span className="text-lg font-bold text-cpu-orange">
+        <div className="pt-2 flex flex-wrap items-center justify-between gap-2 mt-auto min-w-0">
+          <div className="flex flex-col min-w-0">
+            <span className="text-base sm:text-lg font-bold text-cpu-orange">
               {formation.gratuit
                 ? "Gratuit"
                 : `${new Intl.NumberFormat("fr-FR").format(formation.prixMembre || formation.prixPublic || 0)} FCFA`}
@@ -179,7 +179,7 @@ export function EnhancedFormationCard({
           </div>
           <Button 
               asChild
-              className="cursor-pointer rounded-full px-4 bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold" 
+              className="cursor-pointer rounded-full px-3 sm:px-4 bg-cpu-orange hover:bg-cpu-orange/90 text-white font-semibold max-w-full" 
               size="sm"
             >
               <Link href={`/formations/${formation.slug}`}>Voir →</Link>

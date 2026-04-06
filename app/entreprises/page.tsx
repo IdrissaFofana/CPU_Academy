@@ -911,26 +911,26 @@ export default function EntreprisesPage() {
       {/* Content */}
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/20">
         {/* Logos Clients Section */}
-        <section className="container mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12 border-b border-slate-100">
+        <section className="container mx-auto px-4 md:px-6 lg:px-8 py-8 sm:py-10 md:py-12 border-b border-slate-100">
           <p className="text-center text-sm text-slate-600 mb-6 md:mb-8">
             Plus de {totalPartenaires} entreprises nous font confiance
           </p>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-6 md:gap-8 max-w-6xl mx-auto items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto items-center">
             {isPartenairesLoading && Array.from({ length: 6 }).map((_, idx) => (
-              <div key={`loading-${idx}`} className="p-4">
-                <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-slate-100 animate-pulse" />
+              <div key={`loading-${idx}`} className="p-2 sm:p-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto rounded-full bg-slate-100 animate-pulse" />
               </div>
             ))}
 
             {!isPartenairesLoading && logosClients.map((client, idx) => (
               <div
                 key={client}
-                className="flex items-center justify-center p-4 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 animate-fade-in"
+                className="flex items-center justify-center p-2 sm:p-4 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 animate-fade-in"
                 style={{ animationDelay: `${idx * 50}ms` }}
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-2">
-                    <Building className="w-6 h-6 md:w-8 md:h-8 text-slate-400" />
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-2">
+                    <Building className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-slate-400" />
                   </div>
                   <p className="text-xs text-slate-500 font-medium">{client}</p>
                 </div>
@@ -960,7 +960,7 @@ export default function EntreprisesPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
             {temoignages.map((temoignage, idx) => (
               <div
                 key={idx}
@@ -1032,9 +1032,9 @@ export default function EntreprisesPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-5 gap-6 relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 sm:gap-6 relative">
               {/* Ligne connectrice sur desktop */}
-              <div className="hidden md:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-200 via-orange-400 to-orange-200 z-0" style={{ top: '4rem' }}></div>
+              <div className="hidden xl:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-200 via-orange-400 to-orange-200 z-0" style={{ top: '4rem' }}></div>
               
               {processusCollaboration.map((etape, idx) => {
                 const Icon = etape.icon;
@@ -1044,7 +1044,7 @@ export default function EntreprisesPage() {
                     className="relative z-10 animate-slide-up"
                     style={{ animationDelay: `${idx * 150}ms` }}
                   >
-                    <div className="bg-white rounded-2xl p-6 border-2 border-slate-100 shadow-lg transition-all  text-center">
+                    <div className="bg-white rounded-2xl p-5 sm:p-6 border-2 border-slate-100 shadow-lg transition-all text-center h-full">
                       {/* Numéro avec icône */}
                       <div className="relative inline-flex mb-4">
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
@@ -1100,26 +1100,26 @@ export default function EntreprisesPage() {
 
         {/* Services Section */}
         <section id="services-entreprises" className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12 animate-slide-up">
+          <div className="text-center mb-10 sm:mb-12 animate-slide-up">
             <Badge className="mb-4 bg-orange-100 text-orange-700 border-0">
               <Briefcase className="w-3 h-3 mr-1" />
               Nos services
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               Des solutions adaptées à vos besoins
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
               Un accompagnement complet pour développer les compétences de vos collaborateurs
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 max-w-6xl mx-auto">
             {services.map((service, idx) => {
               const Icon = service.icon;
               return (
                 <Card
                   key={idx}
-                  className="p-6 transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up"
+                  className="p-5 sm:p-6 transition-all duration-300 border-2 hover:border-orange-200 animate-slide-up"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-${service.color}-100 mb-3`}>
@@ -1143,20 +1143,20 @@ export default function EntreprisesPage() {
 
         {/* Packs Métiers Section */}
         <section id="former-vos-equipes" className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12 animate-slide-up">
+          <div className="text-center mb-10 sm:mb-12 animate-slide-up">
             <Badge className="mb-4 bg-orange-100 text-orange-700 border-0">
               <Briefcase className="w-3 h-3 mr-1" />
               Packs métiers
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               Packs métiers
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
               Des parcours de formation thématiques pour chaque fonction clé de l'entreprise
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 max-w-7xl mx-auto">
             {packsMetiers.map((pack, idx) => {
               const Icon = pack.icon;
               return (
@@ -1170,11 +1170,11 @@ export default function EntreprisesPage() {
 
                   <div className="p-6">
                     {/* Header avec icône */}
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-3 mb-4">
                       <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${pack.gradient} text-white shadow-lg`}>
                         <Icon className="w-6 h-6" />
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                         <Badge variant="outline" className="text-xs bg-slate-50">
                           <Clock className="w-3 h-3 mr-1" />
                           {pack.duree}
@@ -1194,7 +1194,7 @@ export default function EntreprisesPage() {
                     {/* Prix avec FDFP */}
                     {pack.prix && (
                       <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-4 mb-4 border border-slate-200">
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
                           <span className="text-xs text-slate-600">À partir de</span>
                           {pack.financement.fdfpEligible && (
                             <Badge variant="outline" className="text-xs bg-green-50 border-green-200 text-green-700">
@@ -1236,18 +1236,18 @@ export default function EntreprisesPage() {
                     </div>
 
                     {/* CTA Buttons */}
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <Button
                         type="button"
                         variant="outline"
-                        className="cursor-pointer border-slate-300 hover:bg-slate-50"
+                        className="cursor-pointer border-slate-300 hover:bg-slate-50 text-xs sm:text-sm"
                         onClick={() => handleViewPackDetails(idx)}
                       >
                         En savoir plus
                       </Button>
                       <Button
                         type="button"
-                        className={`cursor-pointer bg-gradient-to-r ${pack.gradient} hover:opacity-90 text-white shadow-md transition-all`}
+                        className={`cursor-pointer bg-gradient-to-r ${pack.gradient} hover:opacity-90 text-white shadow-md transition-all text-xs sm:text-sm`}
                         onClick={() => handleApplyToPack(pack)}
                       >
                         Postuler
@@ -1293,7 +1293,7 @@ export default function EntreprisesPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {optionsFinancement.map((option, idx) => {
                 const Icon = option.icon;
                 return (
@@ -1370,7 +1370,7 @@ export default function EntreprisesPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6">
               {resultatsClients.map((resultat, idx) => {
                 const Icon = resultat.icon;
                 return (
@@ -1402,40 +1402,39 @@ export default function EntreprisesPage() {
         </section>
 
         {/* Avantages Section */}
-        <section id="solutions-sur-mesure" className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-gradient-to-br from-orange-50/30 via-white to-blue-50/20">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+        <section id="solutions-sur-mesure" className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 bg-gradient-to-br from-orange-50/30 via-white to-blue-50/20">
+          <div className="text-center mb-10 sm:mb-12 md:mb-16 animate-fade-in">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2">
               Pourquoi choisir CPU Formation ?
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 sm:gap-8 max-w-7xl mx-auto">
             {avantages.map((avantage, idx) => {
               const Icon = avantage.icon;
               return (
                 <div
                   key={idx}
-                  className="flex flex-col items-center text-center group cursor-pointer animate-fade-in"
+                  className="flex sm:flex-col items-start sm:items-center gap-4 sm:gap-0 text-left sm:text-center group cursor-pointer animate-fade-in"
                   style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   {/* Cercle avec icône */}
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 rounded-full bg-orange-50 flex items-center justify-center group-hover:bg-orange-100 transition-all duration-300 group-hover:scale-110">
-                      <Icon className="w-9 h-9 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="relative sm:mb-6 flex-shrink-0">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-orange-50 flex items-center justify-center group-hover:bg-orange-100 transition-all duration-300 group-hover:scale-110">
+                      <Icon className="w-7 h-7 sm:w-9 sm:h-9 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
                     </div>
                     {/* Effet de pulse au survol */}
                     <div className="absolute inset-0 rounded-full bg-orange-200 opacity-0 group-hover:opacity-20 group-hover:animate-ping"></div>
                   </div>
 
-                  {/* Titre */}
-                  <h3 className="text-base font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors">
-                    {avantage.titre}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {avantage.description}
-                  </p>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors">
+                      {avantage.titre}
+                    </h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      {avantage.description}
+                    </p>
+                  </div>
                 </div>
               );
             })}
@@ -1458,7 +1457,7 @@ export default function EntreprisesPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {isPartenairesLoading && Array.from({ length: 3 }).map((_, idx) => (
                 <div
                   key={`partenaire-loading-${idx}`}
@@ -1481,7 +1480,7 @@ export default function EntreprisesPage() {
               ))}
 
               {!isPartenairesLoading && partenairesCards.length === 0 && (
-                <div className="md:col-span-3 text-center text-sm text-slate-500 py-6">
+                <div className="sm:col-span-2 lg:col-span-3 text-center text-sm text-slate-500 py-6">
                   Les données partenaires sont temporairement indisponibles.
                 </div>
               )}
@@ -1582,7 +1581,7 @@ export default function EntreprisesPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {isRessourcesLoading && Array.from({ length: 4 }).map((_, idx) => (
                 <div key={`ressource-loading-${idx}`} className="bg-white rounded-2xl p-6 border-2 border-slate-100 animate-pulse">
                   <div className="flex items-start gap-4">
@@ -1628,20 +1627,20 @@ export default function EntreprisesPage() {
                     className="bg-white rounded-2xl p-6 border-2 border-slate-100 transition-all  animate-slide-up"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
                       {/* Icône */}
                       <div className={`w-14 h-14 flex-shrink-0 rounded-xl ${theme.iconWrap} flex items-center justify-center`}>
                         <Icon className={`w-7 h-7 ${theme.iconColor}`} />
                       </div>
 
                       {/* Contenu */}
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="text-lg font-bold text-slate-900">
+                      <div className="flex-1 min-w-0 w-full">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900 break-words">
                             {ressource.titre}
                           </h3>
                           {ressource.badge && (
-                            <Badge className="bg-orange-100 text-orange-700 text-xs ml-2">
+                            <Badge className="bg-orange-100 text-orange-700 text-xs w-fit sm:ml-2">
                               {ressource.badge}
                             </Badge>
                           )}
@@ -1651,8 +1650,8 @@ export default function EntreprisesPage() {
                           {ressource.description}
                         </p>
 
-                        <div className="flex items-center justify-between">
-<div className="flex items-center gap-3 text-xs text-slate-500">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                             <span>{ressource.format}</span>
                             <span>•</span>
                             <span>{ressource.taille}</span>
@@ -1666,7 +1665,7 @@ export default function EntreprisesPage() {
 
                           <Button
                             size="sm"
-                            className={`cursor-pointer bg-gradient-to-r ${theme.buttonClass} hover:opacity-90 text-white`}
+                            className={`cursor-pointer bg-gradient-to-r ${theme.buttonClass} hover:opacity-90 text-white w-full sm:w-auto`}
                             onClick={() => {
                               if (ressource.url) {
                                 window.open(ressource.url, "_blank", "noopener,noreferrer");
@@ -1686,7 +1685,7 @@ export default function EntreprisesPage() {
               })}
 
               {!isRessourcesLoading && apiRessourcesEntreprises.length === 0 && (
-                <div className="md:col-span-2 text-center text-sm text-slate-500 py-8 bg-white rounded-2xl border-2 border-slate-100">
+                <div className="lg:col-span-2 text-center text-sm text-slate-500 py-8 bg-white rounded-2xl border-2 border-slate-100">
                   Aucune ressource téléchargeable disponible pour le moment.
                 </div>
               )}
@@ -1710,7 +1709,7 @@ export default function EntreprisesPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6">
               {certificationsLabels.map((certif, idx) => (
                 <div
                   key={idx}

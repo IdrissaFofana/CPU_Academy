@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAC - Presentation Backend</title>
+  <style>
+    :root {
+      --cpu-orange: #f17425;
+      --cpu-orange-dark: #d95f16;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --ok: #15803d;
+      --warn: #b45309;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #fff7f2 0%, var(--bg) 260px);
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 8px solid var(--cpu-orange);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+      line-height: 1.2;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.3;
+      color: #111827;
+    }
+
+    p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: #374151;
+    }
+
+    li { margin: 6px 0; line-height: 1.45; }
+
+    .pill {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #9a3412;
+      background: #ffedd5;
+      border: 1px solid #fed7aa;
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin-bottom: 10px;
+    }
+
+    .status {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .status > div {
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .ok { background: #ecfdf3; border: 1px solid #bbf7d0; color: var(--ok); }
+    .warn { background: #fff7ed; border: 1px solid #fed7aa; color: var(--warn); }
+
+    .api-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+
+    .small { font-size: 13px; color: var(--muted); }
+
+    .footer {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #6b7280;
+      text-align: right;
+    }
+
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .card.wide { grid-column: 1 / -1; }
+      .status { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <span class="pill">Decision backend</span>
+      <h1>RAC autonome (non lie aux formations)</h1>
+      <p>
+        Objectif: permettre au super admin de creer des metiers RAC avec des documents requis, puis laisser
+        les utilisateurs postuler sur le site principal avec validation stricte des pieces cote serveur.
+      </p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Contexte actuel</h2>
+        <ul>
+          <li>Le RAC actuel est centre sur <strong>formationId</strong> et le dossier candidat.</li>
+          <li>La page RAC frontend affiche des metiers/documents statiques.</li>
+          <li>Il manque une checklist dynamique par metier et sa validation backend.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Decision cible</h2>
+        <ul>
+          <li>Le RAC devient un domaine autonome: <strong>pas de lien obligatoire a Formation</strong>.</li>
+          <li>Le dossier RAC reference un <strong>racMetierId</strong>.</li>
+          <li>Les documents obligatoires sont definis par metier (admin).</li>
+        </ul>
+      </article>
+
+      <article class="card wide">
+        <h2>Evolution API demandee (notification de changement)</h2>
+        <div class="status">
+          <div class="warn"><strong>A modifier</strong><br/>Remplacer l'usage de <code>formationId</code> dans le flux RAC par <code>racMetierId</code>.</div>
+          <div class="ok"><strong>A conserver</strong><br/>Le workflow dossier/timeline/statuts RAC peut etre garde et etendu.</div>
+        </div>
+        <ul>
+          <li><strong>Nouvelle entite:</strong> <code>racMetier</code> (nom, description, secteur, niveau, publication).</li>
+          <li><strong>Nouvelle entite:</strong> <code>racMetierRequiredDocument</code> (label, obligatoire, formats, taille max, ordre).</li>
+          <li><strong>Evolution:</strong> <code>RacDossier</code> avec <code>racMetierId</code> + documents soumis.</li>
+          <li><strong>Validation serveur:</strong> refus 422 si pieces obligatoires manquantes/invalides.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Endpoints proposes</h2>
+        <div class="api-box">GET    /api/rac/metiers/public
+GET    /api/rac/metiers/{id}
+POST   /api/rac/dossiers
+GET    /api/rac/dossiers/{id}
+GET    /api/rac/dossiers/{id}/timeline</div>
+        <p class="small">Public: consultation metiers + depot dossier.</p>
+      </article>
+
+      <article class="card">
+        <h2>Admin endpoints proposes</h2>
+        <div class="api-box">POST   /api/rac/metiers
+PATCH  /api/rac/metiers/{id}
+DELETE /api/rac/metiers/{id}
+POST   /api/rac/metiers/{id}/documents-requis
+PATCH  /api/rac/metiers/{id}/documents-requis/{docId}
+DELETE /api/rac/metiers/{id}/documents-requis/{docId}
+GET    /api/rac/dossiers?racMetierId=&statut=</div>
+        <p class="small">Admin: gestion catalogue metiers + checklist docs + suivi candidatures.</p>
+      </article>
+
+      <article class="card wide">
+        <h2>Champs necessaires (creation metier RAC)</h2>
+        <ul>
+          <li><strong>racMetier:</strong> nom, description, secteur, niveau, isPublished, isActive, ordreAffichage.</li>
+          <li><strong>requiredDocuments[] (definis par admin):</strong> code, label, obligatoire, formatsAutorises[], tailleMaxMo, minFiles, maxFiles, ordre.</li>
+          <li>Le tableau <code>requiredDocuments[]</code> doit accepter un <strong>nombre variable</strong> d'elements.</li>
+          <li>Chaque metier peut avoir des documents differents (types, quantites, contraintes).</li>
+        </ul>
+        <div class="api-box">POST /api/rac/metiers
+{
+  "nom": "Technicien froid et climatisation",
+  "description": "Certification des acquis professionnels RAC",
+  "secteur": "Froid & Climatisation",
+  "niveau": "BT",
+  "isPublished": true,
+  "isActive": true,
+  "ordreAffichage": 3,
+  "requiredDocuments": [
+    {
+      "code": "cv",
+      "label": "CV detaille",
+      "obligatoire": true,
+      "formatsAutorises": ["pdf"],
+      "tailleMaxMo": 5,
+      "minFiles": 1,
+      "maxFiles": 1,
+      "ordre": 1
+    },
+    {
+      "code": "attestation_travail",
+      "label": "Attestations d'employeur",
+      "obligatoire": true,
+      "formatsAutorises": ["pdf", "jpg", "png"],
+      "tailleMaxMo": 10,
+      "minFiles": 1,
+      "maxFiles": 5,
+      "ordre": 2
+    },
+    {
+      "code": "portfolio",
+      "label": "Photos / preuves de realisations",
+      "obligatoire": false,
+      "formatsAutorises": ["pdf", "jpg", "png"],
+      "tailleMaxMo": 20,
+      "minFiles": 0,
+      "maxFiles": 10,
+      "ordre": 3
+    }
+  ]
+}</div>
+      </article>
+
+      <article class="card wide">
+        <h2>Champs necessaires (candidature utilisateur)</h2>
+        <ul>
+          <li>Le dossier utilisateur doit pointer vers <code>racMetierId</code> (et non formationId).</li>
+          <li>Le frontend affiche dynamiquement les labels des documents requis du metier choisi.</li>
+          <li>Le backend doit refuser la soumission si un document obligatoire manque.</li>
+        </ul>
+        <div class="api-box">POST /api/rac/dossiers
+{
+  "racMetierId": "uuid-metier",
+  "candidat": "Nom Prenom",
+  "email": "candidat@email.com",
+  "telephone": "+2250700000000",
+  "anneesExperience": 4,
+  "competencesRevendiquees": ["Maintenance", "Diagnostic"],
+  "documentsJoints": [
+    {
+      "requiredDocumentCode": "cv",
+      "url": "/uploads/rac/cv.pdf",
+      "name": "CV",
+      "type": "pdf"
+    }
+  ]
+}
+
+422 si documents obligatoires manquants:
+{
+  "message": "Documents obligatoires manquants",
+  "missingDocuments": ["attestation_travail"]
+}</div>
+      </article>
+
+      <article class="card wide">
+        <h2>Plan de migration (court et sur)</h2>
+        <ul>
+          <li><strong>Phase 1:</strong> ajouter metiers RAC + documents requis (sans casser l'existant).</li>
+          <li><strong>Phase 2:</strong> accepter <code>racMetierId</code> sur POST dossier RAC + validation obligatoire.</li>
+          <li><strong>Phase 3:</strong> deprecier progressivement la dependance <code>formationId</code> du module RAC.</li>
+        </ul>
+      </article>
+
+      <article class="card wide">
+        <h2>Livrable attendu equipe backend</h2>
+        <ul>
+          <li>Spec finale DTO + erreurs de validation (422 detaille par document).</li>
+          <li>Creation metier RAC avec <code>requiredDocuments[]</code> dynamique dans une seule requete.</li>
+          <li>Endpoints operationnels + securisation admin/public.</li>
+          <li>Swagger mis a jour pour permettre l'integration frontend immediate.</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="footer">CPU Academy - Presentation backend RAC</div>
+  </main>
+</body>
+</html>

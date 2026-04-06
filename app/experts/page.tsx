@@ -23,6 +23,8 @@ import {
   LayoutGrid,
   BookOpen,
   UserPlus,
+  SlidersHorizontal,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -147,6 +149,7 @@ const EXPERTS_PER_PAGE = 9;
 export default function ExpertsPage() {
   // State for view mode
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact">("grid");
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const { formations, isLoading, error } = useFormations({ limit: 400 });
   const experts = useMemo(() => mapFormationsToExperts(formations), [formations]);
   
@@ -315,9 +318,10 @@ export default function ExpertsPage() {
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
-            {/* Sidebar Filters */}
-            <aside className="w-full lg:w-80 flex-shrink-0">
+          <div className="flex flex-col xl:flex-row gap-6 md:gap-8">
+            {/* Sidebar Filtres — visible xl+ seulement */}
+            <aside className="hidden xl:block xl:w-80 flex-shrink-0">
+              <div className="sticky top-24 overflow-y-auto max-h-[calc(100vh-7rem)]">
               <ExpertFilters
                 filters={filters}
                 onFiltersChange={updateFilters}
@@ -326,7 +330,24 @@ export default function ExpertsPage() {
                 availableSpecialties={availableSpecialties}
                 availableLocations={availableLocations}
               />
+              </div>
             </aside>
+
+            {/* Bouton Filtrer — visible jusqu'à xl (mobile + tablette) */}
+            <div className="xl:hidden">
+              <Button
+                onClick={() => setIsFilterDrawerOpen(true)}
+                className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white h-12 text-base font-semibold shadow-lg"
+              >
+                <SlidersHorizontal className="w-5 h-5 mr-2" />
+                Filtrer les experts
+                {(filters.specialties.length + filters.locations.length + (filters.availableOnly ? 1 : 0) + (filters.minRating > 0 ? 1 : 0)) > 0 && (
+                  <span className="ml-2 bg-white text-cpu-orange text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {filters.specialties.length + filters.locations.length + (filters.availableOnly ? 1 : 0) + (filters.minRating > 0 ? 1 : 0)}
+                  </span>
+                )}
+              </Button>
+            </div>
 
             {/* Main Content */}
             <div className="flex-1 min-w-0">
@@ -539,6 +560,53 @@ export default function ExpertsPage() {
           </div>
         </section>
       </div>
+
+      {/* Drawer Filtres — mobile/tablette */}
+      {isFilterDrawerOpen && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 xl:hidden"
+            onClick={() => setIsFilterDrawerOpen(false)}
+          />
+          {/* Panneau */}
+          <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white z-50 xl:hidden shadow-2xl flex flex-col">
+            {/* Header du drawer */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-white">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-5 h-5 text-cpu-orange" />
+                <span className="font-bold text-lg text-slate-900">Filtres</span>
+              </div>
+              <button
+                onClick={() => setIsFilterDrawerOpen(false)}
+                className="p-2 rounded-xl hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-600" />
+              </button>
+            </div>
+            {/* Contenu scrollable */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <ExpertFilters
+                filters={filters}
+                onFiltersChange={updateFilters}
+                onReset={resetFilters}
+                resultsCount={resultsCount}
+                availableSpecialties={availableSpecialties}
+                availableLocations={availableLocations}
+              />
+            </div>
+            {/* Pied du drawer */}
+            <div className="px-4 py-4 border-t border-slate-100 bg-white">
+              <Button
+                onClick={() => setIsFilterDrawerOpen(false)}
+                className="w-full bg-cpu-orange hover:bg-cpu-orange/90 text-white h-12 font-semibold"
+              >
+                Voir les {resultsCount} expert{resultsCount > 1 ? 's' : ''}
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }

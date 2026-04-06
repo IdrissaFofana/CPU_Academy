@@ -138,11 +138,11 @@ export function ImpactSection() {
   }, [isVisible, prefersReducedMotion]);
 
   return (
-    <section ref={sectionRef} className="py-12 md:py-20 bg-[#f5f1ed]">
+    <section ref={sectionRef} className="py-10 md:py-16 bg-[#f5f1ed]">
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
         {/* Impact en chiffres */}
-        <div className="text-center mb-12 animate-slide-down">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-3">
+        <div className="text-center mb-10 lg:mb-12 animate-slide-down">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-3">
             Notre impact en chiffres
           </h2>
           <p className="text-base text-slate-600 max-w-3xl mx-auto">
@@ -150,7 +150,7 @@ export function ImpactSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {stats.map((stat, index) => (
             <div
               key={index}
@@ -168,7 +168,7 @@ export function ImpactSection() {
                   transition-all duration-500 shadow-md">
                   {stat.icon}
                 </div>
-                <div className="text-4xl font-bold text-slate-900 tabular-nums group-hover:text-cpu-orange transition-colors duration-300">
+                  <div className="text-3xl sm:text-4xl font-bold text-slate-900 tabular-nums group-hover:text-cpu-orange transition-colors duration-300">
                   {isVisible ? (
                     <>
                       {animatedValues[index].toLocaleString('fr-FR')}
