@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FileText, ChevronRight } from "lucide-react";
+import { LegalSummaryNav } from "@/components/legal/LegalSummaryNav";
 
 export const metadata: Metadata = {
   title: "Mentions Légales - CPU Formation",
@@ -8,6 +9,16 @@ export const metadata: Metadata = {
     "Mentions légales du site CPU Formation, édité par la CPU-PMECI.",
   robots: { index: true, follow: true },
 };
+
+const SECTION_LINKS = [
+  { id: "editeur", label: "Éditeur du site" },
+  { id: "hebergement", label: "Hébergement" },
+  { id: "propriete", label: "Propriété intellectuelle" },
+  { id: "responsabilite", label: "Limitation de responsabilité" },
+  { id: "liens", label: "Liens hypertextes" },
+  { id: "donnees", label: "Données personnelles & cookies" },
+  { id: "droit-applicable", label: "Droit applicable" },
+];
 
 export default function MentionsLegalesPage() {
   return (
@@ -36,9 +47,19 @@ export default function MentionsLegalesPage() {
       </div>
 
       {/* ── Sections ── */}
-      <div className="max-w-4xl mx-auto px-4 py-10 sm:py-14 space-y-6">
+      <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10 lg:py-14">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+          <LegalSummaryNav
+            title="Mentions"
+            subtitle="Accès rapide aux informations légales du site"
+            updatedAt="6 avril 2026"
+            icon={<FileText className="w-4 h-4" />}
+            items={SECTION_LINKS}
+          />
+
+          <main className="flex-1 min-w-0 w-full space-y-5 sm:space-y-6">
         {/* Éditeur */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <section id="editeur" className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 lg:p-6 shadow-sm scroll-mt-24">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             1. Éditeur du site
           </h2>
@@ -77,7 +98,7 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Hébergement */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <section id="hebergement" className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 lg:p-6 shadow-sm scroll-mt-24">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             2. Hébergement
           </h2>
@@ -95,7 +116,7 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Propriété intellectuelle */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <section id="propriete" className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 lg:p-6 shadow-sm scroll-mt-24">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             3. Propriété intellectuelle
           </h2>
@@ -111,7 +132,7 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Responsabilité */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <section id="responsabilite" className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 lg:p-6 shadow-sm scroll-mt-24">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             4. Limitation de responsabilité
           </h2>
@@ -126,7 +147,7 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Liens externes */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <section id="liens" className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 lg:p-6 shadow-sm scroll-mt-24">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             5. Liens hypertextes
           </h2>
@@ -138,7 +159,7 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Données personnelles */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <section id="donnees" className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 lg:p-6 shadow-sm scroll-mt-24">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             6. Données personnelles & cookies
           </h2>
@@ -161,7 +182,7 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Droit applicable */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <section id="droit-applicable" className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 lg:p-6 shadow-sm scroll-mt-24">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             7. Droit applicable
           </h2>
@@ -172,6 +193,8 @@ export default function MentionsLegalesPage() {
             d&apos;Ivoire.
           </p>
         </section>
+          </main>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ScrollText, ChevronRight } from "lucide-react";
+import { LegalSummaryNav } from "@/components/legal/LegalSummaryNav";
 
 export const metadata: Metadata = {
   title: "Conditions Générales d'Utilisation - CPU Formation",
@@ -212,6 +213,11 @@ const ARTICLES = [
 ];
 
 export default function CguPage() {
+  const summaryItems = ARTICLES.map((article) => ({
+    id: article.id,
+    label: article.title.replace(/^Article\s+\d+\s*[–-]\s*/i, ""),
+  }));
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ── Hero ── */}
@@ -240,61 +246,24 @@ export default function CguPage() {
       </div>
 
       {/* ── Contenu ── */}
-      <div className="max-w-4xl mx-auto px-4 py-10 sm:py-14">
-        <div className="flex gap-8 items-start">
-          {/* Sommaire — fixe, pleine hauteur d'écran */}
-          <aside className="hidden lg:flex flex-col w-60 flex-shrink-0 sticky top-0 h-screen">
-            <div className="flex flex-col h-full rounded-2xl overflow-hidden shadow-md border border-gray-100">
-              {/* En-tête */}
-              <div className="bg-[#1a1f2e] px-5 py-5 flex items-center gap-3 flex-shrink-0">
-                <div className="w-8 h-8 rounded-lg bg-[#F17425]/20 flex items-center justify-center flex-shrink-0">
-                  <ScrollText className="w-4 h-4 text-[#F17425]" />
-                </div>
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Navigation</p>
-                  <p className="text-white font-bold text-sm leading-tight">Articles</p>
-                </div>
-              </div>
+      <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10 lg:py-14">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+          <LegalSummaryNav
+            title="Articles"
+            subtitle="Accès rapide aux règles d'utilisation de la plateforme"
+            updatedAt="6 avril 2026"
+            icon={<ScrollText className="w-4 h-4" />}
+            items={summaryItems}
+          />
 
-              {/* Liens */}
-              <nav className="flex-1 overflow-y-auto bg-white py-3">
-                {ARTICLES.map((a, i) => {
-                  const label = a.title.replace(/^Article\s+\d+\s*[–-]\s*/i, "");
-                  return (
-                    <a
-                      key={a.id}
-                      href={`#${a.id}`}
-                      className="group flex items-start gap-3 px-4 py-2.5 border-l-2 border-transparent hover:border-[#F17425] hover:bg-orange-50/60 transition-all duration-150"
-                    >
-                      <span className="flex-shrink-0 w-6 h-6 mt-0.5 rounded-full bg-gray-100 group-hover:bg-[#F17425] text-gray-400 group-hover:text-white text-xs font-bold flex items-center justify-center transition-colors duration-150">
-                        {i + 1}
-                      </span>
-                      <span className="text-base text-gray-500 group-hover:text-[#F17425] leading-snug transition-colors duration-150">
-                        {label}
-                      </span>
-                    </a>
-                  );
-                })}
-              </nav>
-
-              {/* Pied */}
-              <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 flex-shrink-0">
-                <p className="text-[10px] text-gray-400 leading-snug">
-                  Mise à jour :{" "}
-                  <span className="font-semibold text-gray-500">6 avril 2026</span>
-                </p>
-              </div>
-            </div>
-          </aside>
-
-          <main className="flex-1 min-w-0 space-y-6">
+          <main className="flex-1 min-w-0 w-full space-y-5 sm:space-y-6">
             {ARTICLES.map((a) => (
               <section
                 key={a.id}
                 id={a.id}
-                className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm scroll-mt-6"
+                className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 lg:p-6 shadow-sm scroll-mt-24"
               >
-                <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">
+                <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4 pb-3 border-b border-gray-100">
                   {a.title}
                 </h2>
                 <div className="text-sm text-gray-600 leading-relaxed">
@@ -304,8 +273,8 @@ export default function CguPage() {
             ))}
 
             {/* Contact */}
-            <div className="bg-orange-50 border border-orange-100 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <ScrollText className="w-8 h-8 text-[#F17425] flex-shrink-0" />
+            <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 sm:p-5 lg:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <ScrollText className="w-7 h-7 sm:w-8 sm:h-8 text-[#F17425] flex-shrink-0" />
               <div>
                 <p className="font-semibold text-gray-900">
                   Une question sur nos conditions ?
