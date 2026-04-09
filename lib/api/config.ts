@@ -125,4 +125,28 @@ export const API_ENDPOINTS = {
     BASE: '/api/enrollments',
     BY_ID: (id: string) => `/api/enrollments/${id}`,
   },
+
+  // Banners
+  BANNERS: {
+    BASE: '/api/banners',
+    FOR_SITE_WEB: '/api/banners/for-site-web',
+    ACTIVE_BY_POSITION: (position: string) => `/api/banners/active/${position}`,
+    BY_ID: (id: string) => `/api/banners/${id}`,
+  },
+
+  // Entreprises
+  ENTREPRISES: {
+    PACKS: '/api/entreprises/packs',
+    PACK_BY_ID: (id: string) => `/api/entreprises/packs/${id}`,
+    LEADS: '/api/entreprises/leads',
+    LEAD_BY_ID: (id: string) => `/api/entreprises/leads/${id}`,
+  },
+
+  // RAC
+  RAC: {
+    DOSSIERS: '/api/formation/rac',
+    DOSSIER_BY_ID: (id: string) => `/api/formation/rac/${id}`,
+    DOSSIER_TIMELINE: (id: string) => `/api/formation/rac/${id}/timeline`,
+    METIERS_PUBLIC: '/api/formation/rac-metiers/public',
+  },
 } as const;

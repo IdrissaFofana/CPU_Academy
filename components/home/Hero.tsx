@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/config";
 
 interface HeroSlide {
   title: string;
@@ -22,7 +24,13 @@ interface HeroSlide {
   }>;
 }
 
-const heroSlides: HeroSlide[] = [
+const DEFAULT_TRUST_BADGES: HeroSlide["trustBadges"] = [
+  { icon: "check", color: "orange", title: "Certifié CPU", subtitle: "Reconnu nationalement" },
+  { icon: "users", color: "green", title: "+10,000 apprenants", subtitle: "Déjà formés" },
+  { icon: "building", color: "orange", title: "500+ entreprises", subtitle: "Partenaires actifs" },
+];
+
+const staticHeroSlides: HeroSlide[] = [
   {
     title: "Formez-vous aux métiers d'avenir avec",
     highlight: "CPU Formation",
@@ -81,8 +89,67 @@ const heroSlides: HeroSlide[] = [
   }
 ];
 
+/** Map an API banner object to a HeroSlide */
+function apiBannerToSlide(banner: any): HeroSlide {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://back.cpupme.com";
+  const rawImage: string = banner.image_url ?? "";
+  const image = rawImage.startsWith("http") ? rawImage : `${baseUrl}${rawImage}`;
+
+  return {
+    title: banner.title ?? "Découvrez nos formations avec",
+    highlight: "CPU Formation",
+    description: banner.description ?? "La plateforme de formation professionnelle de référence en Côte d'Ivoire.",
+    primaryButton: {
+      label: "Découvrir",
+      href: banner.link_url ?? "/catalogue",
+    },
+    secondaryButton: { label: "Voir le catalogue", href: "/catalogue" },
+    image: image || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800&h=600",
+    badge: { icon: "+", number: "350", text: "Formations disponibles", subtext: "Pour tous les niveaux" },
+    trustBadges: DEFAULT_TRUST_BADGES,
+  };
+}
+
 export function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(staticHeroSlides);
+
+  // Fetch banners with category "formation" from API
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchBanners() {
+      try {
+        const data = await apiClient.get(API_ENDPOINTS.BANNERS.FOR_SITE_WEB, {
+          params: { position: "homepage", activeOnly: true },
+        });
+        const items: any[] = Array.isArray(data) ? data : (data?.data ?? []);
+        const formationBanners = items.filter((b: any) => {
+          const slug = (b?.category?.slug ?? "").toLowerCase();
+          const name = (b?.category?.name ?? "").toLowerCase();
+          return slug === "formation" || name === "formation";
+        });
+
+        if (!cancelled) {
+          const apiSlides = formationBanners
+            .sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0))
+            .map(apiBannerToSlide);
+
+          // Fill up to 4 slides with static fallbacks if API returned fewer than 4
+          const combined =
+            apiSlides.length >= 4
+              ? apiSlides.slice(0, 4)
+              : [...apiSlides, ...staticHeroSlides.slice(0, 4 - apiSlides.length)];
+
+          setHeroSlides(combined.length > 0 ? combined : staticHeroSlides);
+        }
+      } catch {
+        // On error, keep static slides — already set as default state
+      }
+    }
+    fetchBanners();
+    return () => { cancelled = true; };
+  }, []);
+
   const totalSlides = heroSlides.length;
 
   // Auto-play

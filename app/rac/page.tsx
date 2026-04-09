@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { 
   CheckCircle, 
   Award, 
@@ -35,12 +35,190 @@ import {
   Wheat,
   Laptop,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Plus,
+  Trash2,
+  Upload,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { PageBanner } from "@/components/layout/PageBanner";
+import { apiClient } from "@/lib/api/client";
+import { API_ENDPOINTS } from "@/lib/api/config";
 import Link from "next/link";
+
+// ─── FileUploadZone ───────────────────────────────────────────────────────────
+function FileUploadZone({
+  label,
+  formats,
+  required,
+  value,
+  onUrlChange,
+}: {
+  label: string;
+  formats?: string[] | null;
+  required?: boolean;
+  value: string;
+  onUrlChange: (url: string) => void;
+}) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const acceptedTypes =
+    formats && formats.length > 0
+      ? formats.map((f) => `.${f.toLowerCase()}`).join(",")
+      : ".pdf,.doc,.docx,.jpg,.jpeg,.png";
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const text = e.dataTransfer.getData("text/plain");
+    if (text && (text.startsWith("http://") || text.startsWith("https://"))) {
+      onUrlChange(text.trim());
+      setFileName("");
+      return;
+    }
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      setFileName(file.name);
+      onUrlChange(URL.createObjectURL(file));
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFileName(file.name);
+      onUrlChange(URL.createObjectURL(file));
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const text = e.clipboardData.getData("text/plain").trim();
+    if (text.startsWith("http://") || text.startsWith("https://")) {
+      e.preventDefault();
+      onUrlChange(text);
+      setFileName("");
+    }
+  };
+
+  const clear = () => {
+    onUrlChange("");
+    setFileName("");
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  const hasValue = Boolean(value && value.trim());
+
+  return (
+    <div className="space-y-2" onPaste={handlePaste} tabIndex={-1}>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-sm font-semibold text-gray-800">{label}</span>
+        {required && (
+          <span className="text-[11px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">
+            Obligatoire
+          </span>
+        )}
+        {formats && formats.length > 0 && (
+          <span className="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+            {formats.map((f) => f.toUpperCase()).join(" · ")}
+          </span>
+        )}
+      </div>
+
+      {!hasValue ? (
+        <div
+          className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 group select-none ${
+            isDragging
+              ? "border-orange-500 bg-orange-50/80 scale-[1.01] shadow-lg shadow-orange-100"
+              : "border-gray-200 hover:border-orange-400 hover:bg-orange-50/40"
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => inputRef.current?.click()}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept={acceptedTypes}
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          <div
+            className={`w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center transition-all duration-300 ${
+              isDragging
+                ? "bg-orange-100 scale-110 rotate-3"
+                : "bg-gray-100 group-hover:bg-orange-100 group-hover:scale-105"
+            }`}
+          >
+            <Upload
+              className={`w-7 h-7 transition-colors ${
+                isDragging
+                  ? "text-orange-500"
+                  : "text-gray-400 group-hover:text-orange-500"
+              }`}
+            />
+          </div>
+          <p
+            className={`font-semibold text-sm mb-1 transition-colors ${
+              isDragging
+                ? "text-orange-600"
+                : "text-gray-600 group-hover:text-orange-600"
+            }`}
+          >
+            {isDragging ? "✓ Déposez ici" : "Glisser-déposer ou cliquer pour sélectionner"}
+          </p>
+          <p className="text-xs text-gray-400 mb-3">Formats acceptés : {acceptedTypes.replace(/\./g, "").toUpperCase()}</p>
+          <div className="inline-flex items-center gap-1.5 text-xs text-gray-400 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
+            <kbd className="bg-gray-50 border border-gray-300 rounded px-1 py-0.5 text-[10px] font-mono text-gray-500">Ctrl+V</kbd>
+            <span>pour coller une URL</span>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 p-4 bg-green-50 border-2 border-green-200 rounded-2xl animate-fade-in group">
+          <div className="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+            <CheckCircle2 className="w-6 h-6 text-green-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-green-800 truncate">
+              {fileName || value}
+            </p>
+            <p className="text-xs text-green-600 mt-0.5">
+              {fileName ? "Fichier sélectionné" : "URL configurée"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={clear}
+            className="w-9 h-9 rounded-xl bg-green-100 hover:bg-red-100 flex items-center justify-center transition-all duration-200 flex-shrink-0 hover:scale-110"
+            aria-label="Supprimer"
+          >
+            <X className="w-4 h-4 text-green-600 hover:text-red-500 transition-colors" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function RACPage() {
   const [selectedType, setSelectedType] = useState("professionnel");
@@ -293,6 +471,235 @@ export default function RACPage() {
     }
   ];
 
+  type RequiredDocument = {
+    id?: string;
+    label: string;
+    obligatoire?: boolean;
+    formats?: string[] | null;
+  };
+
+  type RacMetierApi = {
+    id: string;
+    nom: string;
+    description?: string | null;
+    secteur: string;
+    niveau: string;
+    publication?: boolean;
+    requiredDocuments?: RequiredDocument[];
+  };
+
+  type DocumentJointForm = {
+    name: string;
+    type: string;
+    url: string;
+  };
+
+  type RacFormData = {
+    racMetierId: string;
+    candidat: string;
+    email: string;
+    telephone: string;
+    dateDepot: string;
+    anneesExperience: number;
+    documentsJoints: DocumentJointForm[];
+    commentaireLibre: string;
+  };
+
+  const [racMetiersApi, setRacMetiersApi] = useState<RacMetierApi[]>([]);
+  const [loadingRacMetiers, setLoadingRacMetiers] = useState(true);
+  const [racSubmitStatus, setRacSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [racFormVisible, setRacFormVisible] = useState(false);
+  const [racFormData, setRacFormData] = useState<RacFormData>({
+    racMetierId: "",
+    candidat: "",
+    email: "",
+    telephone: "",
+    dateDepot: new Date().toISOString().slice(0, 10),
+    anneesExperience: 0,
+    documentsJoints: [{ name: "", type: "", url: "" }],
+    commentaireLibre: "",
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchRacMetiers() {
+      setLoadingRacMetiers(true);
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.RAC.METIERS_PUBLIC);
+        const items = Array.isArray(response)
+          ? response
+          : Array.isArray((response as any)?.data)
+          ? (response as any).data
+          : [];
+        if (!cancelled) {
+          setRacMetiersApi(items as RacMetierApi[]);
+        }
+      } catch {
+        if (!cancelled) {
+          setRacMetiersApi([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingRacMetiers(false);
+        }
+      }
+    }
+    fetchRacMetiers();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Scroll-reveal animation for page sections
+  useEffect(() => {
+    const els = document.querySelectorAll("[data-reveal]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -60px 0px" }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  const selectedRacMetier = useMemo(
+    () => racMetiersApi.find((m) => m.id === racFormData.racMetierId) || null,
+    [racMetiersApi, racFormData.racMetierId]
+  );
+
+  const displaySecteursMetiers = useMemo(() => {
+    if (racMetiersApi.length === 0) return secteursMetiers;
+
+    const grouped = racMetiersApi.reduce<Record<string, { id: string; nom: string; metiers: any[] }>>((acc, metier) => {
+      const key = (metier.secteur || "Autres").trim();
+      if (!acc[key]) {
+        acc[key] = {
+          id: key.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "autres",
+          nom: key,
+          metiers: [],
+        };
+      }
+      acc[key].metiers.push({
+        id: metier.id,
+        nom: metier.nom,
+        blocs: metier.requiredDocuments?.length ?? 0,
+        duree: "RAC",
+        niveau: metier.niveau || "N/A",
+        requiredDocuments: metier.requiredDocuments || [],
+      });
+      return acc;
+    }, {});
+
+    return Object.values(grouped).map((secteur) => ({
+      ...secteur,
+      icon: <Briefcase className="w-5 h-5" />,
+      nombreMetiers: secteur.metiers.length,
+    }));
+  }, [racMetiersApi]);
+
+  const sectorFilterOptions = useMemo(() => {
+    const names = displaySecteursMetiers.map((s) => s.nom);
+    return ["Tous", ...names.slice(0, 6)];
+  }, [displaySecteursMetiers]);
+
+  const setRacField = <K extends keyof RacFormData>(field: K, value: RacFormData[K]) => {
+    setRacFormData((prev) => ({ ...prev, [field]: value }));
+    if (racSubmitStatus !== "idle") setRacSubmitStatus("idle");
+  };
+
+  const updateDocument = (index: number, field: keyof DocumentJointForm, value: string) => {
+    setRacFormData((prev) => {
+      const next = [...prev.documentsJoints];
+      next[index] = { ...next[index], [field]: value };
+      return { ...prev, documentsJoints: next };
+    });
+    if (racSubmitStatus !== "idle") setRacSubmitStatus("idle");
+  };
+
+  const addDocumentRow = () => {
+    setRacFormData((prev) => ({
+      ...prev,
+      documentsJoints: [...prev.documentsJoints, { name: "", type: "", url: "" }],
+    }));
+  };
+
+  const removeDocumentRow = (index: number) => {
+    setRacFormData((prev) => {
+      if (prev.documentsJoints.length <= 1) return prev;
+      return {
+        ...prev,
+        documentsJoints: prev.documentsJoints.filter((_, i) => i !== index),
+      };
+    });
+  };
+
+  const prefillForMetier = (metierId: string) => {
+    const metier = racMetiersApi.find((m) => m.id === metierId);
+    const docs = (metier?.requiredDocuments || []).map((d) => ({
+      name: d.label || "",
+      type: (d.formats?.[0] || "pdf").toLowerCase(),
+      url: "",
+    }));
+    setRacFormData((prev) => ({
+      ...prev,
+      racMetierId: metierId,
+      documentsJoints: docs.length > 0 ? docs : [{ name: "", type: "pdf", url: "" }],
+    }));
+    setRacSubmitStatus("idle");
+    setRacFormVisible(true);
+    setTimeout(() => {
+      document.getElementById("rac-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+  };
+
+  const closeRacForm = () => {
+    setRacFormVisible(false);
+    setRacSubmitStatus("idle");
+  };
+
+  const handleRacSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const docsPayload = racFormData.documentsJoints
+      .map((d) => ({ name: d.name.trim(), type: d.type.trim(), url: d.url.trim() }))
+      .filter((d) => d.name && d.type && d.url);
+
+    if (!racFormData.racMetierId || !racFormData.candidat || !racFormData.email || !racFormData.telephone || !racFormData.dateDepot) {
+      setRacSubmitStatus("error");
+      return;
+    }
+
+    try {
+      await apiClient.post(API_ENDPOINTS.RAC.DOSSIERS, {
+        racMetierId: racFormData.racMetierId,
+        candidat: racFormData.candidat,
+        email: racFormData.email,
+        telephone: racFormData.telephone,
+        dateDepot: racFormData.dateDepot,
+        anneesExperience: Number(racFormData.anneesExperience) || 0,
+        documentsJoints: docsPayload,
+      });
+
+      setRacSubmitStatus("success");
+      setRacFormData((prev) => ({
+        ...prev,
+        candidat: "",
+        email: "",
+        telephone: "",
+        anneesExperience: 0,
+        commentaireLibre: "",
+        documentsJoints: [{ name: "", type: "", url: "" }],
+      }));
+    } catch {
+      setRacSubmitStatus("error");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Hero Section */}
@@ -401,7 +808,13 @@ export default function RACPage() {
       <section className="bg-gradient-to-br from-orange-50 via-white to-green-50 py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg transition-all duration-300 hover:scale-105  group">
+            <Button
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg transition-all duration-300 hover:scale-105  group"
+              onClick={() => {
+                setRacFormVisible(true);
+                setTimeout(() => document.getElementById("rac-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+              }}
+            >
               Déposer ma candidature
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -414,7 +827,7 @@ export default function RACPage() {
       </section>
 
       {/* Qu'est-ce que le RAC */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
@@ -484,7 +897,7 @@ export default function RACPage() {
       </section>
 
       {/* Types de RAC */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -535,7 +948,7 @@ export default function RACPage() {
       </section>
 
       {/* Avantages */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
@@ -576,7 +989,7 @@ export default function RACPage() {
       </section>
 
       {/* Validation modulaire */}
-      <section className="py-16 bg-gradient-to-br from-white via-orange-50 to-green-50">
+      <section className="py-16 bg-gradient-to-br from-white via-orange-50 to-green-50" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
@@ -709,7 +1122,7 @@ export default function RACPage() {
       </section>
 
       {/* Processus en 6 étapes */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 to-orange-50">
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-orange-50" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -763,7 +1176,7 @@ export default function RACPage() {
       </section>
 
       {/* Documents requis */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
@@ -802,7 +1215,7 @@ export default function RACPage() {
       </section>
 
       {/* Métiers certifiables RAC */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
@@ -831,7 +1244,7 @@ export default function RACPage() {
 
                 {/* Filtres */}
                 <div className="flex gap-2 flex-wrap justify-center">
-                  {["Tous", "Automobile & Transport", "BTP & Construction", "Froid & Climatisation"].map((filter) => (
+                  {sectorFilterOptions.map((filter) => (
                     <button
                       key={filter}
                       onClick={() => setSelectedFilter(filter)}
@@ -841,7 +1254,7 @@ export default function RACPage() {
                           : "bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-300"
                       }`}
                     >
-                      {filter === "Tous" ? "Tous" : filter.split("&")[0].trim()}
+                      {filter}
                     </button>
                   ))}
                 </div>
@@ -850,11 +1263,11 @@ export default function RACPage() {
 
             {/* Liste des secteurs avec accordéon */}
             <div className="space-y-4">
-              {secteursMetiers
+              {displaySecteursMetiers
                 .filter(secteur => {
                   // Filtrage par catégorie
                   if (selectedFilter === "Tous") return true;
-                  return secteur.nom.includes(selectedFilter.split("&")[0].trim());
+                  return secteur.nom === selectedFilter;
                 })
                 .filter(secteur => {
                   // Filtrage par recherche
@@ -890,11 +1303,11 @@ export default function RACPage() {
                     </div>
                   </Card>
                 ) : (
-                  secteursMetiers
+                  displaySecteursMetiers
                     .filter(secteur => {
                       // Filtrage par catégorie
                       if (selectedFilter === "Tous") return true;
-                      return secteur.nom.includes(selectedFilter.split("&")[0].trim());
+                      return secteur.nom === selectedFilter;
                     })
                     .filter(secteur => {
                       // Filtrage par recherche
@@ -973,7 +1386,17 @@ export default function RACPage() {
                                   <span>{metier.duree}</span>
                                 </div>
                               </div>
-                              <Button className="w-full mt-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm transition-all">
+                              <Button
+                                className="w-full mt-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm transition-all"
+                                onClick={() => {
+                                  const apiMetierId = (metier as any).id as string | undefined;
+                                  if (apiMetierId) {
+                                    prefillForMetier(apiMetierId);
+                                  } else {
+                                    document.getElementById("rac-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                                  }
+                                }}
+                              >
                                 Postuler
                               </Button>
                             </div>
@@ -1000,8 +1423,317 @@ export default function RACPage() {
         </div>
       </section>
 
+      {/* Formulaire dépôt dossier RAC — affiché uniquement au clic Postuler */}
+      {racFormVisible && (
+        <section id="rac-form" className="py-16 bg-gradient-to-br from-orange-50/60 via-white to-green-50/40 relative overflow-hidden">
+          {/* Decorative blobs */}
+          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-orange-100 rounded-full opacity-25 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-green-100 rounded-full opacity-25 blur-3xl pointer-events-none" />
+
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="max-w-3xl mx-auto animate-form-reveal">
+
+              {/* Form header */}
+              <div className="flex items-start justify-between mb-8">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    <FileCheck className="w-4 h-4" />
+                    Dossier de candidature
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                    Postuler au RAC
+                  </h2>
+                  {selectedRacMetier ? (
+                    <p className="text-lg text-orange-600 font-semibold">
+                      {selectedRacMetier.nom}
+                      {selectedRacMetier.secteur ? ` · ${selectedRacMetier.secteur}` : ""}
+                      {selectedRacMetier.niveau ? ` · ${selectedRacMetier.niveau}` : ""}
+                    </p>
+                  ) : (
+                    <p className="text-gray-500 text-base">Sélectionnez un métier pour personnaliser votre dossier</p>
+                  )}
+                </div>
+                <button
+                  onClick={closeRacForm}
+                  className="w-10 h-10 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center transition-all duration-200 flex-shrink-0 hover:scale-110 group mt-1"
+                  aria-label="Fermer le formulaire"
+                >
+                  <X className="w-5 h-5 text-gray-500 group-hover:text-red-500 transition-colors" />
+                </button>
+              </div>
+
+              <Card className="border-2 border-orange-100 shadow-2xl rounded-3xl overflow-hidden">
+                <form className="p-6 md:p-10 space-y-10" onSubmit={handleRacSubmit}>
+
+                  {/* Métier selector (only if no pre-selected métier) */}
+                  {!selectedRacMetier && (
+                    <div className="space-y-2">
+                      <Label htmlFor="rac-metier-select" className="font-semibold text-gray-800">
+                        Choisir un métier RAC <span className="text-orange-500">*</span>
+                      </Label>
+                      <select
+                        id="rac-metier-select"
+                        value={racFormData.racMetierId}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) prefillForMetier(val);
+                          else setRacField("racMetierId", "");
+                        }}
+                        className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white px-3 text-sm focus:outline-none focus:border-orange-400 transition-colors"
+                        required
+                      >
+                        <option value="">— Sélectionnez un métier —</option>
+                        {racMetiersApi.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.nom}{m.secteur ? ` — ${m.secteur}` : ""}
+                          </option>
+                        ))}
+                      </select>
+                      {loadingRacMetiers && (
+                        <p className="text-xs text-slate-400">Chargement des métiers depuis l'API…</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ── Section 1 : Informations personnelles ── */}
+                  <div>
+                    <h3 className="flex items-center gap-3 text-xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-orange-100">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                        1
+                      </div>
+                      Informations personnelles
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="rac-candidat" className="font-medium text-gray-700">
+                          Nom complet <span className="text-orange-500">*</span>
+                        </Label>
+                        <Input
+                          id="rac-candidat"
+                          value={racFormData.candidat}
+                          onChange={(e) => setRacField("candidat", e.target.value)}
+                          className="h-12 rounded-xl border-2 border-slate-200 focus:border-orange-400 transition-colors"
+                          placeholder="Jean Dupont"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="rac-email" className="font-medium text-gray-700">
+                          Email <span className="text-orange-500">*</span>
+                        </Label>
+                        <Input
+                          id="rac-email"
+                          type="email"
+                          value={racFormData.email}
+                          onChange={(e) => setRacField("email", e.target.value)}
+                          className="h-12 rounded-xl border-2 border-slate-200 focus:border-orange-400 transition-colors"
+                          placeholder="jean@exemple.com"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="rac-telephone" className="font-medium text-gray-700">
+                          Téléphone <span className="text-orange-500">*</span>
+                        </Label>
+                        <Input
+                          id="rac-telephone"
+                          value={racFormData.telephone}
+                          onChange={(e) => setRacField("telephone", e.target.value)}
+                          className="h-12 rounded-xl border-2 border-slate-200 focus:border-orange-400 transition-colors"
+                          placeholder="+225 07 00 00 00"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="rac-experience" className="font-medium text-gray-700">
+                          Années d'expérience
+                        </Label>
+                        <Input
+                          id="rac-experience"
+                          type="number"
+                          min={0}
+                          max={50}
+                          value={racFormData.anneesExperience}
+                          onChange={(e) => setRacField("anneesExperience", Number(e.target.value))}
+                          className="h-12 rounded-xl border-2 border-slate-200 focus:border-orange-400 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="rac-date-depot" className="font-medium text-gray-700">
+                          Date de dépôt <span className="text-orange-500">*</span>
+                        </Label>
+                        <Input
+                          id="rac-date-depot"
+                          type="date"
+                          value={racFormData.dateDepot}
+                          onChange={(e) => setRacField("dateDepot", e.target.value)}
+                          className="h-12 rounded-xl border-2 border-slate-200 focus:border-orange-400 transition-colors w-full md:w-56"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Section 2 : Documents justificatifs ── */}
+                  <div>
+                    <h3 className="flex items-center gap-3 text-xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-orange-100">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                        2
+                      </div>
+                      Documents justificatifs
+                    </h3>
+
+                    {/* Per-métier required documents */}
+                    {selectedRacMetier?.requiredDocuments && selectedRacMetier.requiredDocuments.length > 0 ? (
+                      <div className="space-y-5">
+                        <div className="flex items-center gap-3 p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl">
+                          <ClipboardCheck className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                          <p className="text-sm text-blue-800">
+                            <strong>{selectedRacMetier.requiredDocuments.length} document(s)</strong> requis pour la certification{" "}
+                            <strong>{selectedRacMetier.nom}</strong>. Glissez-déposez ou collez une URL (Ctrl+V).
+                          </p>
+                        </div>
+                        {selectedRacMetier.requiredDocuments.map((doc, idx) => (
+                          <div
+                            key={`${doc.label}-${idx}`}
+                            className="bg-white border-2 border-slate-100 rounded-2xl p-5 hover:border-orange-200 transition-colors shadow-sm animate-fade-in"
+                            style={{ animationDelay: `${idx * 60}ms` }}
+                          >
+                            <FileUploadZone
+                              label={doc.label}
+                              formats={doc.formats || null}
+                              required={doc.obligatoire}
+                              value={racFormData.documentsJoints[idx]?.url || ""}
+                              onUrlChange={(url) => updateDocument(idx, "url", url)}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      /* Generic document fields (no métier selected or no required docs) */
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <p className="text-sm text-slate-500">
+                            Ajoutez vos documents justificatifs (CV, attestations, diplômes…)
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={addDocumentRow}
+                            className="border-orange-300 text-orange-600 hover:bg-orange-50 rounded-xl gap-1"
+                          >
+                            <Plus className="w-4 h-4" /> Ajouter
+                          </Button>
+                        </div>
+                        <div className="space-y-4">
+                          {racFormData.documentsJoints.map((doc, idx) => (
+                            <div
+                              key={`doc-${idx}`}
+                              className="bg-white border-2 border-slate-100 rounded-2xl p-5 hover:border-orange-200 transition-colors shadow-sm relative"
+                            >
+                              {racFormData.documentsJoints.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeDocumentRow(idx)}
+                                  className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors"
+                                  aria-label="Supprimer ce document"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                                </button>
+                              )}
+                              <div className="space-y-2 mb-4">
+                                <Label className="font-medium text-gray-700">Nom du document</Label>
+                                <Input
+                                  value={doc.name}
+                                  placeholder="Ex : CV professionnel, Attestation employeur…"
+                                  onChange={(e) => updateDocument(idx, "name", e.target.value)}
+                                  className="h-11 rounded-xl border-2 border-slate-200 focus:border-orange-400 transition-colors"
+                                />
+                              </div>
+                              <FileUploadZone
+                                label="Fichier ou URL"
+                                formats={null}
+                                required={false}
+                                value={doc.url}
+                                onUrlChange={(url) => updateDocument(idx, "url", url)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ── Section 3 : Commentaire ── */}
+                  <div>
+                    <h3 className="flex items-center gap-3 text-xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-orange-100">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                        3
+                      </div>
+                      Commentaire <span className="text-gray-400 font-normal text-base ml-1">(facultatif)</span>
+                    </h3>
+                    <Textarea
+                      id="rac-commentaire"
+                      rows={4}
+                      value={racFormData.commentaireLibre}
+                      onChange={(e) => setRacField("commentaireLibre", e.target.value)}
+                      placeholder="Décrivez votre parcours, vos motivations, ou toute information utile pour l'évaluation de votre dossier…"
+                      className="rounded-xl border-2 border-slate-200 focus:border-orange-400 transition-colors resize-none"
+                    />
+                  </div>
+
+                  {/* Feedback messages */}
+                  {racSubmitStatus === "error" && (
+                    <div className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-red-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <X className="w-3.5 h-3.5 text-red-600" />
+                      </div>
+                      <div className="text-sm text-red-700">
+                        <p className="font-semibold mb-1">Impossible d'envoyer le dossier</p>
+                        <p>Vérifiez que tous les champs obligatoires sont remplis (nom, email, téléphone, date de dépôt).</p>
+                      </div>
+                    </div>
+                  )}
+                  {racSubmitStatus === "success" && (
+                    <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-4 flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-green-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-green-700" />
+                      </div>
+                      <div className="text-sm text-green-700">
+                        <p className="font-semibold mb-1">Dossier envoyé avec succès !</p>
+                        <p>Notre équipe examinera votre candidature et vous contactera dans les meilleurs délais.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Submit row */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <Button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white h-14 text-base rounded-2xl shadow-lg hover:shadow-orange-200 hover:scale-[1.02] transition-all duration-200 font-semibold"
+                    >
+                      <FileCheck className="mr-2 w-5 h-5" />
+                      Envoyer mon dossier RAC
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={closeRacForm}
+                      className="border-2 border-gray-300 text-gray-600 hover:border-red-300 hover:text-red-600 h-14 px-8 rounded-2xl transition-all"
+                    >
+                      Annuler
+                    </Button>
+                  </div>
+
+                </form>
+              </Card>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
@@ -1058,7 +1790,7 @@ export default function RACPage() {
       </section>
 
       {/* CTA Final */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50" data-reveal>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
             <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl p-8 md:p-12 lg:p-16 text-center shadow-2xl">
@@ -1070,11 +1802,23 @@ export default function RACPage() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-6 text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 font-semibold hover:scale-105 group">
+                <Button
+                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-6 text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 font-semibold hover:scale-105 group"
+                  onClick={() => {
+                    setRacFormVisible(true);
+                    setTimeout(() => document.getElementById("rac-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+                  }}
+                >
                   Déposer ma candidature
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <Button className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-6 text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 font-semibold hover:scale-105">
+                <Button
+                  className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-6 text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 font-semibold hover:scale-105"
+                  onClick={() => {
+                    setRacFormVisible(true);
+                    setTimeout(() => document.getElementById("rac-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+                  }}
+                >
                   Parler à un conseiller
                 </Button>
               </div>

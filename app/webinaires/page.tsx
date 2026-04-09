@@ -17,7 +17,7 @@ import {
   type WebinaireStatus,
 } from "@/lib/adapters/webinaire-adapter";
 import {
-  Building2, Calendar, Check, ChevronLeft, ChevronRight,
+  Calendar, Check, ChevronLeft, ChevronRight,
   Clock, Grid3x3, LayoutGrid, List, Play, SlidersHorizontal,
   Sparkles, Tag, Users, Video, X,
 } from "lucide-react";
@@ -58,7 +58,6 @@ function statusBadge(statut: WebinaireStatus) {
 export default function WebinairesPage() {
   const [selectedStatus, setSelectedStatus] = useState<"all" | WebinaireStatus>("all");
   const [selectedTheme, setSelectedTheme] = useState("all");
-  const [selectedSecteur, setSelectedSecteur] = useState("all");
   const [selectedDuree, setSelectedDuree] = useState("all");
   const [onlyGratuit, setOnlyGratuit] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -79,14 +78,7 @@ export default function WebinairesPage() {
     return Array.from(s).sort();
   }, [webinaires]);
 
-  const allSecteurs = useMemo(() => {
-    const s = new Set<string>();
-    webinaires.forEach((w) => { if (w.secteur) s.add(w.secteur); });
-    return Array.from(s).sort();
-  }, [webinaires]);
-
-  const themeOptions = [{ value: "all", label: "Tous les thèmes" }, ...allThemes.map((t) => ({ value: t, label: t }))];
-  const secteurOptions = [{ value: "all", label: "Tous les secteurs" }, ...allSecteurs.map((s) => ({ value: s, label: s }))];
+  const categorieOptions = [{ value: "all", label: "Toutes les catégories" }, ...allThemes.map((t) => ({ value: t, label: t }))];  
   const dureeOptions = [
     { value: "all",   label: "Toutes les durées" },
     { value: "court", label: "Court (< 30 min)" },
@@ -97,14 +89,12 @@ export default function WebinairesPage() {
   const nombreFiltresActifs =
     (selectedStatus !== "all" ? 1 : 0) +
     (selectedTheme !== "all" ? 1 : 0) +
-    (selectedSecteur !== "all" ? 1 : 0) +
     (selectedDuree !== "all" ? 1 : 0) +
     (onlyGratuit ? 1 : 0);
 
   const reinitialiserFiltres = () => {
     setSelectedStatus("all");
     setSelectedTheme("all");
-    setSelectedSecteur("all");
     setSelectedDuree("all");
     setOnlyGratuit(false);
     setSearchTerm("");
@@ -115,7 +105,6 @@ export default function WebinairesPage() {
       webinaires.filter((w) => {
         if (selectedStatus !== "all" && w.statut !== selectedStatus) return false;
         if (selectedTheme !== "all" && !w.themes.includes(selectedTheme)) return false;
-        if (selectedSecteur !== "all" && w.secteur !== selectedSecteur) return false;
         if (selectedDuree !== "all") {
           if (selectedDuree === "court" && w.dureeMinutes >= 30) return false;
           if (selectedDuree === "moyen" && (w.dureeMinutes < 30 || w.dureeMinutes > 60)) return false;
@@ -133,14 +122,14 @@ export default function WebinairesPage() {
         }
         return true;
       }),
-    [webinaires, selectedStatus, selectedTheme, selectedSecteur, selectedDuree, onlyGratuit, searchTerm]
+    [webinaires, selectedStatus, selectedTheme, selectedDuree, onlyGratuit, searchTerm]
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredWebinaires.length / ITEMS_PER_PAGE));
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedWebinaires = filteredWebinaires.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  useEffect(() => { setCurrentPage(1); }, [selectedStatus, selectedTheme, selectedSecteur, selectedDuree, onlyGratuit, searchTerm]);
+  useEffect(() => { setCurrentPage(1); }, [selectedStatus, selectedTheme, selectedDuree, onlyGratuit, searchTerm]);
   useEffect(() => { if (currentPage > totalPages) setCurrentPage(totalPages); }, [currentPage, totalPages]);
 
   const Sidebar = ({ isMobile = false }: { isMobile?: boolean }) => (
@@ -189,24 +178,14 @@ export default function WebinairesPage() {
         </div>
       </div>
 
-      {/* Thème */}
+      {/* Catégorie */}
       <div className="mb-6">
         <Label className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
           <Tag className="w-4 h-4 text-orange-500" />
-          Thème
+          Catégorie
         </Label>
-        <SearchableSelect value={selectedTheme} onValueChange={setSelectedTheme} options={themeOptions}
-          placeholder="Tous les thèmes" searchPlaceholder="Rechercher un thème..." emptyText="Aucun thème trouvé" />
-      </div>
-
-      {/* Secteur */}
-      <div className="mb-6">
-        <Label className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
-          <Building2 className="w-4 h-4 text-orange-500" />
-          Secteur
-        </Label>
-        <SearchableSelect value={selectedSecteur} onValueChange={setSelectedSecteur} options={secteurOptions}
-          placeholder="Tous les secteurs" searchPlaceholder="Rechercher un secteur..." emptyText="Aucun secteur trouvé" />
+        <SearchableSelect value={selectedTheme} onValueChange={setSelectedTheme} options={categorieOptions}
+          placeholder="Toutes les catégories" searchPlaceholder="Rechercher une catégorie..." emptyText="Aucune catégorie trouvée" />
       </div>
 
       {/* Durée */}
@@ -329,12 +308,6 @@ export default function WebinairesPage() {
                     <Badge className="bg-orange-100 text-orange-700 border border-orange-200 flex items-center gap-1 px-3 py-1">
                       <Tag className="w-3 h-3" />{selectedTheme}
                       <button onClick={() => setSelectedTheme("all")} className="ml-1"><X className="w-3 h-3" /></button>
-                    </Badge>
-                  )}
-                  {selectedSecteur !== "all" && (
-                    <Badge className="bg-orange-100 text-orange-700 border border-orange-200 flex items-center gap-1 px-3 py-1">
-                      <Building2 className="w-3 h-3" />{selectedSecteur}
-                      <button onClick={() => setSelectedSecteur("all")} className="ml-1"><X className="w-3 h-3" /></button>
                     </Badge>
                   )}
                   {selectedDuree !== "all" && (

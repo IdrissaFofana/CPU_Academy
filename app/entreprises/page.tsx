@@ -137,6 +137,79 @@ const initialFormData: ContactFormData = {
   rgpd: false,
 };
 
+const ICONE_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  target: Target,
+  trending_up: TrendingUp,
+  trendingup: TrendingUp,
+  bar_chart: BarChart,
+  barchart: BarChart,
+  users: Users,
+  settings: Settings,
+  zap: Zap,
+  rocket: Rocket,
+  briefcase: Briefcase,
+  award: Award,
+  shield: Shield,
+  graduation_cap: GraduationCap,
+  graduationcap: GraduationCap,
+  lightbulb: Lightbulb,
+  building: Building,
+};
+
+const COULEUR_GRADIENT_MAP: Record<string, string> = {
+  orange: "from-orange-500 to-orange-600",
+  blue: "from-blue-500 to-blue-600",
+  green: "from-green-500 to-green-600",
+  purple: "from-purple-500 to-purple-600",
+  indigo: "from-indigo-500 to-indigo-600",
+  cyan: "from-cyan-500 to-cyan-600",
+  red: "from-red-500 to-red-600",
+  pink: "from-pink-500 to-pink-600",
+  yellow: "from-yellow-500 to-yellow-600",
+};
+
+type ApiEntreprisePack = {
+  id: string;
+  titre: string;
+  slug: string;
+  description?: string | null;
+  categorie: string;
+  couleur: string;
+  icone: string;
+  dureeJours: number;
+  nbModules: number;
+  ordre: number;
+  actif: boolean;
+  formations: string[];
+  prix: { parPersonne: number; groupe8Plus: number; groupe15Plus: number; devise?: string };
+  financement: { fdfpEligible: boolean; tauxPriseEnCharge: string; resteACharge: number };
+};
+
+function normalizeApiPack(raw: ApiEntreprisePack, index: number): PackMetier {
+  const iconeKey = (raw.icone ?? "").toLowerCase().replace(/[^a-z_]/g, "");
+  const couleurKey = (raw.couleur ?? "orange").toLowerCase();
+  return {
+    titre: raw.titre,
+    icon: ICONE_MAP[iconeKey] ?? Target,
+    description: raw.description ?? raw.categorie,
+    duree: `${raw.dureeJours} jour${raw.dureeJours > 1 ? "s" : ""}`,
+    modules: raw.nbModules,
+    formations: raw.formations ?? [],
+    prix: {
+      parPersonne: raw.prix?.parPersonne ?? 0,
+      groupe8Plus: raw.prix?.groupe8Plus,
+      groupe15Plus: raw.prix?.groupe15Plus,
+    },
+    financement: {
+      fdfpEligible: raw.financement?.fdfpEligible ?? false,
+      priseEnCharge: raw.financement?.tauxPriseEnCharge ?? "60-70%",
+      resteACharge: raw.financement?.resteACharge ?? 0,
+    },
+    color: couleurKey in COULEUR_GRADIENT_MAP ? couleurKey : "orange",
+    gradient: COULEUR_GRADIENT_MAP[couleurKey] ?? "from-orange-500 to-orange-600",
+  };
+}
+
 const packsMetiers: PackMetier[] = [
   {
     titre: "Pack Direction & Management",
@@ -657,6 +730,8 @@ export default function EntreprisesPage() {
   const [isFaqLoading, setIsFaqLoading] = useState(true);
   const [apiRessourcesEntreprises, setApiRessourcesEntreprises] = useState<ApiRessourceEntreprise[]>([]);
   const [isRessourcesLoading, setIsRessourcesLoading] = useState(true);
+  const [apiPacks, setApiPacks] = useState<PackMetier[]>([]);
+  const [isPacksLoading, setIsPacksLoading] = useState(true);
   const [selectedPackIndex, setSelectedPackIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState<ContactFormData>(initialFormData);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
@@ -721,9 +796,33 @@ export default function EntreprisesPage() {
       }
     }
 
+    async function fetchPacks() {
+      setIsPacksLoading(true);
+      try {
+        const response = await apiClient.get(API_ENDPOINTS.ENTREPRISES.PACKS);
+        const rawItems: any[] = Array.isArray(response) ? response : (response?.data ?? []);
+        const normalized = rawItems
+          .filter((p: any) => p?.actif !== false)
+          .sort((a: any, b: any) => (a.ordre ?? 0) - (b.ordre ?? 0))
+          .map((p: any, i: number) => normalizeApiPack(p as ApiEntreprisePack, i));
+        if (!isCancelled) {
+          setApiPacks(normalized.length > 0 ? normalized : []);
+        }
+      } catch {
+        if (!isCancelled) {
+          setApiPacks([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsPacksLoading(false);
+        }
+      }
+    }
+
     fetchPartenaires();
     fetchFaqEntreprises();
     fetchRessourcesEntreprises();
+    fetchPacks();
 
     return () => {
       isCancelled = true;
@@ -747,13 +846,29 @@ export default function EntreprisesPage() {
 
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isPackDetailModalOpen, setIsPackDetailModalOpen] = useState(false);
-  const selectedPack = selectedPackIndex !== null ? packsMetiers[selectedPackIndex] : null;
+  const displayedPacks = apiPacks.length > 0 ? apiPacks : packsMetiers;
+  const selectedPack = selectedPackIndex !== null ? displayedPacks[selectedPackIndex] : null;
   const PackDetailIcon: React.ComponentType<{ className?: string }> = selectedPack?.icon ?? Target;
 
-  const openGeneralContactModal = () => {
-    setFormData(initialFormData);
+  const openContactForm = (preset?: Partial<ContactFormData>) => {
+    const defaultType = preset?.typebesoin ?? "sur-mesure";
+    setFormData({
+      ...initialFormData,
+      typebesoin: defaultType,
+      packInteresse:
+        preset?.packInteresse ??
+        (defaultType === "pack-metier" ? "" : "Formation / pack non défini"),
+      message:
+        preset?.message ??
+        "Nous souhaitons une proposition adaptée à notre besoin métier (pack existant ou non défini).",
+      ...preset,
+    });
     setSubmitStatus("idle");
     setIsContactModalOpen(true);
+  };
+
+  const openGeneralContactModal = () => {
+    openContactForm();
   };
 
   const handleInputChange = (field: keyof ContactFormData, value: string | boolean) => {
@@ -770,29 +885,63 @@ export default function EntreprisesPage() {
 
   const handleApplyToPack = (pack: PackMetier) => {
     setSelectedPackIndex(null);
-    setFormData({
-      ...initialFormData,
+    const contactSection = document.getElementById("contact");
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    openContactForm({
       typebesoin: "pack-metier",
       packInteresse: pack.titre,
       message: `Nous souhaitons postuler au ${pack.titre} (${pack.duree}, ${pack.modules} modules). Merci de nous envoyer les modalités de démarrage et les options de financement adaptées.`,
     });
-    setSubmitStatus("idle");
-    setIsContactModalOpen(true);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    const maybeOpenFromHash = () => {
+      if (window.location.hash === "#contact") {
+        openGeneralContactModal();
+      }
+    };
+
+    maybeOpenFromHash();
+    window.addEventListener("hashchange", maybeOpenFromHash);
+    return () => window.removeEventListener("hashchange", maybeOpenFromHash);
+  }, []);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!formData.rgpd) {
+    if (!formData.rgpd || !formData.collaborateurs || !formData.delai || !formData.typebesoin) {
       setSubmitStatus("error");
       return;
     }
-    setSubmitStatus("success");
-    console.log("Demande entreprise:", formData);
-    setTimeout(() => {
-      setIsContactModalOpen(false);
-      setFormData(initialFormData);
-      setSubmitStatus("idle");
-    }, 2500);
+
+    const packInteresse = formData.packInteresse?.trim() || "Demande sur mesure";
+
+    setSubmitStatus("idle");
+    try {
+      await apiClient.post(API_ENDPOINTS.ENTREPRISES.LEADS, {
+        entreprise: formData.entreprise,
+        secteur: formData.secteur,
+        nom: formData.nom,
+        fonction: formData.fonction,
+        email: formData.email,
+        tel: formData.tel,
+        typebesoin: formData.typebesoin,
+        packInteresse,
+        collaborateurs: formData.collaborateurs,
+        delai: formData.delai,
+        message: formData.message || undefined,
+        rgpd: formData.rgpd,
+      });
+      setSubmitStatus("success");
+      setTimeout(() => {
+        setIsContactModalOpen(false);
+        setFormData(initialFormData);
+        setSubmitStatus("idle");
+      }, 2500);
+    } catch {
+      setSubmitStatus("error");
+    }
   };
 
   return (
@@ -1157,7 +1306,15 @@ export default function EntreprisesPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 max-w-7xl mx-auto">
-            {packsMetiers.map((pack, idx) => {
+            {isPacksLoading && Array.from({ length: 6 }).map((_, idx) => (
+              <Card key={`skel-${idx}`} className="p-6 border-2 border-slate-100 animate-pulse">
+                <div className="h-12 w-12 rounded-xl bg-slate-200 mb-4" />
+                <div className="h-5 bg-slate-200 rounded mb-2 w-3/4" />
+                <div className="h-4 bg-slate-100 rounded mb-4 w-full" />
+                <div className="h-24 bg-slate-100 rounded mb-4" />
+              </Card>
+            ))}
+            {!isPacksLoading && displayedPacks.map((pack, idx) => {
               const Icon = pack.icon;
               return (
                 <Card
@@ -2133,27 +2290,35 @@ export default function EntreprisesPage() {
                   </Select>
                 </div>
 
-                {formData.typebesoin === "pack-metier" && (
-                  <div className="space-y-1.5">
-                    <Label htmlFor="m-pack" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Pack sélectionné
-                    </Label>
-                    <Input
-                      id="m-pack"
-                      value={formData.packInteresse}
-                      onChange={(e) => handleInputChange("packInteresse", e.target.value)}
-                      placeholder="Ex: Pack Direction & Management"
-                      className="h-11 rounded-xl border-2 border-orange-200 bg-orange-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all text-sm font-medium"
-                    />
-                  </div>
-                )}
+                <div className="space-y-1.5">
+                  <Label htmlFor="m-pack" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Formation / pack souhaité *
+                  </Label>
+                  <Input
+                    id="m-pack"
+                    required
+                    value={formData.packInteresse}
+                    onChange={(e) => handleInputChange("packInteresse", e.target.value)}
+                    placeholder="Ex: Pack Direction & Management ou besoin non défini"
+                    className={`h-11 rounded-xl border-2 transition-all text-sm ${
+                      formData.typebesoin === "pack-metier"
+                        ? "border-orange-200 bg-orange-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 font-medium"
+                        : "border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                    }`}
+                  />
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="m-collaborateurs" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                       Collaborateurs *
                     </Label>
-                    <Select value={formData.collaborateurs} onValueChange={(value) => handleInputChange("collaborateurs", value)}>
+                    <Select
+                      required
+                      name="collaborateurs"
+                      value={formData.collaborateurs}
+                      onValueChange={(value) => handleInputChange("collaborateurs", value)}
+                    >
                       <SelectTrigger
                         id="m-collaborateurs"
                         className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm"
@@ -2172,7 +2337,12 @@ export default function EntreprisesPage() {
                     <Label htmlFor="m-delai" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                       Délai souhaité *
                     </Label>
-                    <Select value={formData.delai} onValueChange={(value) => handleInputChange("delai", value)}>
+                    <Select
+                      required
+                      name="delai"
+                      value={formData.delai}
+                      onValueChange={(value) => handleInputChange("delai", value)}
+                    >
                       <SelectTrigger
                         id="m-delai"
                         className="h-11 rounded-xl border-2 border-slate-200 bg-slate-50 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm"
@@ -2224,7 +2394,7 @@ export default function EntreprisesPage() {
                   <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <XCircle className="w-4 h-4 text-red-600" />
                   </div>
-                  <p className="text-sm text-red-700">Veuillez accepter la politique de confidentialité pour envoyer votre demande.</p>
+                  <p className="text-sm text-red-700">Veuillez compléter les champs obligatoires (type de besoin, collaborateurs, délai) et accepter la politique de confidentialité.</p>
                 </div>
               )}
 

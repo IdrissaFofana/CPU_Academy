@@ -124,37 +124,37 @@ export function CatalogueFilters({
         />
       </div>
 
-      {/* Région */}
+      {/* Centre de formation */}
       <div className="mb-6">
         <Label htmlFor={isMobile ? "region-mobile" : "region"} className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
           <MapPin className="w-4 h-4 text-cpu-orange" />
-          Région
+          Centre de formation
         </Label>
         <SearchableSelect
           triggerId={isMobile ? "region-mobile" : "region"}
           value={region}
           onValueChange={setRegion}
           options={regionSelectOptions}
-          placeholder="Toutes les régions"
-          searchPlaceholder="Rechercher une région..."
-          emptyText="Aucune région trouvée"
+          placeholder="Tous les centres"
+          searchPlaceholder="Rechercher un centre..."
+          emptyText="Aucun centre trouvé"
         />
       </div>
 
-      {/* Secteur */}
+      {/* Catégorie */}
       <div className="mb-6">
         <Label htmlFor={isMobile ? "secteur-mobile" : "secteur"} className="mb-3 block text-sm font-semibold text-slate-700 flex items-center gap-2">
           <Building2 className="w-4 h-4 text-cpu-orange" />
-          Secteur
+          Catégorie
         </Label>
         <SearchableSelect
           triggerId={isMobile ? "secteur-mobile" : "secteur"}
           value={secteur}
           onValueChange={setSecteur}
           options={secteurSelectOptions}
-          placeholder="Tous les secteurs"
-          searchPlaceholder="Rechercher un secteur..."
-          emptyText="Aucun secteur trouvé"
+          placeholder="Toutes les catégories"
+          searchPlaceholder="Rechercher une catégorie..."
+          emptyText="Aucune catégorie trouvée"
         />
       </div>
 

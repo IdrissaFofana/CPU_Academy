@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'api.cpupme.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'storage.cpupme.com',
+      },
     ],
   },
 };
