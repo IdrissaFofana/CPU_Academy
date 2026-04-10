@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FormationModal } from "./FormationModal";
 import type { Formation } from "@/types";
-import { Clock, MapPin, Users, Star, BookOpen, ShoppingCart, Check } from "lucide-react";
+import { Clock, MapPin, Star, BookOpen, ShoppingCart, Check } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { getModeFallbackImage } from "@/lib/utils";
 
@@ -138,10 +138,6 @@ export function FormationCard({ formation, variant = "default" }: FormationCardP
           <span className="flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5" />
             {formation.region || "Abidjan"}
-          </span>
-          <span className="flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" />
-            {formation.nbInscrits || 245}
           </span>
         </div>
 

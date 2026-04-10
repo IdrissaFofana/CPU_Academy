@@ -87,7 +87,7 @@ function ParcoursCardGrid({
             {/* FLOATING BADGES (Top Left) */}
             <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
               {/* Bestseller Badge */}
-              {parcours.nbInscrits && parcours.nbInscrits > 1000 && (
+              {(parcours.nbInscrits || 0) > 1000 && (
                 <Badge className="bg-cpu-orange/90 backdrop-blur-sm text-white border-0 shadow-lg hover:scale-110 transition-transform flex items-center gap-1">
                   <Zap className="w-3 h-3" />
                   Bestseller
@@ -178,17 +178,11 @@ function ParcoursCardGrid({
               <span className="text-slate-500">({parcours.nbAvis || 0})</span>
             </div>
 
-            {/* QUICK STATS (2 colonnes) */}
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            {/* QUICK STATS */}
+            <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1 text-slate-600">
                 <Clock className="w-3.5 h-3.5 text-cpu-orange flex-shrink-0" />
                 <span className="font-semibold">{parcours.dureeTotal}h</span>
-              </div>
-              <div className="flex items-center gap-1 text-slate-600">
-                <Users className="w-3.5 h-3.5 text-cpu-green flex-shrink-0" />
-                <span className="font-semibold">
-                  {(parcours.nbInscrits || 0).toLocaleString()}
-                </span>
               </div>
             </div>
 
@@ -223,13 +217,7 @@ function ParcoursCardGrid({
                 )}
               </div>
 
-              {/* Momentum Badge */}
-              {parcours.nbInscritsMonth && parcours.nbInscritsMonth > 0 && (
-                <div className="flex items-center gap-1 text-xs text-cpu-green font-semibold bg-cpu-green/10 px-2 py-1 rounded">
-                  <TrendingUp className="w-3 h-3" />
-                  +{parcours.nbInscritsMonth}
-                </div>
-              )}
+
             </div>
 
             {/* CTA BUTTONS */}
@@ -319,10 +307,7 @@ function ParcoursCardList({
               </div>
               <span>·</span>
               <span className="font-semibold">{parcours.dureeTotal}h</span>
-              <span>·</span>
-              <span className="font-semibold">
-                {(parcours.nbInscrits || 0).toLocaleString()} inscrits
-              </span>
+
             </div>
           </div>
 

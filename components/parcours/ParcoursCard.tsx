@@ -142,16 +142,6 @@ export function ParcoursCard({ parcours, onInscription, isFavorite = false, onTo
             </div>
           </div>
           
-          <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gradient-to-br from-cpu-orange/10 to-cpu-orange/5 group-hover:from-cpu-orange/20 group-hover:to-cpu-orange/10 transition-colors">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-cpu-green to-green-600 flex items-center justify-center">
-              <Users className="w-4 h-4 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs text-slate-500 font-medium">Inscrits</div>
-              <div className="text-sm font-bold text-slate-900">{parcours.nbInscrits || 0}</div>
-            </div>
-          </div>
-          
           <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gradient-to-br from-yellow-50 to-yellow-50/50 group-hover:from-yellow-100 group-hover:to-yellow-50 transition-colors">
             <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center">
               <Star className="w-4 h-4 text-white fill-white" />

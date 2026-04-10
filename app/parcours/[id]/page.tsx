@@ -210,10 +210,6 @@ export default function ParcoursDetailPage() {
                                 <Clock className="w-3 h-3" />
                                 {formation.duree}h
                               </span>
-                              <span className="flex items-center gap-1 text-xs text-slate-600">
-                                <Users className="w-3 h-3" />
-                                {formation.nbInscrits || 0}+ inscrits
-                              </span>
                               {formation.expert && (
                                 <span className="flex items-center gap-1 text-xs text-slate-600">
                                   👤 <span className="font-medium">{formation.expert.prenom} {formation.expert.nom}</span>
@@ -333,14 +329,6 @@ export default function ParcoursDetailPage() {
                     <div>
                       <p className="text-xs text-slate-600">Durée</p>
                       <p className="font-semibold text-slate-900">{parcours.dureeTotal} heures</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-cpu-orange flex-shrink-0" />
-                    <div>
-                      <p className="text-xs text-slate-600">Inscrits</p>
-                      <p className="font-semibold text-slate-900">{parcours.nbInscrits || 0}+ participants</p>
                     </div>
                   </div>
 

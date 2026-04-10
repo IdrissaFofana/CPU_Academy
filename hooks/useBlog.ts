@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api/client';
 import { API_ENDPOINTS } from '@/lib/api/config';
+import { getFriendlyApiErrorMessage } from '@/lib/api/error-messages';
 
 export interface BlogAuthor {
   id: string;
@@ -76,7 +77,9 @@ export function resolveBlogMediaUrl(
   }
 
   if (featuredImage.startsWith('/')) {
-    return `${process.env.NEXT_PUBLIC_API_URL || 'https://back.cpupme.com'}${featuredImage}`;
+    // ✅ Importer depuis le client API centralisé au lieu de process.env
+    const { API_CONFIG } = require('@/lib/api');
+    return `${API_CONFIG.BASE_URL}${featuredImage}`;
   }
 
   return mediaById[featuredImage] || null;
@@ -132,8 +135,7 @@ export function useBlog() {
         );
         setPosts(response.data.data || []);
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to fetch blog posts';
-        setError(message);
+        setError(getFriendlyApiErrorMessage(err, 'blog.list'));
         setPosts([]);
       } finally {
         setLoading(false);
@@ -167,8 +169,7 @@ export function useBlogPost(slug: string | null) {
         );
         setPost(response.data);
       } catch (err) {
-        const message = err instanceof Error ? err.message : `Failed to fetch post: ${slug}`;
-        setError(message);
+        setError(getFriendlyApiErrorMessage(err, 'blog.detail'));
         setPost(null);
       } finally {
         setLoading(false);

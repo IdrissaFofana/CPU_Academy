@@ -13,7 +13,6 @@ import {
   ChevronDown,
   ChevronRight,
   Star,
-  Users,
   CheckCircle,
   ArrowRight,
   Download,
@@ -214,10 +213,6 @@ export function ASonRythmeLayout({
                     <span>({formationReviews.length} avis)</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4" />
-                  <span>{formation.nbInscrits?.toLocaleString() || "0"} inscrits</span>
-                </div>
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
                   <span>{formation.duree}h de contenu</span>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/config";
+import { getFriendlyApiErrorMessage } from "@/lib/api/error-messages";
 import {
   FileText,
   Download,
@@ -131,7 +132,7 @@ export default function GuidesPage() {
         }
       } catch (error) {
         if (!isCancelled) {
-          setGuidesError(error instanceof Error ? error.message : "Erreur API inattendue");
+          setGuidesError(getFriendlyApiErrorMessage(error, "guides.list"));
           setRessources([]);
         }
       } finally {
@@ -291,7 +292,7 @@ export default function GuidesPage() {
 
           {guidesError && (
             <Card className="max-w-3xl mx-auto p-6 bg-red-50 border-red-200 text-red-800 mb-8">
-              Impossible de charger les guides depuis l'API. {guidesError}
+              Impossible de charger les guides pour le moment. Veuillez reessayer un peu plus tard.
             </Card>
           )}
 

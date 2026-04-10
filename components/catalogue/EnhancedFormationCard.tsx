@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { X, Bookmark, Zap, Star, Trophy, BookOpen, Check, Clock, Users, Video, MapPin, Monitor } from 'lucide-react';
+import { X, Bookmark, Zap, Star, Trophy, BookOpen, Check, Clock, Video, MapPin, Monitor } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -72,7 +72,7 @@ export function EnhancedFormationCard({
           )}
           {isPopular && (
             <Badge className="bg-amber-500 text-white text-xs flex items-center gap-1 font-semibold">
-              <Star className="w-3 h-3 fill-current" /> {formation.nbInscrits || 0} inscrits
+              <Star className="w-3 h-3 fill-current" /> Populaire
             </Badge>
           )}
           {isBestSeller && (
@@ -154,7 +154,7 @@ export function EnhancedFormationCard({
             <Clock className="w-3 h-3" /> {formation.duree}h
           </div>
           <div className="flex items-center gap-1">
-            <Users className="w-3 h-3" /> {formation.nbInscrits || 0}
+            <BookOpen className="w-3 h-3" /> {typeVisual.label}
           </div>
         </div>
 

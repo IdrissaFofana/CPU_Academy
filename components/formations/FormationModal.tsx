@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import type { Formation } from "@/types";
 import { getModeFallbackImage } from "@/lib/utils";
 import { 
-  Clock, MapPin, Users, Star, CheckCircle2, Award, BookOpen, 
+  Clock, MapPin, Star, CheckCircle2, Award, BookOpen, 
   Target, GraduationCap, FileText, Package, Calendar, TrendingUp 
 } from "lucide-react";
 
@@ -80,10 +80,6 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
                       <span className="font-semibold">{formation.notesMoyenne}</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-1.5">
-                    <Users className="h-4 w-4" />
-                    <span>{formation.nbInscrits || 0} inscrits</span>
-                  </div>
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-4 w-4" />
                     <span>{formation.duree} semaines</span>
@@ -239,9 +235,7 @@ export function FormationModal({ formation, open, onOpenChange }: FormationModal
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       Prêt à commencer cette formation ?
                     </h3>
-                    <p className="text-gray-600">
-                      Rejoignez {formation.nbInscrits || 0} personnes déjà inscrites
-                    </p>
+                    <p className="text-gray-600">Inscrivez-vous et commencez dès aujourd'hui.</p>
                   </div>
                   <div className="flex flex-col items-center md:items-end gap-3">
                     {formation.gratuit ? (

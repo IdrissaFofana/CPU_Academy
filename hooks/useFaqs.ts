@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { faqService } from '@/lib/api/services';
 import { Faq } from '@/lib/api/types';
+import { getFriendlyApiErrorMessage } from '@/lib/api/error-messages';
 
 interface UseFaqsParams {
   statut?: string;
@@ -95,7 +96,7 @@ export function useFaqs(params: UseFaqsParams = {}) {
       setFaqs(items);
     } catch (err) {
       setFaqs([]);
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
     } finally {
       setIsLoading(false);
     }

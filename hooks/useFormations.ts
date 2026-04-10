@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { formationService } from '@/lib/api/services';
 import { Formation, PaginatedResponse } from '@/lib/api/types';
 import type { Chapitre, Lecon } from '@/types';
+import { getFriendlyApiErrorMessage } from '@/lib/api/error-messages';
 
 interface UseFormationsParams {
   page?: number;
@@ -62,7 +63,7 @@ export function useFormations(params: UseFormationsParams = {}) {
 
       setData(normalized);
     } catch (err) {
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
     } finally {
       setIsLoading(false);
       setHasFetched(true);
@@ -109,7 +110,7 @@ export function useFormation(id: string, autoFetch = true) {
       const response = await formationService.getById(id);
       setFormation(response.data);
     } catch (err) {
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
     } finally {
       setIsLoading(false);
       setHasFetched(true);
@@ -209,7 +210,7 @@ export function useFormationContent(formationId: string, autoFetch = true) {
 
       setChapitres(resolvedChapitres);
     } catch (err) {
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
     } finally {
       setIsLoading(false);
       setHasFetched(true);
@@ -242,7 +243,7 @@ export function useFormationMutations() {
       const response = await formationService.create(data);
       return response.data;
     } catch (err) {
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
       throw err;
     } finally {
       setIsLoading(false);
@@ -256,7 +257,7 @@ export function useFormationMutations() {
       const response = await formationService.update(id, data);
       return response.data;
     } catch (err) {
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
       throw err;
     } finally {
       setIsLoading(false);
@@ -269,7 +270,7 @@ export function useFormationMutations() {
     try {
       await formationService.delete(id);
     } catch (err) {
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
       throw err;
     } finally {
       setIsLoading(false);
@@ -283,7 +284,7 @@ export function useFormationMutations() {
       const response = await formationService.publish(id);
       return response.data;
     } catch (err) {
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
       throw err;
     } finally {
       setIsLoading(false);
@@ -297,7 +298,7 @@ export function useFormationMutations() {
       const response = await formationService.archive(id);
       return response.data;
     } catch (err) {
-      setError(err as Error);
+      setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
       throw err;
     } finally {
       setIsLoading(false);

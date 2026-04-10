@@ -153,9 +153,9 @@ export function Navbar() {
                   <Image 
                     src="/images/cpu-logo.png" 
                     alt="CPU Formation" 
-                    width={120}
-                    height={44}
-                    className="h-11 w-auto transition-transform duration-300 group-hover:scale-105"
+                    width={160}
+                    height={59}
+                    className="h-auto w-auto max-w-[130px] lg:max-w-[150px] xl:max-w-[160px] transition-transform duration-300 group-hover:scale-105"
                     priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-cpu-orange/20 to-cpu-green/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl -z-10" />

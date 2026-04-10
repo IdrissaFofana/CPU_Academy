@@ -100,7 +100,7 @@ export function PageBanner({
               alt="CPU Formation Logo"
               width={650}
               height={650}
-              className="w-auto h-[50%] object-contain opacity-60"
+              className="max-h-[50vh] w-auto h-auto object-contain opacity-60"
               priority
             />
           </div>

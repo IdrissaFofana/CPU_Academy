@@ -1,13 +1,29 @@
 /**
- * Configuration de l'API
+ * Configuration centralisée de l'API
+ * 
+ * ⚠️ IMPORTANT : Tous les appels API doivent passer par cette config
+ * Ne JAMAIS hardcoder les URLs dans les composants/services
+ * 
+ * Fichier .env.local requis :
+ *   NEXT_PUBLIC_API_URL=https://back.cpupme.ci
+ *   NEXT_PUBLIC_API_TIMEOUT=30000
  */
 
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://back.cpupme.com',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://back.cpupme.ci',
   TIMEOUT: parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000'),
   TOKEN_KEY: process.env.NEXT_PUBLIC_TOKEN_KEY || 'cpu_access_token',
   REFRESH_TOKEN_KEY: process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY || 'cpu_refresh_token',
 } as const;
+
+/**
+ * Valider la configuration au démarrage (côté client)
+ */
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  if (!process.env.NEXT_PUBLIC_API_URL) {
+    console.warn('⚠️ NEXT_PUBLIC_API_URL non définie dans .env.local');
+  }
+}
 
 export const API_ENDPOINTS = {
   // Health

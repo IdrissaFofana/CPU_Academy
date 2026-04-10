@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { objectifsMetier, regions } from "@/data/constants";
+import { formationsMock } from "@/data/mock";
 import { Search, Filter, X, Grid3x3, List, LayoutGrid, ArrowUpDown, Award, Building, HelpCircle, SlidersHorizontal, Clock, ChevronLeft, ChevronRight, BookOpen, Video, MapPin, Wifi, Layers, Monitor } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
@@ -87,6 +88,21 @@ interface CatalogueContentProps {
   hideBanner?: boolean;
 }
 
+function normalizeFormat(value?: string): "Vidéo" | "Live" | "Présentiel" | "Hybride" {
+  const normalized = (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+  if (normalized.includes("live") || normalized.includes("webinaire")) return "Live";
+  if (normalized.includes("presentiel") || normalized.includes("salle")) return "Présentiel";
+  if (normalized.includes("hybride")) return "Hybride";
+  if (normalized.includes("video") || normalized.includes("rythme") || normalized.includes("ligne")) return "Vidéo";
+
+  return "Vidéo";
+}
+
 export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBanner = false }: CatalogueContentProps = {}) {
   const searchParams = useSearchParams();
   const expertParam = searchParams.get('expert');
@@ -125,7 +141,18 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
     [apiFormations]
   );
 
-  const baseFormations = apiFormationsNormalized;
+  const baseFormations = useMemo(() => {
+    if (apiFormationsNormalized.length > 0) {
+      return apiFormationsNormalized;
+    }
+
+    // Fallback pour eviter une UI vide si l'API est temporairement indisponible.
+    if (!apiLoading && apiError) {
+      return formationsMock as CatalogueFormation[];
+    }
+
+    return apiFormationsNormalized;
+  }, [apiFormationsNormalized, apiLoading, apiError]);
 
   const objectifOptions = useMemo(() => {
     const values = Array.from(new Set(baseFormations.map((formation) => formation.objectifMetier).filter(Boolean)));
@@ -223,7 +250,7 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
       if (niveau && niveau !== "all" && formation.niveau !== niveau) {
         return false;
       }
-      if (format && format !== "all" && formation.format !== format) {
+      if (format && format !== "all" && normalizeFormat(formation.format || formation.modalite) !== format) {
         return false;
       }
       // Locked mode filter (from parent page — filters on raw modalite field)
@@ -379,10 +406,11 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
                 {FORMAT_TABS.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = format === tab.value;
+                  const isCounterLoading = apiLoading && apiFormationsNormalized.length === 0;
                   // Compter les formations de ce format
                   const count = tab.value === "all"
                     ? baseFormations.length
-                    : baseFormations.filter((f) => f.format === tab.value).length;
+                    : baseFormations.filter((f) => normalizeFormat(f.format || f.modalite) === tab.value).length;
 
                   return (
                     <button
@@ -416,7 +444,7 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
                             : "bg-slate-100 text-slate-500 group-hover:bg-slate-200"
                           }
                         `}>
-                          {count}
+                          {isCounterLoading ? "..." : count}
                         </span>
                       </div>
                       {/* Description (visible uniquement xl+) */}
@@ -756,50 +784,53 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
       </div>
 
       {/* Mobile Drawer Overlay */}
-      {isDrawerOpen && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 xl:hidden animate-fade-in"
-            onClick={() => setIsDrawerOpen(false)}
-            aria-hidden="true"
+      <>
+        {/* Backdrop */}
+        <div 
+          className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 xl:hidden transition-opacity duration-300 ${
+            isDrawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={() => setIsDrawerOpen(false)}
+          aria-hidden="true"
+        />
+        
+        {/* Drawer */}
+        <div 
+          className={`fixed inset-y-0 right-0 w-full max-w-md bg-white z-50 xl:hidden shadow-2xl transition-transform duration-300 will-change-transform ${
+            isDrawerOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
+          }`}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="drawer-title"
+          aria-hidden={!isDrawerOpen}
+        >
+          <CatalogueFilters
+            objectifOptions={objectifOptions}
+            regionOptions={regionOptions}
+            secteurOptions={secteurOptions}
+            niveauOptions={niveauOptions}
+            formatOptions={formatOptions}
+            objectif={objectif}
+            setObjectif={setObjectif}
+            region={region}
+            setRegion={setRegion}
+            secteur={secteur}
+            setSecteur={setSecteur}
+            niveau={niveau}
+            setNiveau={setNiveau}
+            format={format}
+            setFormat={setFormat}
+            gratuit={gratuit}
+            setGratuit={setGratuit}
+            certifiant={certifiant}
+            setCertifiant={setCertifiant}
+            nombreFiltresActifs={nombreFiltresActifs}
+            reinitialiserFiltres={reinitialiserFiltres}
+            onClose={() => setIsDrawerOpen(false)}
+            isMobile={true}
           />
-          
-          {/* Drawer */}
-          <div 
-            className="fixed inset-y-0 right-0 w-full max-w-md bg-white z-50 xl:hidden shadow-2xl animate-slide-left"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="drawer-title"
-          >
-            <CatalogueFilters
-              objectifOptions={objectifOptions}
-              regionOptions={regionOptions}
-              secteurOptions={secteurOptions}
-              niveauOptions={niveauOptions}
-              formatOptions={formatOptions}
-              objectif={objectif}
-              setObjectif={setObjectif}
-              region={region}
-              setRegion={setRegion}
-              secteur={secteur}
-              setSecteur={setSecteur}
-              niveau={niveau}
-              setNiveau={setNiveau}
-              format={format}
-              setFormat={setFormat}
-              gratuit={gratuit}
-              setGratuit={setGratuit}
-              certifiant={certifiant}
-              setCertifiant={setCertifiant}
-              nombreFiltresActifs={nombreFiltresActifs}
-              reinitialiserFiltres={reinitialiserFiltres}
-              onClose={() => setIsDrawerOpen(false)}
-              isMobile={true}
-            />
-          </div>
-        </>
-      )}
+        </div>
+      </>
     </>
   );
 }

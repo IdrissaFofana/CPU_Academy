@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { missionVisionService } from '@/lib/api/services';
 import { MissionVision } from '@/lib/api/types/missionvision.types';
+import { getFriendlyApiErrorMessage } from '@/lib/api/error-messages';
 
 /**
  * Hook pour récupérer les missions/visions pour le site web
@@ -34,8 +35,7 @@ export function useMissionVision() {
           });
         }
       } catch (err: any) {
-        const error = err as Error;
-        setError(error);
+        setError(new Error(getFriendlyApiErrorMessage(err, 'default')));
         
         // Log détaillé pour le développement
         if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
@@ -46,7 +46,7 @@ export function useMissionVision() {
             '\n→ Le site affichera le contenu statique par défaut.'
           );
         } else {
-          console.error('Erreur lors du chargement des missions/visions:', err);
+          console.warn('⚠️ API Mission/Vision indisponible temporairement.');
         }
       } finally {
         setIsLoading(false);

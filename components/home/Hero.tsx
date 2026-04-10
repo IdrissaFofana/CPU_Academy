@@ -5,8 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { apiClient } from "@/lib/api/client";
-import { API_ENDPOINTS } from "@/lib/api/config";
+import { bannerService } from "@/lib/api/services/banner.service";
+import { API_CONFIG } from "@/lib/api";
 
 interface HeroSlide {
   title: string;
@@ -91,9 +91,8 @@ const staticHeroSlides: HeroSlide[] = [
 
 /** Map an API banner object to a HeroSlide */
 function apiBannerToSlide(banner: any): HeroSlide {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://back.cpupme.com";
   const rawImage: string = banner.image_url ?? "";
-  const image = rawImage.startsWith("http") ? rawImage : `${baseUrl}${rawImage}`;
+  const image = rawImage.startsWith("http") ? rawImage : `${API_CONFIG.BASE_URL}${rawImage}`;
 
   return {
     title: banner.title ?? "Découvrez nos formations avec",
@@ -114,22 +113,22 @@ export function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(staticHeroSlides);
 
-  // Fetch banners with category "formation" from API
+  // Fetch banners via centralized banner service
   useEffect(() => {
     let cancelled = false;
+    
     async function fetchBanners() {
       try {
-        const data = await apiClient.get(API_ENDPOINTS.BANNERS.FOR_SITE_WEB, {
-          params: { position: "homepage", activeOnly: true },
-        });
-        const items: any[] = Array.isArray(data) ? data : (data?.data ?? []);
-        const formationBanners = items.filter((b: any) => {
-          const slug = (b?.category?.slug ?? "").toLowerCase();
-          const name = (b?.category?.name ?? "").toLowerCase();
-          return slug === "formation" || name === "formation";
-        });
-
+        // ✅ Utiliser le service centralisé au lieu d'appeler l'API directement
+        const banners = await bannerService.getForSiteWeb("homepage", false);
+        
         if (!cancelled) {
+          const formationBanners = banners.filter((b: any) => {
+            const slug = (b?.category?.slug ?? "").toLowerCase();
+            const name = (b?.category?.name ?? "").toLowerCase();
+            return slug === "formation" || name === "formation";
+          });
+
           const apiSlides = formationBanners
             .sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0))
             .map(apiBannerToSlide);
@@ -141,11 +140,17 @@ export function Hero() {
               : [...apiSlides, ...staticHeroSlides.slice(0, 4 - apiSlides.length)];
 
           setHeroSlides(combined.length > 0 ? combined : staticHeroSlides);
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ Hero banners loaded:', combined.length);
+          }
         }
-      } catch {
+      } catch (error) {
+        console.error('❌ Failed to fetch hero banners:', error);
         // On error, keep static slides — already set as default state
       }
     }
+    
     fetchBanners();
     return () => { cancelled = true; };
   }, []);
@@ -185,7 +190,7 @@ export function Hero() {
             alt="CPU Formation Logo"
             width={650}
             height={650}
-            className="w-auto h-[70%] object-contain opacity-60"
+            className="max-h-[70vh] w-auto h-auto object-contain opacity-60"
             priority
           />
         </div>

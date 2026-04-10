@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { parcoursService } from "@/lib/api/services/parcours.service";
 import { formationService } from "@/lib/api/services/formation.service";
+import { getFriendlyApiErrorMessage } from "@/lib/api/error-messages";
 
 function buildParcoursFallbackFromFormations(rawFormations: any[]): any[] {
   const grouped = new Map<string, any[]>();
@@ -62,7 +63,7 @@ export function useParcours(autoFetch = true) {
         setParcours(fallbackParcours);
         setError(null);
       } catch (fallbackErr) {
-        setError((fallbackErr || parcoursErr) as Error);
+        setError(new Error(getFriendlyApiErrorMessage(fallbackErr || parcoursErr, "default")));
       }
     } finally {
       setIsLoading(false);

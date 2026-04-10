@@ -7,7 +7,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Radio,
   Clock,
-  Users,
   Calendar,
   ChevronRight,
   Star,
@@ -248,10 +247,6 @@ export function WebinarLayout({
                     <span>({formationReviews.length} avis)</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-cpu-orange" />
-                  <span>{formation.nbInscrits?.toLocaleString() || "0"} participants</span>
-                </div>
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-cpu-orange" />
                   <span>{formation.duree}h de session</span>
@@ -499,10 +494,6 @@ export function WebinarLayout({
                     <li className="flex items-center justify-between">
                       <span className="text-slate-500 flex items-center gap-2"><Clock className="w-4 h-4" /> Durée</span>
                       <span className="font-medium text-white">{formation.duree}h</span>
-                    </li>
-                    <li className="flex items-center justify-between">
-                      <span className="text-slate-500 flex items-center gap-2"><Users className="w-4 h-4" /> Participants</span>
-                      <span className="font-medium text-white">{formation.nbInscrits?.toLocaleString() || "0"}</span>
                     </li>
                     <li className="flex items-center justify-between">
                       <span className="text-slate-500">Niveau</span>

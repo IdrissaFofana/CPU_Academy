@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { apiClient } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/config";
+import { getFriendlyApiErrorMessage } from "@/lib/api/error-messages";
 
 type Certification = {
   id: string | number;
@@ -552,12 +553,8 @@ export default function CertificationsPage() {
       } else {
         setVerifyError("Certificat invalide ou introuvable.");
       }
-    } catch (error: any) {
-      const apiMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Impossible de vérifier ce certificat pour le moment.";
-      setVerifyError(String(apiMessage));
+    } catch (error: unknown) {
+      setVerifyError(getFriendlyApiErrorMessage(error, "certifications.verify"));
     } finally {
       setIsVerifying(false);
     }

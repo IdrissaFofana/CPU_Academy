@@ -7,7 +7,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   MapPin,
   Clock,
-  Users,
   Calendar,
   ChevronRight,
   Star,
@@ -303,10 +302,6 @@ export function PresentielLayout({
                     <span>({formationReviews.length} avis)</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-green-400" />
-                  <span>{formation.nbInscrits?.toLocaleString() || "0"} participants</span>
-                </div>
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-green-400" />
                   <span>{formation.duree}h de formation</span>
@@ -683,10 +678,6 @@ export function PresentielLayout({
                     <span className="font-medium text-slate-800">{formation.duree}h</span>
                   </li>
                   <li className="flex items-center justify-between">
-                    <span className="text-slate-500 flex items-center gap-2"><Users className="w-4 h-4" /> Participants</span>
-                    <span className="font-medium text-slate-800">{formation.nbInscrits?.toLocaleString()}</span>
-                  </li>
-                  <li className="flex items-center justify-between">
                     <span className="text-slate-500">Niveau</span>
                     <span className="font-medium text-slate-800">{formation.niveau}</span>
                   </li>
@@ -719,11 +710,11 @@ export function PresentielLayout({
                     +225 27 20 30 40 50
                   </a>
                   <a
-                    href="mailto:formation@cpupme.com"
+                    href="mailto:formation@cpupme.ci"
                     className="flex items-center gap-2 text-sm text-slate-600 hover:text-green-700 transition-colors"
                   >
                     <Mail className="w-4 h-4 text-green-600" />
-                    formation@cpupme.com
+                    formation@cpupme.ci
                   </a>
                 </div>
                 <div className="mt-4 pt-4 border-t border-slate-100">

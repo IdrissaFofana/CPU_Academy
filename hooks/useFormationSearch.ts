@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import type { FiltresRecherche, Formation } from "@/types";
+import { getFriendlyApiErrorMessage } from "@/lib/api/error-messages";
 
 export function useFormationSearch() {
   const [filtres, setFiltres] = useState<FiltresRecherche>({});
@@ -26,7 +27,7 @@ export function useFormationSearch() {
       setResultats([]);
       setFiltres(nouveauxFiltres);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur de recherche");
+      setError(getFriendlyApiErrorMessage(err, "formations.search"));
     } finally {
       setLoading(false);
     }

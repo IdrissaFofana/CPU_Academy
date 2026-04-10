@@ -1,7 +1,25 @@
 /**
  * Export centralisé de tous les services API
+ * 
+ * ✅ UTILISATION CORRECTE :
+ *   import { formationService } from '@/lib/api/services';
+ *   const formations = await formationService.getPublic();
+ * 
+ * ❌ INCORRECT (ne pas importer directement apiClient) :
+ *   import { apiClient } from '@/lib/api/client';
+ *   const response = await apiClient.get('/api/...');
+ * 
+ * Toujours utiliser les services pour maintenir la centralisation
  */
 
+// Website content services
+export { partenaireService, equipeService } from './website.service';
+export type { Partenaire, Membre } from './website.service';
+
+export { bannerService } from './banner.service';
+export type { Banner } from './banner.service';
+
+// Formation services
 export { authService } from './auth.service';
 export { formationService } from './formation.service';
 export { userService } from './user.service';

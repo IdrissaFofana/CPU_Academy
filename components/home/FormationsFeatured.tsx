@@ -90,7 +90,7 @@ export function AboutSection() {
                 className="cursor-pointer group shadow-lg shadow-cpu-orange/20-orange/30 transition-all duration-300" 
                 asChild
               >
-                <a href="https://cpupme.com/" target="_blank" rel="noopener noreferrer">
+                <a href="https://cpupme.ci/" target="_blank" rel="noopener noreferrer">
                   En savoir plus
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </a>
