@@ -7,12 +7,7 @@ export type ApiParcoursResponse = {
 };
 
 export const parcoursService = {
-  async getPublic(): Promise<ApiParcoursResponse> {
-    // Swagger can expose either /public or base route depending on environment.
-    try {
-      return await apiClient.get<ApiParcoursResponse>(API_ENDPOINTS.PARCOURS.PUBLIC);
-    } catch {
-      return await apiClient.get<ApiParcoursResponse>(API_ENDPOINTS.PARCOURS.BASE);
-    }
+  async getPublic(): Promise<any> {
+    return await apiClient.get<any>(API_ENDPOINTS.PARCOURS.PUBLIC);
   },
 };

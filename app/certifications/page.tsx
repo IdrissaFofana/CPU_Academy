@@ -10,8 +10,7 @@ import { Award, CheckCircle2, Clock, Users, TrendingUp, Shield, BookOpen, Send, 
 import { useMemo } from "react";
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
-import { apiClient } from "@/lib/api/client";
-import { API_ENDPOINTS } from "@/lib/api/config";
+import { certificationService } from "@/lib/api/services";
 import { getFriendlyApiErrorMessage } from "@/lib/api/error-messages";
 
 type Certification = {
@@ -103,10 +102,13 @@ function normalizeTypesCertifications(payload: any): Certification[] {
 }
 
 function normalizeVerifyResponse(payload: any): VerifyResponse {
-  const source = payload?.data || payload;
+  const source = payload?.data || payload || {};
+  const certification = source?.certification ||
+    (source?.id || source?.code || source?.typeCertification || source?.formation ? source : undefined);
+
   return {
-    valid: Boolean(source?.valid),
-    certification: source?.certification,
+    valid: typeof source?.valid === "boolean" ? source.valid : Boolean(certification),
+    certification,
   };
 }
 
@@ -465,7 +467,7 @@ export default function CertificationsPage() {
     async function fetchTypesCertifications() {
       setIsCertificationsLoading(true);
       try {
-        const response = await apiClient.get(API_ENDPOINTS.CERTIFICATIONS.TYPES);
+        const response = await certificationService.getTypes();
         const normalized = normalizeTypesCertifications(response);
 
         if (!isCancelled && normalized.length > 0) {
@@ -543,9 +545,7 @@ export default function CertificationsPage() {
     setVerifyResult(null);
 
     try {
-      const response = await apiClient.get(
-        API_ENDPOINTS.CERTIFICATIONS.VERIFY_BY_CODE(encodeURIComponent(code))
-      );
+      const response = await certificationService.verifyByCode(encodeURIComponent(code));
       const normalized = normalizeVerifyResponse(response);
 
       if (normalized.valid) {

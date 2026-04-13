@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ export default function ParcoursDetailPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const parcoursId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const [showAllFormations, setShowAllFormations] = useState(false);
   const { isParcoursLiked, toggleParcoursFavorite } = useFavorites();
   const { trackCardClick } = useTelemetry();
   const { parcours: apiParcours, isLoading, error } = useParcours();
@@ -86,6 +88,10 @@ export default function ParcoursDetailPage() {
   }
 
   const isFavorite = isParcoursLiked(parcours.id);
+  const visibleFormations = showAllFormations
+    ? parcours.formations
+    : parcours.formations.slice(0, 3);
+  const hasMoreThanThreeFormations = parcours.formations.length > 3;
 
   return (
     <>
@@ -97,7 +103,7 @@ export default function ParcoursDetailPage() {
         ]}
         slides={[
           {
-            image: "/images/formation-tech.png",
+            image: parcours.image,
             title: parcours.titre,
             subtitle: parcours.description,
             trustBadges: [
@@ -163,8 +169,8 @@ export default function ParcoursDetailPage() {
                   {parcours.description}
                 </p>
                 <p className="text-slate-600 leading-relaxed">
-                  Ce parcours est généré dynamiquement à partir des formations actuellement publiées sur la plateforme.
-                  Vous bénéficiez ainsi d'un contenu toujours à jour avec les besoins réels du marché.
+                  Ce parcours métier est alimenté par l'API backend et regroupe les formations rattachées à ce métier.
+                  Vous consultez donc un contenu cohérent, maintenu côté catalogue, avec un détail fidèle à la donnée publiée.
                 </p>
               </Card>
 
@@ -193,15 +199,24 @@ export default function ParcoursDetailPage() {
                 {/* Group formations by instructor */}
                 <div className="space-y-8">
                   {parcours.formations && parcours.formations.length > 0 ? (
-                    parcours.formations.map((formation: any, formIdx: number) => (
-                      <div key={formation.id} className="pb-8 border-b border-slate-200 last:border-0">
+                    visibleFormations.map((formation: any, formIdx: number) => (
+                      <Link
+                        key={formation.id}
+                        href={`/formations/${formation.slug || formation.id}`}
+                        className="group block pb-8 border-b border-slate-200 last:border-0"
+                      >
                         {/* Formation Header */}
-                        <div className="flex gap-4 mb-4">
+                        <div className="flex gap-4 mb-4 rounded-xl border border-transparent p-3 -m-3 transition-colors group-hover:border-cpu-orange/30 group-hover:bg-orange-50/40">
                           <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-cpu-orange/20 text-cpu-orange flex items-center justify-center font-bold">
                             {formIdx + 1}
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-lg font-bold text-slate-900">{formation.titre}</h3>
+                            <div className="flex items-start justify-between gap-3">
+                              <h3 className="text-lg font-bold text-slate-900 transition-colors group-hover:text-cpu-orange">{formation.titre}</h3>
+                              <span className="text-xs font-semibold text-cpu-orange opacity-0 transition-opacity group-hover:opacity-100">
+                                Voir le détail
+                              </span>
+                            </div>
                             <p className="text-sm text-slate-600 mt-1">{formation.resume}</p>
                             
                             {/* Formation Info */}
@@ -224,7 +239,7 @@ export default function ParcoursDetailPage() {
                           <div className="ml-16 space-y-3">
                             <p className="text-sm font-semibold text-slate-700 mb-3">Modules:</p>
                             {formation.modules.map((module: any, modIdx: number) => (
-                              <div key={module.id} className="flex gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">
+                              <div key={module.id} className="flex gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 transition-colors group-hover:bg-slate-100">
                                 <div className="flex-shrink-0 w-8 h-8 rounded bg-cpu-green/20 text-cpu-green flex items-center justify-center text-xs font-semibold">
                                   {modIdx + 1}
                                 </div>
@@ -242,11 +257,26 @@ export default function ParcoursDetailPage() {
                             ))}
                           </div>
                         )}
-                      </div>
+                      </Link>
                     ))
                   ) : (
                     <div className="text-sm text-slate-600 p-4 bg-slate-50 rounded">
                       Formations en cours de chargement...
+                    </div>
+                  )}
+
+                  {hasMoreThanThreeFormations && (
+                    <div className="pt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowAllFormations((prev) => !prev)}
+                        className="w-full sm:w-auto"
+                      >
+                        {showAllFormations
+                          ? "Voir moins"
+                          : `Voir plus (${parcours.formations.length - 3} de plus)`}
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -377,7 +407,7 @@ export default function ParcoursDetailPage() {
                     `${parcours.formations.length} formations structurées`,
                     `${parcours.dureeTotal}h de montée en compétence`,
                     parcours.certifiant ? "Parcours certifiant" : "Parcours professionnalisant",
-                    `Format dominant: ${parcours.format}`,
+                    `Format dominant : ${parcours.format}`,
                   ].map((benefit, idx) => (
                     <div key={idx} className="flex gap-2 items-center text-sm text-slate-700">
                       <Check className="w-4 h-4 text-cpu-orange flex-shrink-0" />

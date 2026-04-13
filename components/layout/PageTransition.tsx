@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 /**
@@ -9,20 +8,12 @@ import { usePathname } from "next/navigation";
  */
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [show, setShow] = useState(true);
-
-  useEffect(() => {
-    setShow(false);
-    const t = setTimeout(() => setShow(true), 60);
-    return () => clearTimeout(t);
-  }, [pathname]);
 
   return (
     <div
+      key={pathname}
       style={{
-        opacity: show ? 1 : 0,
-        transform: show ? "translateY(0)" : "translateY(12px)",
-        transition: "opacity 450ms ease, transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        animation: "fadeInUp 420ms ease",
       }}
     >
       {children}

@@ -65,6 +65,7 @@ import { useNotifications } from "@/contexts/NotificationContext";
 import { useSimpleAuth } from "@/contexts/SimpleAuthContext";
 import { formationService } from "@/lib/api/services/formation.service";
 import { centreFormationService } from "@/lib/api/services/centreFormation.service";
+import { SHOW_A_SON_RYTHME } from "@/lib/formation-visibility";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -121,7 +122,11 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    // Close all transient UI layers on route changes to avoid portal teardown races.
     setIsMenuOpen(false);
+    setIsSearchOpen(false);
+    setAccountDrawerOpen(false);
+    setCommandPaletteOpen(false);
   }, [pathname]);
 
   // Raccourci clavier pour ouvrir la palette de commandes
@@ -190,7 +195,9 @@ export function Navbar() {
                   { label: "Toutes les formations", href: "/catalogue", icon: <Book className="w-4 h-4" />, description: formationCount !== null ? `${formationCount} formation${formationCount > 1 ? "s" : ""} disponible${formationCount > 1 ? "s" : ""}` : "Catalogue de formations" },
                   { label: "Webinaires live", href: "/webinaires", icon: <Video className="w-4 h-4" />, description: "Sessions interactives en direct" },
                   { label: "Formations présentiel", href: "/presentiel", icon: <MapPin className="w-4 h-4" />, description: "Apprenez en salle avec un expert" },
-                  { label: "À son rythme", href: "/a-son-rythme", icon: <Monitor className="w-4 h-4" />, description: "E-learning flexible 24h/24" },
+                  ...(SHOW_A_SON_RYTHME
+                    ? [{ label: "À son rythme", href: "/a-son-rythme", icon: <Monitor className="w-4 h-4" />, description: "E-learning flexible 24h/24" }]
+                    : []),
                   { sectionLabel: "Accompagnement" },
                   { label: "Parcours métiers", href: "/parcours", icon: <Rocket className="w-4 h-4" />, description: "Programmes complets certifiants" },
                   { label: "Centres de formation", href: "/centres-formation", icon: <MapPin className="w-4 h-4" />, description: centreCount !== null ? `${centreCount} centre${centreCount > 1 ? "s" : ""} en Côte d'Ivoire` : "Centres de formation" },
@@ -389,9 +396,11 @@ export function Navbar() {
             <MobileNavLink href="/presentiel" icon={<MapPin className="w-5 h-5" />}>
               Formations présentiel
             </MobileNavLink>
-            <MobileNavLink href="/a-son-rythme" icon={<Monitor className="w-5 h-5" />}>
-              À son rythme
-            </MobileNavLink>
+            {SHOW_A_SON_RYTHME && (
+              <MobileNavLink href="/a-son-rythme" icon={<Monitor className="w-5 h-5" />}>
+                À son rythme
+              </MobileNavLink>
+            )}
             <MobileNavLink href="/parcours" icon={<Rocket className="w-5 h-5" />}>
               Parcours métiers
             </MobileNavLink>
@@ -580,6 +589,10 @@ const NavLinkWithDropdown = ({
     return pathname === basePath || pathname.startsWith(basePath + '/');
   });
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
   
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -649,6 +662,7 @@ const NavLinkWithDropdown = ({
             >
               <Link 
                 href={item.href!} 
+                onClick={() => setIsOpen(false)}
                 className={`w-full flex items-start gap-3 cursor-pointer px-3 py-2.5 rounded-md transition-all duration-200 group/item animate-dropdown-item ${
                   pathname === item.href 
                     ? "bg-orange-100 text-cpu-orange font-medium" 

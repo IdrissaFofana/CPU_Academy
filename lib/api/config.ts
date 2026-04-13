@@ -52,9 +52,9 @@ export const API_ENDPOINTS = {
   },
 
   PARCOURS: {
-    BASE: '/api/formation/parcours',
-    PUBLIC: '/api/formation/parcours/public',
-    BY_ID: (id: string) => `/api/formation/parcours/${id}`,
+    BASE: '/api/formation/parcours-metiers',
+    PUBLIC: '/api/formation/parcours-metiers/public',
+    BY_ID: (id: string) => `/api/formation/parcours-metiers/${id}`,
   },
 
   CHAPITRES: {
@@ -163,6 +163,9 @@ export const API_ENDPOINTS = {
     DOSSIERS: '/api/formation/rac',
     DOSSIER_BY_ID: (id: string) => `/api/formation/rac/${id}`,
     DOSSIER_TIMELINE: (id: string) => `/api/formation/rac/${id}/timeline`,
+    METIERS: '/api/formation/rac-metiers',
     METIERS_PUBLIC: '/api/formation/rac-metiers/public',
+    METIER_BY_ID: (id: string) => `/api/formation/rac-metiers/${id}`,
+    METIER_REQUIRED_DOCUMENTS: (id: string) => `/api/formation/rac-metiers/${id}/required-documents`,
   },
 } as const;

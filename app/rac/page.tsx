@@ -47,8 +47,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PageBanner } from "@/components/layout/PageBanner";
-import { apiClient } from "@/lib/api/client";
-import { API_ENDPOINTS } from "@/lib/api/config";
+import { racService, type RacMetierPublic, type RacMetierRequiredDocument } from "@/lib/api/services/rac.service";
+import { faqService } from "@/lib/api/services";
+import { getFriendlyApiErrorMessage } from "@/lib/api/error-messages";
+import type { Faq } from "@/lib/api/types";
 import Link from "next/link";
 
 // ─── FileUploadZone ───────────────────────────────────────────────────────────
@@ -219,6 +221,14 @@ function FileUploadZone({
   );
 }
 // ─────────────────────────────────────────────────────────────────────────────
+
+function normalizeFaqCategory(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
 
 export default function RACPage() {
   const [selectedType, setSelectedType] = useState("professionnel");
@@ -471,23 +481,6 @@ export default function RACPage() {
     }
   ];
 
-  type RequiredDocument = {
-    id?: string;
-    label: string;
-    obligatoire?: boolean;
-    formats?: string[] | null;
-  };
-
-  type RacMetierApi = {
-    id: string;
-    nom: string;
-    description?: string | null;
-    secteur: string;
-    niveau: string;
-    publication?: boolean;
-    requiredDocuments?: RequiredDocument[];
-  };
-
   type DocumentJointForm = {
     name: string;
     type: string;
@@ -505,9 +498,18 @@ export default function RACPage() {
     commentaireLibre: string;
   };
 
-  const [racMetiersApi, setRacMetiersApi] = useState<RacMetierApi[]>([]);
+  const [racMetiersApi, setRacMetiersApi] = useState<RacMetierPublic[]>([]);
+  const [requiredDocumentsForSelected, setRequiredDocumentsForSelected] = useState<RacMetierRequiredDocument[]>([]);
   const [loadingRacMetiers, setLoadingRacMetiers] = useState(true);
+  const [loadingRequiredDocuments, setLoadingRequiredDocuments] = useState(false);
   const [racSubmitStatus, setRacSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [racSubmitMessage, setRacSubmitMessage] = useState<string | null>(null);
+  const [isSubmittingRac, setIsSubmittingRac] = useState(false);
+  const [createdRacDossier, setCreatedRacDossier] = useState<{ id: string; statut?: string; timelineCount?: number } | null>(null);
+  const [racFaqs, setRacFaqs] = useState<Faq[]>([]);
+  const [loadingRacFaqs, setLoadingRacFaqs] = useState(true);
+  const [racFaqError, setRacFaqError] = useState<string | null>(null);
+  const viewedFaqIdsRef = useRef<Set<string>>(new Set());
   const [racFormVisible, setRacFormVisible] = useState(false);
   const [racFormData, setRacFormData] = useState<RacFormData>({
     racMetierId: "",
@@ -525,14 +527,9 @@ export default function RACPage() {
     async function fetchRacMetiers() {
       setLoadingRacMetiers(true);
       try {
-        const response = await apiClient.get(API_ENDPOINTS.RAC.METIERS_PUBLIC);
-        const items = Array.isArray(response)
-          ? response
-          : Array.isArray((response as any)?.data)
-          ? (response as any).data
-          : [];
+        const items = await racService.getPublicMetiers();
         if (!cancelled) {
-          setRacMetiersApi(items as RacMetierApi[]);
+          setRacMetiersApi(items);
         }
       } catch {
         if (!cancelled) {
@@ -545,6 +542,41 @@ export default function RACPage() {
       }
     }
     fetchRacMetiers();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchRacFaqs() {
+      setLoadingRacFaqs(true);
+      setRacFaqError(null);
+
+      try {
+        const items = await faqService.getPublic({ statut: "Publié" });
+        const filtered = items
+          .filter((faq) => normalizeFaqCategory(String(faq.categorie || "")) === "rac")
+          .sort((a, b) => (a.ordre || 0) - (b.ordre || 0));
+
+        if (!cancelled) {
+          setRacFaqs(filtered);
+        }
+      } catch (error: unknown) {
+        if (!cancelled) {
+          setRacFaqs([]);
+          setRacFaqError(getFriendlyApiErrorMessage(error, "default"));
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingRacFaqs(false);
+        }
+      }
+    }
+
+    fetchRacFaqs();
+
     return () => {
       cancelled = true;
     };
@@ -610,6 +642,8 @@ export default function RACPage() {
   const setRacField = <K extends keyof RacFormData>(field: K, value: RacFormData[K]) => {
     setRacFormData((prev) => ({ ...prev, [field]: value }));
     if (racSubmitStatus !== "idle") setRacSubmitStatus("idle");
+    if (racSubmitMessage) setRacSubmitMessage(null);
+    if (createdRacDossier) setCreatedRacDossier(null);
   };
 
   const updateDocument = (index: number, field: keyof DocumentJointForm, value: string) => {
@@ -619,6 +653,17 @@ export default function RACPage() {
       return { ...prev, documentsJoints: next };
     });
     if (racSubmitStatus !== "idle") setRacSubmitStatus("idle");
+    if (racSubmitMessage) setRacSubmitMessage(null);
+    if (createdRacDossier) setCreatedRacDossier(null);
+  };
+
+  const inferDocType = (rawType: string, rawUrl: string): string => {
+    const byType = rawType.trim().toLowerCase();
+    if (byType) return byType;
+
+    const cleanUrl = rawUrl.trim().split("?")[0].split("#")[0];
+    const ext = cleanUrl.includes(".") ? cleanUrl.split(".").pop() || "" : "";
+    return ext.trim().toLowerCase() || "pdf";
   };
 
   const addDocumentRow = () => {
@@ -638,19 +683,37 @@ export default function RACPage() {
     });
   };
 
-  const prefillForMetier = (metierId: string) => {
+  const prefillForMetier = async (metierId: string) => {
     const metier = racMetiersApi.find((m) => m.id === metierId);
-    const docs = (metier?.requiredDocuments || []).map((d) => ({
+    setLoadingRequiredDocuments(true);
+
+    let requiredDocs = metier?.requiredDocuments || [];
+    try {
+      const fromApi = await racService.getMetierRequiredDocuments(metierId);
+      if (fromApi.length > 0) {
+        requiredDocs = fromApi;
+      }
+    } catch {
+      // Keep fallback docs from public metier payload
+    } finally {
+      setLoadingRequiredDocuments(false);
+    }
+
+    setRequiredDocumentsForSelected(requiredDocs);
+
+    const docs = requiredDocs.map((d) => ({
       name: d.label || "",
       type: (d.formats?.[0] || "pdf").toLowerCase(),
       url: "",
     }));
+
     setRacFormData((prev) => ({
       ...prev,
       racMetierId: metierId,
       documentsJoints: docs.length > 0 ? docs : [{ name: "", type: "pdf", url: "" }],
     }));
     setRacSubmitStatus("idle");
+    setRacSubmitMessage(null);
     setRacFormVisible(true);
     setTimeout(() => {
       document.getElementById("rac-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -660,22 +723,83 @@ export default function RACPage() {
   const closeRacForm = () => {
     setRacFormVisible(false);
     setRacSubmitStatus("idle");
+    setRacSubmitMessage(null);
+    setIsSubmittingRac(false);
+  };
+
+  const handleFaqView = async (faqId: string) => {
+    if (!faqId || viewedFaqIdsRef.current.has(faqId)) return;
+
+    viewedFaqIdsRef.current.add(faqId);
+
+    try {
+      await faqService.recordView(faqId);
+      setRacFaqs((prev) =>
+        prev.map((item) =>
+          item.id === faqId
+            ? { ...item, vues: Number(item.vues || 0) + 1 }
+            : item
+        )
+      );
+    } catch {
+      // Do not block FAQ interaction when metrics endpoint fails.
+    }
   };
 
   const handleRacSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const docsPayload = racFormData.documentsJoints
-      .map((d) => ({ name: d.name.trim(), type: d.type.trim(), url: d.url.trim() }))
+      .map((d) => ({
+        name: d.name.trim(),
+        type: inferDocType(d.type, d.url),
+        url: d.url.trim(),
+      }))
       .filter((d) => d.name && d.type && d.url);
 
     if (!racFormData.racMetierId || !racFormData.candidat || !racFormData.email || !racFormData.telephone || !racFormData.dateDepot) {
       setRacSubmitStatus("error");
+      setRacSubmitMessage("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+    if (requiredDocumentsForSelected.length > 0) {
+      const missingRequired = requiredDocumentsForSelected.some((doc, idx) => {
+        if (!doc.obligatoire) return false;
+        const row = racFormData.documentsJoints[idx];
+        return !row || !row.url || !row.url.trim();
+      });
+
+      if (missingRequired) {
+        setRacSubmitStatus("error");
+        setRacSubmitMessage("Veuillez joindre tous les documents obligatoires du RAC métier sélectionné.");
+        return;
+      }
+
+      const invalidFormat = requiredDocumentsForSelected.some((doc, idx) => {
+        const allowed = (doc.formats || []).map((f) => f.toLowerCase());
+        if (allowed.length === 0) return false;
+        const row = racFormData.documentsJoints[idx];
+        if (!row) return false;
+        return !allowed.includes(inferDocType(row.type, row.url));
+      });
+
+      if (invalidFormat) {
+        setRacSubmitStatus("error");
+        setRacSubmitMessage("Un ou plusieurs documents ont un format non autorisé par le RAC métier.");
+        return;
+      }
+    }
+
+    if (docsPayload.length === 0) {
+      setRacSubmitStatus("error");
+      setRacSubmitMessage("Ajoutez au moins un document justificatif valide.");
       return;
     }
 
     try {
-      await apiClient.post(API_ENDPOINTS.RAC.DOSSIERS, {
+      setIsSubmittingRac(true);
+      const created = await racService.createDossier({
         racMetierId: racFormData.racMetierId,
         candidat: racFormData.candidat,
         email: racFormData.email,
@@ -685,7 +809,27 @@ export default function RACPage() {
         documentsJoints: docsPayload,
       });
 
+      let timelineCount = 0;
+      if (created?.id) {
+        try {
+          const timeline = await racService.getDossierTimeline(created.id);
+          timelineCount = timeline.length;
+        } catch {
+          timelineCount = 0;
+        }
+      }
+
       setRacSubmitStatus("success");
+      setRacSubmitMessage(null);
+      if (created?.id) {
+        setCreatedRacDossier({
+          id: created.id,
+          statut: created.statut,
+          timelineCount,
+        });
+      } else {
+        setCreatedRacDossier(null);
+      }
       setRacFormData((prev) => ({
         ...prev,
         candidat: "",
@@ -693,10 +837,21 @@ export default function RACPage() {
         telephone: "",
         anneesExperience: 0,
         commentaireLibre: "",
-        documentsJoints: [{ name: "", type: "", url: "" }],
+        documentsJoints:
+          requiredDocumentsForSelected.length > 0
+            ? requiredDocumentsForSelected.map((doc) => ({
+                name: doc.label || "",
+                type: (doc.formats?.[0] || "pdf").toLowerCase(),
+                url: "",
+              }))
+            : [{ name: "", type: "", url: "" }],
       }));
-    } catch {
+    } catch (error: unknown) {
       setRacSubmitStatus("error");
+      setRacSubmitMessage(getFriendlyApiErrorMessage(error, "default"));
+      setCreatedRacDossier(null);
+    } finally {
+      setIsSubmittingRac(false);
     }
   };
 
@@ -1476,7 +1631,7 @@ export default function RACPage() {
                         value={racFormData.racMetierId}
                         onChange={(e) => {
                           const val = e.target.value;
-                          if (val) prefillForMetier(val);
+                          if (val) void prefillForMetier(val);
                           else setRacField("racMetierId", "");
                         }}
                         className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white px-3 text-sm focus:outline-none focus:border-orange-400 transition-colors"
@@ -1584,16 +1739,20 @@ export default function RACPage() {
                     </h3>
 
                     {/* Per-métier required documents */}
-                    {selectedRacMetier?.requiredDocuments && selectedRacMetier.requiredDocuments.length > 0 ? (
+                    {loadingRequiredDocuments ? (
+                      <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                        Chargement des documents requis du métier sélectionné...
+                      </div>
+                    ) : requiredDocumentsForSelected.length > 0 ? (
                       <div className="space-y-5">
                         <div className="flex items-center gap-3 p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl">
                           <ClipboardCheck className="w-5 h-5 text-blue-600 flex-shrink-0" />
                           <p className="text-sm text-blue-800">
-                            <strong>{selectedRacMetier.requiredDocuments.length} document(s)</strong> requis pour la certification{" "}
-                            <strong>{selectedRacMetier.nom}</strong>. Glissez-déposez ou collez une URL (Ctrl+V).
+                            <strong>{requiredDocumentsForSelected.length} document(s)</strong> requis pour la certification{" "}
+                            <strong>{selectedRacMetier?.nom || "sélectionnée"}</strong>. Glissez-déposez ou collez une URL (Ctrl+V).
                           </p>
                         </div>
-                        {selectedRacMetier.requiredDocuments.map((doc, idx) => (
+                        {requiredDocumentsForSelected.map((doc, idx) => (
                           <div
                             key={`${doc.label}-${idx}`}
                             className="bg-white border-2 border-slate-100 rounded-2xl p-5 hover:border-orange-200 transition-colors shadow-sm animate-fade-in"
@@ -1690,7 +1849,7 @@ export default function RACPage() {
                       </div>
                       <div className="text-sm text-red-700">
                         <p className="font-semibold mb-1">Impossible d'envoyer le dossier</p>
-                        <p>Vérifiez que tous les champs obligatoires sont remplis (nom, email, téléphone, date de dépôt).</p>
+                        <p>{racSubmitMessage || "Vérifiez que tous les champs obligatoires sont remplis (nom, email, téléphone, date de dépôt)."}</p>
                       </div>
                     </div>
                   )}
@@ -1702,6 +1861,13 @@ export default function RACPage() {
                       <div className="text-sm text-green-700">
                         <p className="font-semibold mb-1">Dossier envoyé avec succès !</p>
                         <p>Notre équipe examinera votre candidature et vous contactera dans les meilleurs délais.</p>
+                        {createdRacDossier?.id && (
+                          <p className="mt-2 text-green-800">
+                            Référence dossier: <strong>{createdRacDossier.id}</strong>
+                            {createdRacDossier.statut ? ` · Statut: ${createdRacDossier.statut}` : ""}
+                            {typeof createdRacDossier.timelineCount === "number" ? ` · Timeline: ${createdRacDossier.timelineCount} événement(s)` : ""}
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
@@ -1710,15 +1876,17 @@ export default function RACPage() {
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     <Button
                       type="submit"
+                      disabled={isSubmittingRac || loadingRequiredDocuments}
                       className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white h-14 text-base rounded-2xl shadow-lg hover:shadow-orange-200 hover:scale-[1.02] transition-all duration-200 font-semibold"
                     >
                       <FileCheck className="mr-2 w-5 h-5" />
-                      Envoyer mon dossier RAC
+                      {isSubmittingRac ? "Envoi en cours..." : "Envoyer mon dossier RAC"}
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={closeRacForm}
+                      disabled={isSubmittingRac}
                       className="border-2 border-gray-300 text-gray-600 hover:border-red-300 hover:text-red-600 h-14 px-8 rounded-2xl transition-all"
                     >
                       Annuler
@@ -1743,35 +1911,37 @@ export default function RACPage() {
             </div>
 
             <div className="space-y-4">
-              {[
-                {
-                  q: "Quelle expérience professionnelle est requise ?",
-                  r: "En général, un minimum de 2 à 3 ans d'expérience dans le domaine de la formation visée est recommandé. Cependant, chaque candidature est étudiée au cas par cas."
-                },
-                {
-                  q: "Combien coûte la démarche RAC ?",
-                  r: "Les frais varient selon la certification visée, généralement entre 50 000 et 100 000 FCFA. Ce montant est significativement inférieur au coût de la formation complète."
-                },
-                {
-                  q: "Quelle est la durée du processus ?",
-                  r: "Le processus complet prend généralement entre 6 et 12 semaines, selon la rapidité de constitution de votre dossier et la complexité de l'évaluation."
-                },
-                {
-                  q: "Que se passe-t-il si ma candidature est refusée ?",
-                  r: "Vous recevrez un rapport détaillé expliquant les raisons du refus. Vous pourrez alors suivre une formation complémentaire ciblée pour combler les lacunes identifiées."
-                },
-                {
-                  q: "La certification RAC a-t-elle la même valeur qu'une certification classique ?",
-                  r: "Oui, absolument. La certification obtenue via le RAC a exactement la même valeur et reconnaissance qu'une certification obtenue après la formation complète."
-                }
-              ].map((faq, index) => (
-                <Card key={index} className="p-6 border-2 border-gray-100 hover:border-orange-300 transition-all duration-300 group cursor-pointer hover:scale-102 animate-fade-in" style={{ animationDelay: `${index * 80}ms` }}>
+              {loadingRacFaqs && (
+                <Card className="p-6 border-2 border-gray-100 text-sm text-gray-500">
+                  Chargement des FAQ RAC...
+                </Card>
+              )}
+
+              {!loadingRacFaqs && racFaqError && (
+                <Card className="p-6 border-2 border-red-100 bg-red-50 text-sm text-red-700">
+                  Impossible de charger les FAQ RAC pour le moment.
+                </Card>
+              )}
+
+              {!loadingRacFaqs && !racFaqError && racFaqs.length === 0 && (
+                <Card className="p-6 border-2 border-gray-100 text-sm text-gray-600">
+                  Aucune FAQ de catégorie RAC n'est disponible pour le moment.
+                </Card>
+              )}
+
+              {!loadingRacFaqs && !racFaqError && racFaqs.map((faq, index) => (
+                <Card
+                  key={faq.id}
+                  className="p-6 border-2 border-gray-100 hover:border-orange-300 transition-all duration-300 group cursor-pointer hover:scale-102 animate-fade-in"
+                  style={{ animationDelay: `${index * 80}ms` }}
+                  onClick={() => void handleFaqView(faq.id)}
+                >
                   <h4 className="font-semibold text-gray-900 mb-3 flex items-start gap-3 group-hover:text-orange-600 transition-colors">
                     <CheckCircle2 className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300" />
-                    {faq.q}
+                    {faq.question}
                   </h4>
                   <p className="text-gray-600 pl-8 leading-relaxed">
-                    {faq.r}
+                    {faq.reponse}
                   </p>
                 </Card>
               ))}

@@ -4,20 +4,21 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CardImage, AvatarImage } from "@/components/ui/LazyImage";
+import { CardImage } from "@/components/ui/LazyImage";
 import {
   Clock,
-  Users,
   Award,
   ChevronRight,
   Star,
   Heart,
   Zap,
-  TrendingUp,
   Share2,
   Menu,
   LayoutGrid,
-  List
+  List,
+  Layers,
+  CalendarDays,
+  BookOpen,
 } from "lucide-react";
 import type { Parcours } from "@/types";
 
@@ -31,8 +32,20 @@ interface ParcoursCardOptimizedProps {
 }
 
 function getAverageRating(parcours: Parcours): number {
-  const formationCount = parcours.formations?.length || 1;
-  return (parcours.notesMoyenne || 0) / formationCount;
+  return parcours.notesMoyenne || 0;
+}
+
+function formatPrice(parcours: Parcours): string {
+  const price = parcours.prixMembre || parcours.prixPublic || 0;
+  if (parcours.gratuit || price <= 0) return "Gratuit";
+  return `${new Intl.NumberFormat("fr-FR").format(price)} FCFA`;
+}
+
+function formatUpdatedLabel(parcours: Parcours): string {
+  const sourceDate = parcours.datePublication || parcours.dateCreation;
+  const date = new Date(sourceDate);
+  if (Number.isNaN(date.getTime())) return "Mis à jour récemment";
+  return `Mis à jour ${date.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}`;
 }
 
 // ==================== GRID VIEW (DÉFAUT) ====================
@@ -86,13 +99,10 @@ function ParcoursCardGrid({
 
             {/* FLOATING BADGES (Top Left) */}
             <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
-              {/* Bestseller Badge */}
-              {(parcours.nbInscrits || 0) > 1000 && (
-                <Badge className="bg-cpu-orange/90 backdrop-blur-sm text-white border-0 shadow-lg hover:scale-110 transition-transform flex items-center gap-1">
-                  <Zap className="w-3 h-3" />
-                  Bestseller
-                </Badge>
-              )}
+              <Badge className="bg-white/90 backdrop-blur-sm text-slate-900 border-0 shadow-lg flex items-center gap-1">
+                <BookOpen className="w-3 h-3 text-cpu-orange" />
+                {parcours.formations?.length || 0} formation{(parcours.formations?.length || 0) > 1 ? "s" : ""}
+              </Badge>
 
               {/* Top Rated Badge */}
               {getAverageRating(parcours) >= 4.7 && (
@@ -134,6 +144,9 @@ function ParcoursCardGrid({
 
             {/* TITRE OVERLAY (Bottom of image) */}
             <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/60 backdrop-blur-sm">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-white/70 mb-1">
+                {parcours.sousTitre || "Parcours métier"}
+              </p>
               <h3 className="text-base font-bold text-white line-clamp-2 group-hover:translate-x-1 transition-transform">
                 {parcours.titre}
               </h3>
@@ -144,18 +157,23 @@ function ParcoursCardGrid({
           {/* SECTION 2: CONTENT (57% = 240px)           */}
           {/* ═════════════════════════════════════════════ */}
           <div className="flex-1 p-3 flex flex-col justify-between gap-2">
-            {/* INSTRUCTEUR & NIVEAU */}
-            <div className="flex items-start gap-2">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-slate-500 font-medium truncate">
-                  {parcours.instructeur?.nom || "Expert CPU"}
-                </p>
-                <div className="text-xs">
-                  <Badge className="bg-blue-100 text-blue-700 border-0 px-1.5 py-0 text-xs">
-                    {parcours.niveau}
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                <Badge className="bg-blue-100 text-blue-700 border-0 px-2 py-0.5 text-xs">
+                  {parcours.niveau}
+                </Badge>
+                <Badge className="bg-slate-100 text-slate-700 border-0 px-2 py-0.5 text-xs">
+                  {parcours.format}
+                </Badge>
+                {parcours.certifiant && (
+                  <Badge className="bg-amber-100 text-amber-700 border-0 px-2 py-0.5 text-xs">
+                    Certifiant
                   </Badge>
-                </div>
+                )}
               </div>
+              <p className="text-sm text-slate-600 line-clamp-2 min-h-[2.5rem]">
+                {parcours.description}
+              </p>
             </div>
 
             {/* RATING + NOMBRE D'AVIS */}
@@ -179,45 +197,36 @@ function ParcoursCardGrid({
             </div>
 
             {/* QUICK STATS */}
-            <div className="flex items-center gap-4 text-xs">
+            <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="flex items-center gap-1 text-slate-600">
                 <Clock className="w-3.5 h-3.5 text-cpu-orange flex-shrink-0" />
                 <span className="font-semibold">{parcours.dureeTotal}h</span>
               </div>
+              <div className="flex items-center gap-1 text-slate-600">
+                <Layers className="w-3.5 h-3.5 text-cpu-orange flex-shrink-0" />
+                <span className="font-semibold">{parcours.formations?.length || 0} modules</span>
+              </div>
             </div>
 
-            {/* BENEFITS (1 line) */}
-            <div className="flex items-center gap-1 text-xs text-slate-600 line-clamp-1">
-              {parcours.certifiant && (
-                <>
-                  <Award className="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" />
-                  <span>Certificat</span>
-                  <span>·</span>
-                </>
-              )}
-              <Badge className="bg-blue-50 text-blue-700 border-0 px-1 py-0 text-xs inline">
-                {parcours.format || "Hybride"}
-              </Badge>
+            <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
+              {parcours.competences.slice(0, 3).map((competence) => (
+                <Badge key={competence} className="bg-slate-100 text-slate-700 border-0 px-2 py-0.5 text-[11px]">
+                  {competence}
+                </Badge>
+              ))}
             </div>
 
-            {/* PRIX + MOMENTUM */}
+            {/* PRIX + DATE */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex-1">
-                {parcours.gratuit ? (
-                  <div className="text-base font-bold text-cpu-green">
-                    Gratuit
-                  </div>
-                ) : (
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-lg font-bold text-cpu-orange">
-                      {parcours.prixMembre?.toLocaleString() || "N/A"}
-                    </span>
-                    <span className="text-xs text-slate-500">FCFA</span>
-                  </div>
-                )}
+                <div className={`text-base font-bold ${parcours.gratuit ? "text-cpu-green" : "text-cpu-orange"}`}>
+                  {formatPrice(parcours)}
+                </div>
               </div>
-
-
+              <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                <CalendarDays className="w-3 h-3" />
+                {formatUpdatedLabel(parcours)}
+              </div>
             </div>
 
             {/* CTA BUTTONS */}
@@ -295,7 +304,7 @@ function ParcoursCardList({
               {parcours.titre}
             </h3>
             <p className="text-xs text-slate-600 mb-2">
-              {parcours.instructeur?.nom || "Expert CPU"} · {parcours.niveau}
+              {parcours.niveau} · {parcours.format} · {parcours.formations?.length || 0} formation{(parcours.formations?.length || 0) > 1 ? "s" : ""}
             </p>
             <div className="flex items-center gap-3 text-xs text-slate-600 mb-2">
               <div className="flex items-center gap-1">
@@ -307,7 +316,8 @@ function ParcoursCardList({
               </div>
               <span>·</span>
               <span className="font-semibold">{parcours.dureeTotal}h</span>
-
+              <span>·</span>
+              <span className="font-semibold">{parcours.certifiant ? "Certifiant" : "Professionnalisant"}</span>
             </div>
           </div>
 
@@ -318,7 +328,7 @@ function ParcoursCardList({
                 <div className="text-base font-bold text-cpu-green">Gratuit</div>
               ) : (
                 <div className="text-lg font-bold text-cpu-orange">
-                  {parcours.prixMembre?.toLocaleString() || "N/A"} FCFA
+                  {formatPrice(parcours)}
                 </div>
               )}
             </div>
@@ -397,6 +407,7 @@ function ParcoursCardCompact({
               <span className="font-semibold">
                 {(parcours.notesMoyenne || 0).toFixed(1)} pts
               </span>
+              <span>{parcours.formations?.length || 0} form.</span>
               <span>{parcours.dureeTotal}h</span>
               <span>{parcours.niveau}</span>
             </div>

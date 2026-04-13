@@ -84,7 +84,8 @@ export default function ParcoursPage() {
 
   const parcoursMetrics = useMemo(() => {
     const totalParcours = parcoursAvecFormations.length;
-    const totalInscrits = parcoursAvecFormations.reduce((sum, parcours) => sum + (parcours.nbInscrits || 0), 0);
+    const totalFormations = parcoursAvecFormations.reduce((sum, parcours) => sum + (parcours.formations?.length || 0), 0);
+    const totalHours = parcoursAvecFormations.reduce((sum, parcours) => sum + (parcours.dureeTotal || 0), 0);
     const averageRating = totalParcours
       ? parcoursAvecFormations.reduce((sum, parcours) => sum + (parcours.notesMoyenne || 0), 0) / totalParcours
       : 0;
@@ -94,7 +95,8 @@ export default function ParcoursPage() {
 
     return {
       totalParcours,
-      totalInscrits,
+      totalFormations,
+      totalHours,
       averageRating: Number(averageRating.toFixed(1)),
       certifiantRate,
     };
@@ -110,7 +112,7 @@ export default function ParcoursPage() {
           icon: "+",
           number: String(parcoursMetrics.totalParcours || 0),
           text: "Parcours disponibles",
-          subtext: "Construits à partir des formations publiées",
+          subtext: "Récupérés depuis l'API parcours métiers",
         },
         trustBadges: [
           {
@@ -122,14 +124,14 @@ export default function ParcoursPage() {
           {
             icon: "users" as const,
             color: "orange",
-            title: `${parcoursMetrics.totalInscrits.toLocaleString()}+ inscrits`,
-            subtitle: "Apprenants actifs",
+            title: `${parcoursMetrics.totalFormations} formations liées`,
+            subtitle: "Assemblées en parcours métiers",
           },
           {
             icon: "check" as const,
             color: "blue",
-            title: `${parcoursMetrics.averageRating.toFixed(1)} score cumulé`,
-            subtitle: "Évaluation totale des parcours",
+            title: `${parcoursMetrics.totalHours}h de contenu`,
+            subtitle: "Durée totale du catalogue parcours",
           },
         ],
         buttons: [
@@ -191,7 +193,7 @@ export default function ParcoursPage() {
       filtrePrix === "gratuit" ? parcours.gratuit :
       !parcours.gratuit;
     const matchCertifiant = !filtreCertifiant || parcours.certifiant;
-    const matchBestseller = !filtreBestseller || (parcours.nbInscrits || 0) >= 1000;
+    const matchBestseller = !filtreBestseller || (parcours.notesMoyenne || 0) >= 4.5;
     return matchNiveau && matchSearch && matchFormat && matchDuree && matchPrix && matchCertifiant && matchBestseller;
   });
   
@@ -199,7 +201,7 @@ export default function ParcoursPage() {
   const parcoursTries = [...parcoursFiltres].sort((a, b) => {
     switch(triPar) {
       case "populaire":
-        return (b.nbInscrits || 0) - (a.nbInscrits || 0);
+        return (b.formations?.length || 0) - (a.formations?.length || 0);
       case "note":
         return (b.notesMoyenne || 0) - (a.notesMoyenne || 0);
       case "duree-asc":
@@ -241,8 +243,7 @@ export default function ParcoursPage() {
   };
 
   const handleInscription = (parcoursId: string) => {
-    console.log(`Inscription au parcours ${parcoursId}`);
-    // TODO: Rediriger vers la page d'inscription
+    window.location.href = `/parcours/${parcoursId}`;
   };
 
   const resetFilters = () => {
@@ -289,9 +290,9 @@ export default function ParcoursPage() {
                 Transformez votre carrière
               </h2>
               <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                Des <span className="text-cpu-orange font-semibold">parcours complets</span> conçus pour vous faire progresser rapidement. 
+                Des <span className="text-cpu-orange font-semibold">parcours métiers API-driven</span> conçus pour structurer une vraie montée en compétence. 
                 <br className="hidden md:block" />
-                De débutant à expert, trouvez votre voie.
+                Chaque parcours regroupe les formations réellement associées par le backend.
               </p>
             </div>
 
@@ -604,8 +605,8 @@ export default function ParcoursPage() {
                           {
                             value: filtreBestseller,
                             setter: setFiltreBestseller,
-                            label: "Bestseller",
-                            sub: "1 000+ inscrits",
+                            label: "Parcours étoilés",
+                            sub: "Notes fortes sur les formations associées",
                             Icon: Flame,
                             activeColor: "bg-yellow-500",
                           },
@@ -865,7 +866,7 @@ export default function ParcoursPage() {
                 Prêt à démarrer votre parcours ?
               </h2>
               <p className="text-xl mb-10 text-slate-300 max-w-2xl mx-auto leading-relaxed">
-                Rejoignez des <span className="text-cpu-orange font-semibold">{parcoursMetrics.totalInscrits.toLocaleString()}</span> apprenants qui transforment leur carrière avec CPU Formation
+                Explorez <span className="text-cpu-orange font-semibold">{parcoursMetrics.totalParcours}</span> parcours métiers et <span className="text-cpu-orange font-semibold">{parcoursMetrics.totalFormations}</span> formations structurées pour accélérer votre progression.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">

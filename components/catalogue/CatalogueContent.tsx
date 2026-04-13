@@ -20,6 +20,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useFormations } from "@/hooks/useFormations";
 import type { Formation } from "@/types";
 import { mapApiFormationToAppFormation } from "@/lib/adapters/formation-adapter";
+import { SHOW_A_SON_RYTHME, isASonRythmeFormation } from "@/lib/formation-visibility";
 
 type ViewMode = "grid" | "list" | "compact";
 type SortOption = "recent" | "popular" | "title" | "price";
@@ -27,7 +28,9 @@ type SortOption = "recent" | "popular" | "title" | "price";
 const ITEMS_PER_PAGE = 12; // 3 colonnes × 4 lignes en desktop
 const DEFAULT_SECTEURS = ["Secteur Primaire", "Secteur Secondaire", "Secteur Tertiaire", "Secteur Quaternaire"];
 const DEFAULT_NIVEAUX = ["Débutant", "Intermédiaire", "Avancé"] as const;
-const DEFAULT_FORMATS = ["Vidéo", "Live", "Présentiel", "Hybride"] as const;
+const DEFAULT_FORMATS = SHOW_A_SON_RYTHME
+  ? (["Vidéo", "Live", "Présentiel", "Hybride"] as const)
+  : (["Live", "Présentiel", "Hybride"] as const);
 
 // Config de la barre de navigation Format
 const FORMAT_TABS = [
@@ -64,17 +67,19 @@ const FORMAT_TABS = [
     hoverBg: "hover:bg-emerald-50",
     description: "En salle, dans un centre de formation",
   },
-  {
-    value: "Vidéo",
-    label: "À son rythme",
-    shortLabel: "À son rythme",
-    icon: Monitor,
-    color: "text-violet-600",
-    activeBg: "bg-gradient-to-r from-violet-500 to-indigo-500",
-    activeText: "text-white",
-    hoverBg: "hover:bg-violet-50",
-    description: "Apprenez quand vous voulez, où vous voulez",
-  },
+  ...(SHOW_A_SON_RYTHME
+    ? [{
+        value: "Vidéo",
+        label: "À son rythme",
+        shortLabel: "À son rythme",
+        icon: Monitor,
+        color: "text-violet-600",
+        activeBg: "bg-gradient-to-r from-violet-500 to-indigo-500",
+        activeText: "text-white",
+        hoverBg: "hover:bg-violet-50",
+        description: "Apprenez quand vous voulez, où vous voulez",
+      }]
+    : []),
 ] as const;
 
 type CatalogueFormation = Formation;
@@ -142,16 +147,21 @@ export function CatalogueContent({ lockedModalite, lockedModaliteLabel, hideBann
   );
 
   const baseFormations = useMemo(() => {
+    const applyVisibilityRules = (items: CatalogueFormation[]) =>
+      SHOW_A_SON_RYTHME
+        ? items
+        : items.filter((formation) => !isASonRythmeFormation(formation.format, formation.modalite));
+
     if (apiFormationsNormalized.length > 0) {
-      return apiFormationsNormalized;
+      return applyVisibilityRules(apiFormationsNormalized);
     }
 
     // Fallback pour eviter une UI vide si l'API est temporairement indisponible.
     if (!apiLoading && apiError) {
-      return formationsMock as CatalogueFormation[];
+      return applyVisibilityRules(formationsMock as CatalogueFormation[]);
     }
 
-    return apiFormationsNormalized;
+    return applyVisibilityRules(apiFormationsNormalized);
   }, [apiFormationsNormalized, apiLoading, apiError]);
 
   const objectifOptions = useMemo(() => {

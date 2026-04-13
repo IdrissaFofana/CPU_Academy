@@ -7,6 +7,7 @@ import { useFormations } from "@/hooks/useFormations";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getModeFallbackImage } from "@/lib/utils";
+import { SHOW_A_SON_RYTHME, isASonRythmeFormation } from "@/lib/formation-visibility";
 import {
   ArrowRight,
   BookOpen,
@@ -195,8 +196,14 @@ function FormationCard({ formation }: { formation: ApiFormation }) {
 export function HomeFormationsSection() {
   const { formations, isLoading, error } = useFormations({ limit: 200 });
 
-  // Show first 8 formations
-  const featured = (formations as unknown as ApiFormation[]).slice(0, 8);
+  const visibleFormations = SHOW_A_SON_RYTHME
+    ? (formations as unknown as ApiFormation[])
+    : (formations as unknown as ApiFormation[]).filter(
+        (formation) => !isASonRythmeFormation(formation.mode, formation.mode)
+      );
+
+  // Show first 8 visible formations
+  const featured = visibleFormations.slice(0, 8);
 
   return (
     <section className="py-16 md:py-24 bg-white">
@@ -264,9 +271,9 @@ export function HomeFormationsSection() {
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </Button>
-            {formations.length > 8 && (
+            {visibleFormations.length > 8 && (
               <p className="text-sm text-slate-400 mt-3">
-                {formations.length - 8} autres formations disponibles dans le catalogue
+                {visibleFormations.length - 8} autres formations disponibles dans le catalogue
               </p>
             )}
           </div>

@@ -30,3 +30,5 @@ export { participantService } from './participant.service';
 export { centreFormationService } from './centreFormation.service';
 export { sessionService } from './session.service';
 export { parcoursService } from '@/lib/api/services/parcours.service';
+export { certificationService } from './certification.service';
+export { racService } from './rac.service';

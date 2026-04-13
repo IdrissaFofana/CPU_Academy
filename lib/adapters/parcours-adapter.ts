@@ -1,4 +1,5 @@
 import { mapApiFormationToAppFormation } from "@/lib/adapters/formation-adapter";
+import { getParcoursFallbackImage } from "@/lib/utils";
 import type { Formation, Parcours } from "@/types";
 
 type RawParcours = {
@@ -7,6 +8,7 @@ type RawParcours = {
   description?: string;
   formations?: any[];
   created_at?: unknown;
+  updated_at?: unknown;
 };
 
 const PARCOURS_COLORS = [
@@ -66,6 +68,47 @@ function toIsoDate(value: unknown): string {
   return new Date().toISOString();
 }
 
+function slugify(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getParcoursTheme(label: string, index: number) {
+  const normalized = label
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+  if (/(finance|banc|compta|gestion)/.test(normalized)) {
+    return { color: "emerald", gradient: "from-emerald-500 to-teal-600" };
+  }
+  if (/(market|vente|commerce|client)/.test(normalized)) {
+    return { color: "blue", gradient: "from-sky-500 to-blue-700" };
+  }
+  if (/(tech|cloud|reseau|digital|data|infra)/.test(normalized)) {
+    return { color: "indigo", gradient: "from-indigo-500 to-blue-800" };
+  }
+  if (/(management|lead|rh|equipe)/.test(normalized)) {
+    return { color: "violet", gradient: "from-violet-500 to-purple-700" };
+  }
+  if (/(beaute|cosmetique|mode|service)/.test(normalized)) {
+    return { color: "amber", gradient: "from-amber-400 to-yellow-600" };
+  }
+
+  return PARCOURS_COLORS[index % PARCOURS_COLORS.length];
+}
+
+function computeAverageRating(formations: Formation[]): number {
+  const rated = formations.filter((item) => (item.notesMoyenne || 0) > 0);
+  if (rated.length === 0) return 0;
+  const total = rated.reduce((sum, item) => sum + (item.notesMoyenne || 0), 0);
+  return Number((total / rated.length).toFixed(1));
+}
+
 function getDominantFormat(formations: Formation[]): string {
   const scores = formations.reduce<Record<string, number>>((acc, formation) => {
     const key = formation.format || "Hybride";
@@ -90,12 +133,17 @@ export function buildParcoursFromApi(rawParcoursList: any[]): Parcours[] {
   return normalizeArray(rawParcoursList).map((rawItem, index) => {
     const rawParcours = (rawItem || {}) as RawParcours;
     const related = getRelatedFormations(rawParcours);
-    const colorTheme = PARCOURS_COLORS[index % PARCOURS_COLORS.length];
+    const colorTheme = getParcoursTheme(rawParcours.nom || `Parcours ${index + 1}`, index);
     const totalDuree = related.reduce((sum, item) => sum + (item.duree || 0), 0);
     const totalInscrits = related.reduce((sum, item) => sum + (item.nbInscrits || 0), 0);
-    const totalEvaluation = related.reduce((sum, item) => sum + (item.notesMoyenne || 0), 0);
     const totalPrixPublic = related.reduce((sum, item) => sum + toNumber(item.prixPublic), 0);
     const totalPrixMembre = related.reduce((sum, item) => sum + toNumber(item.prixMembre), 0);
+    const averageRating = computeAverageRating(related);
+    const cheapestPrice = related.reduce((min, item) => {
+      const price = toNumber(item.prixMembre || item.prixPublic);
+      if (price <= 0) return min;
+      return min === 0 ? price : Math.min(min, price);
+    }, 0);
 
     const competences = Array.from(
       new Set(related.flatMap((item) => (Array.isArray(item.competences) ? item.competences : [])))
@@ -111,15 +159,15 @@ export function buildParcoursFromApi(rawParcoursList: any[]): Parcours[] {
     const parcours: Parcours = {
       id: rawParcours.id || `parcours-${index}`,
       titre: rawParcours.nom || `Parcours ${index + 1}`,
-      slug: rawParcours.id || `parcours-${index}`,
-      sousTitre: "Parcours métier",
-      description: rawParcours.description || "Parcours professionnel dynamique",
-      image: related.find((item) => Boolean(item.image))?.image || "/images/default-formation.jpg",
+      slug: rawParcours.id || slugify(rawParcours.nom || `parcours-${index}`),
+      sousTitre: `${related.length} formation${related.length > 1 ? "s" : ""} intégrée${related.length > 1 ? "s" : ""}`,
+      description: rawParcours.description || "Parcours métier structuré à partir des formations associées.",
+      image: getParcoursFallbackImage(rawParcours.nom),
       icon: "target",
       color: colorTheme.color,
       gradient: colorTheme.gradient,
       objectifs: Array.from(new Set(related.flatMap((item) => item.objectifs || []))).slice(0, 6),
-      publicCible: "Entrepreneurs, salariés et professionnels en évolution",
+      publicCible: "Professionnels, entrepreneurs et équipes en montée en compétence",
       competences: competences.length > 0 ? competences : ["Compétences métier", "Application pratique"],
       dureeTotal: Math.max(1, totalDuree),
       format: getDominantFormat(related) as Parcours["format"],
@@ -129,16 +177,16 @@ export function buildParcoursFromApi(rawParcoursList: any[]): Parcours[] {
       certifiant: related.some((item) => item.certifiant),
       gratuit: related.every((item) => item.gratuit),
       prixPublic: totalPrixPublic,
-      prixMembre: totalPrixMembre,
+      prixMembre: totalPrixMembre || cheapestPrice,
       nbInscrits: totalInscrits,
-      notesMoyenne: Number(totalEvaluation.toFixed(1)),
+      notesMoyenne: averageRating,
       tauxCompletion: undefined,
       statut: "publié",
       dateCreation: toIsoDate(rawParcours.created_at),
-      datePublication: undefined,
-      nbAvis: Math.max(related.length * 4, Math.round(totalInscrits / 5)),
-      nbInscritsMonth: Math.round(totalInscrits * 0.07),
-      nbInscritsWeek: Math.round(totalInscrits * 0.015),
+      datePublication: rawParcours.updated_at ? toIsoDate(rawParcours.updated_at) : undefined,
+      nbAvis: Math.max(related.filter((item) => (item.notesMoyenne || 0) > 0).length * 4, Math.round(totalInscrits / 5)),
+      nbInscritsMonth: undefined,
+      nbInscritsWeek: undefined,
       instructeur: related[0]?.expert
         ? {
             nom: `${related[0].expert.prenom} ${related[0].expert.nom}`,
@@ -160,11 +208,10 @@ export function buildParcoursDetailsFromApi(rawParcoursList: any[], parcoursId: 
   if (!rawParcours) return null;
 
   const related = getRelatedFormations(rawParcours);
-  if (related.length === 0) return null;
 
   const totalDuree = related.reduce((sum, item) => sum + (item.duree || 0), 0);
   const totalInscrits = related.reduce((sum, item) => sum + (item.nbInscrits || 0), 0);
-  const totalEvaluation = related.reduce((sum, item) => sum + (item.notesMoyenne || 0), 0);
+  const averageRating = computeAverageRating(related);
 
   const competences = Array.from(new Set(related.flatMap((item) => item.competences || []))).slice(0, 12);
   const objectifs = Array.from(new Set(related.flatMap((item) => item.objectifs || []))).slice(0, 8);
@@ -185,14 +232,14 @@ export function buildParcoursDetailsFromApi(rawParcoursList: any[], parcoursId: 
   return {
     id: rawParcours.id || parcoursId,
     titre: rawParcours.nom || "Parcours",
-    description: rawParcours.description || "Parcours professionnel dynamique",
-    image: related.find((item) => Boolean(item.image))?.image || "/images/default-formation.jpg",
+    description: rawParcours.description || "Parcours métier structuré à partir des formations associées.",
+    image: getParcoursFallbackImage(rawParcours.nom),
     bestseller: totalInscrits >= 1000,
     niveau: getDominantNiveau(related),
     format: getDominantFormat(related),
     dureeTotal: Math.max(1, totalDuree),
     nbInscrits: totalInscrits,
-    notesMoyenne: Number(totalEvaluation.toFixed(1)),
+    notesMoyenne: averageRating,
     nbAvis: Math.max(related.length * 6, Math.round(totalInscrits / 4)),
     certifiant: related.some((item) => item.certifiant),
     prix: computedPrix,
